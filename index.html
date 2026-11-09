@@ -1658,151 +1658,175 @@ const Z=p=>typeof LANG!="undefined"&&LANG=="en"?p[1]:p[0];
 /* 卡片資料：id、類別、優先度 p、條件 r(ctx)、解鎖提示 hint、徽章 bd(color,symbol)、tag、head、body、punch、sub、cta */
 const OR="#ff8a3d",YE="#ffcf4a",RD="#ff7a7a",GR="#4cc27c";
 const CARDS=[
-{id:"job13",cat:"end",p:3,r:c=>c.k=="quit"&&c.days>=1,hint:["做了至少一天後選擇離職","Quit after working at least one day"],bd:["#3a82d6","→"],
+{id:"job13",ic:"🏃",orb:["📋","📷","🍱","🧯","🎤","🗣️"],cat:"end",p:4,r:c=>c.k=="quit"&&c.days>=1,hint:["做了至少一天後選擇離職","Quit after working at least one day"],bd:["#3a82d6","→"],
  tag:["🚪 結局：提前離職","🚪 Ending: Quit early"],head:["你離職後，公司開了 16 個缺","After you quit, they posted 16 jobs"],
  body:{t:"ad",ti:["📢 急徵（原本工安一人包辦）","📢 Hiring (all done by one safety officer)"],it:[["工安管理員","Safety officer"],["環保專責","Environmental officer"],["防火管理人","Fire manager"],["急救人員","First aider"],["廢棄物聯絡","Waste contact"],["承攬商窗口","Contractor liaison"],["教育訓練講師","Trainer"],["勞檢陪同","Inspection escort"],["施工攝影師","Site photographer"],["會議紀錄","Minute taker"],["尾牙主持人","Party MC"],["拜拜擲筊員","Ritual assistant"],["外籍移工翻譯","Migrant worker interpreter"],["便當訂購窗口","Lunch order desk"],["鄰居陳情接待","Neighbour complaints desk"],["背鍋專員","Scapegoat"]]},
  punch:["待遇：都比你原本的高","Pay: all higher than yours"],cta:["你的公司要開幾個缺？","How many jobs would your company post?"]},
-{id:"bento",cat:"end",p:3,r:c=>c.k=="gold",hint:["拿到金安獎","Win the Golden Safety award"],bd:["#d9a400","★"],
+{id:"quit_d0",cat:"end",p:5,ic:"🫣",r:c=>c.k=="quit"&&c.days==0,hint:["第一天還沒做完就離職","Quit before the first day is over"],bd:["#f472b6","🏃"],
+ tag:["🚪 結局：第一天離職","🚪 Ending: quit on day one"],head:["上工第一天的行程","My first day on the job"],
+ body:{t:"kv",lc:YE,left:1,rows:[[["08:00","08:00"],["被要求簽 12 張表","Asked to sign 12 forms"]],[["09:00","09:00"],["被叫去拍照","Called to take photos"]],[["10:00","10:00"],["發現電箱沒有漏電斷路器","Panel has no leakage breaker"]],[["11:00","11:00"],["被說「你很煩」","Told \"you're annoying\""]],[["11:30","11:30"],["遞出辭呈","Handed in my notice"],RD]]},
+ punch:["撐不到便當來","Didn't make it to lunch"],cta:["你撐得過第一天嗎？","Could you survive day one?"]},
+{id:"quit_short",cat:"end",p:5,ic:"⏱️",r:c=>c.k=="quit"&&c.days==0,hint:["第一天就離職","Quit on day one"],bd:["#f472b6","⏱"],
+ tag:["🚪 結局：第一天離職","🚪 Ending: quit on day one"],head:["本工地最短任期紀錄","Shortest tenure on record"],
+ body:{t:"huge",l:[["3 小時","3 hours"]]},
+ punch:["比便當保溫還短","Shorter than lunch stays warm"],sub:["新紀錄！前任紀錄保持人：撐到午休。","New record! The last holder made it to lunch break."],cta:["你能刷新紀錄嗎？","Can you beat the record?"]},
+{id:"quit_acc",cat:"end",p:5,ic:"😞",r:c=>c.k=="quit"&&c.acc>=1,hint:["出過重大職災後選擇離職","Quit after a major accident"],bd:["#6b4a2f","✉"],
+ tag:["🚪 結局：帶傷離場","🚪 Ending: left after the accident"],head:["出事之後的辭職信","The resignation, after the accident"],
+ body:{t:"form",ti:["離職申請單","Resignation Form"],rows:[[["離職原因","Reason"],["累了","Exhausted"]],[["交接事項","Handover"],["事故調查報告（寫到一半）","Accident report (half done)"]],[["主管意見","Manager"],["「報告寫完再走」","\"Finish the report first\""]],[["同事留言","Coworkers"],["「不是你的錯」","\"It wasn't your fault\""]]],stamp:["保重","Take care"]},
+ punch:["人可以走，教訓要留下","You can leave; the lesson stays"],cta:["出事之後，你會留下來嗎？","After an accident, would you stay?"]},
+{id:"quit_clean",cat:"end",p:5,ic:"😎",r:c=>c.k=="quit"&&c.acc==0&&c.arch=="qs",hint:["安全顧得很好，卻選擇離職","Keep safety tight, then quit anyway"],bd:["#2e9e5b","✓"],
+ tag:["🚪 結局：瀟灑離職","🚪 Ending: walked away clean"],head:["離職交接清單","Handover checklist"],
+ body:{t:"kv",box:1,vc:"#1e7b45",rows:[[["🛡️ 安全紀錄","🛡️ Safety record"],["零事故","Zero accidents"]],[["📋 自動檢查表","📋 Checklists"],["全部簽好","All signed"]],[["🗝️ 電箱鑰匙","🗝️ Panel keys"],["放在桌上","On the desk"]],[["👤 接手的人","👤 Replacement"],["還沒找到","Not found yet"],RD]]},
+ punch:["紀錄很乾淨，位子空著","Clean record, empty seat"],cta:["你走了，誰來接？","If you left, who'd take over?"]},
+{id:"quit_walk",cat:"end",p:5,ic:"🚶",r:c=>c.k=="quit"&&c.acc==0&&c.days>=1&&c.arch!="qs",hint:["做了幾天後說走就走","Work a few days, then just walk"],bd:["#3a82d6","→"],
+ tag:["🚪 結局：說走就走","🚪 Ending: just walked off"],head:["隔天早上的工地群組","Site group chat, next morning"],
+ body:{t:"chat",m:[[["主任","Manager"],["小陳人呢？","Where's Chen?"],0],[["監工","Foreman"],["他說工安不幹了","He says he's done with safety"],0],[["主任","Manager"],["那今天的勞檢誰陪？","Then who escorts today's inspector?"],0],[["全體","Everyone"],["……","…"],1]]},
+ punch:["說走就走，工地還在","You walked; the site's still here"],cta:["你走了，工地會怎樣？","What happens to the site if you leave?"]},
+{id:"quit_why",cat:"end",p:4,ic:"🙃",r:c=>c.k=="quit"&&c.days>=1,hint:["做了至少一天後離職","Quit after at least one day"],bd:["#8a7a5c","?"],
+ tag:["🚪 結局：提前離職","🚪 Ending: quit early"],head:["離職面談","Exit interview"],
+ body:{t:"vs",a:[["🏢 公司以為","🏢 The company thinks"],["「薪水太低吧」","\"The pay, probably\""],"#5b6572"],b:[["🦺 實際上","🦺 Actually"],["什麼都要管，什麼都不能停","In charge of all, allowed to stop nothing"],"#c23030"]},
+ punch:["留不住工安，就留不住安全","Lose the officer, lose the safety"],cta:["你為什麼想離職？","Why would you quit?"]},
+{id:"bento",ic:"🍱",cat:"end",p:3,r:c=>c.k=="gold",hint:["拿到金安獎","Win the Golden Safety award"],bd:["#d9a400","★"],
  tag:["🏆 結局：金安獎","🏆 Ending: Golden Safety"],head:["今日最大工安事件","Today's biggest safety incident"],
  body:{t:"huge",l:[["便當晚到","Lunch boxes"],["20 分鐘","20 min late"]]},
  punch:null,sub:["零事故的一天，沒人記得你做了什麼。這就是你做對了的證明。","A zero-accident day: nobody remembers what you did. That's proof you got it right."],cta:["你能撐到便當最大條嗎？","Can you make lunch the biggest problem?"]},
-{id:"kpi",cat:"end",p:3,r:c=>c.k=="win",hint:["完工（非金安獎）","Finish the project (without gold)"],bd:["#2e9e5b","✓"],
+{id:"kpi",ic:"🥲",cat:"end",p:3,r:c=>c.k=="win",hint:["完工（非金安獎）","Finish the project (without gold)"],bd:["#2e9e5b","✓"],
  tag:["✅ 結局：完工","✅ Ending: Finished"],head:["今日工安 KPI","Today's safety KPIs"],
  body:{t:"kv",rows:[[["被說「你很煩」","Told \"you're annoying\""],["3 次","3 times"]],[["被叫去拍照","Called to take photos"],["5 次","5 times"]],[["勞檢前補簽名","Signatures backfilled before inspection"],["12 張","12 sheets"]],[["聽到「應該沒問題」","Heard \"should be fine\""],["7 次","7 times"]]]},
  punch:["把人平安帶回家：全部","Everyone home safe: all of them"],cta:["你的 KPI 會長怎樣？","What would your KPIs look like?"]},
-{id:"namecard",cat:"gen",p:1,r:c=>!c.insp,hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","i"],
+{id:"namecard",ic:"🪪",orb:["🪖","📋","📷","🩹","🍱","🧧"],cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit",hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","i"],
  head:["名片寫一行，工作做一頁","One line on the card, a page of work"],
  body:{t:"name",f:[["工安小陳","Officer Chen"],["職業安全衛生管理員","Occupational Safety Officer"],["民間建案工務所","Site office"]],b:[["工安・環保・消防・總務","Safety, environment, fire, admin"],["承攬商保母・勞檢接待","Contractor babysitter, inspector host"],["施工攝影師・急救兼司機","Photographer, first aider, driver"],["尾牙主持・拜拜擲筊","Party MC, ritual assistant"],["移工翻譯・便當訂購・陳情接待","Interpreter, lunch orders, complaints"]]},
  punch:["出事時：第一個被問","When things go wrong: asked first"],cta:["你的名片背面寫了什麼？","What's on the back of your card?"]},
-{id:"sixview",cat:"gen",p:1,r:c=>!c.insp,hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","?"],
+{id:"sixview",ic:"👷",orb:["🪖","📋","🩺","📷","🧯","✍️"],cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit",hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","?"],
  head:["別人眼中的工安","The safety officer, as others see it"],
  body:{t:"grid",cols:3,hl:5,c:[["🐢",["老闆以為","The boss thinks"],["拖進度的","Slows things down"]],["👮",["工人以為","Workers think"],["來開罰單的","Here to fine us"]],["❄️",["家人以為","Family thinks"],["坐辦公室吹冷氣","Sits in the A/C"]],["📋",["勞檢以為","Inspectors think"],["都沒在做","Does nothing"]],["🦸",["自己以為","I think"],["救大家的英雄","The hero"]],["✍️",["實際上","Actually"],["在補簽名","Backfilling signatures"]]]},
  punch:["一人分飾六角，薪水領一份","Six roles, one salary"],cta:["你在別人眼中是哪一種？","Which one are you to others?"]},
-{id:"sameq",cat:"gen",p:2,r:c=>!c.insp&&(c.acc>=1||c.k=="fail"),p0:1,hint:["出過事故、或專案失敗","Have an accident or fail the project"],bd:["#d64545","!"],
+{id:"sameq",ic:"🤨",cat:"gen",p:2,r:c=>!c.insp&&c.k!="quit"&&(c.acc>=1||c.k=="fail"),p0:1,hint:["出過事故、或專案失敗","Have an accident or fail the project"],bd:["#d64545","!"],
  head:["工安被問最多的一句話","The question safety hears most"],
  body:{t:"vs",a:[["😌 沒出事時","😌 When all is fine"],["「你們工安到底在忙什麼？」","\"What does safety even do all day?\""],"#2e9e5b"],b:[["🚨 出事時","🚨 After an accident"],["「你們工安到底在忙什麼？」","\"What does safety even do all day?\""],"#c23030"]},
  punch:["同一句話，兩種語氣","Same words, two tones"],cta:["你被問過幾次？","How many times have you been asked?"]},
-{id:"ceiling",cat:"gen",p:1,r:c=>!c.insp&&c.days>=3,hint:["撐過 3 天以上","Last at least 3 days"],bd:["#3a82d6","↕"],
+{id:"ceiling",ic:"🙃",cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit"&&c.days>=3,hint:["撐過 3 天以上","Last at least 3 days"],bd:["#3a82d6","↕"],
  head:["工安的管轄範圍","What safety is in charge of"],
  body:{t:"kv",box:1,rows:[[["🏠 天花板","🏠 Ceiling"],["管","Yes"]],[["🧱 牆壁・管線・電箱","🧱 Walls, pipes, panels"],["管","Yes"]],[["👷 人・車・吊車・便當","👷 People, trucks, cranes, lunch"],["管","Yes"]],[["🪵 地板","🪵 Floor"],["管","Yes"]],[["🕳️ 地板下面的管溝","🕳️ The trench under the floor"],["也管","Also yes"]]]},
  punch:["從天花板管到地板","From the ceiling to the floor"],sub:["唯一管不到的：自己的下班時間","The one thing out of reach: clocking out"],cta:["你管得過來嗎？","Can you cover it all?"]},
-{id:"inspfast",cat:"end",p:2,r:c=>!c.insp&&(c.st=="l1"||c.arch=="lucky"),hint:["靠運氣過關，或因職災停工","Get by on luck, or get shut down by accidents"],bd:["#e8721a","⏱"],
+{id:"inspfast",ic:"🫡",cat:"end",p:2,r:c=>!c.insp&&(c.st=="l1"||c.arch=="lucky"),hint:["靠運氣過關，或因職災停工","Get by on luck, or get shut down by accidents"],bd:["#e8721a","⏱"],
  head:["工地最快的反應速度","The fastest reaction on site"],
  body:{t:"kv",lc:YE,rows:[[["0.0 秒","0.0 s"],["有人喊「勞檢來了」","Someone shouts \"Inspector!\""]],[["0.5 秒","0.5 s"],["全工地安全帽戴好","Every hard hat goes on"]],[["1.0 秒","1.0 s"],["安全帶突然都扣上了","Harnesses suddenly clipped in"]],[["1.5 秒","1.5 s"],["護欄自己長回來","Guardrails grow back"]],[["2.0 秒","2.0 s"],["工安小陳：「平常呢？」","Officer Chen: \"And normally?\""]]],left:1},
  punch:["安全不是做給勞檢看的","Safety isn't a show for inspectors"],cta:["你的工地平常長怎樣？","What's your site like on a normal day?"]},
-{id:"breath",cat:"gen",p:1,r:c=>c.arch=="competent"||c.insp&&c.ratio>=.6&&c.ratio<.85,p1:2,hint:["當個稱職的工安，或巡檢拿中等分數","Be a competent officer, or score mid-range in Hazard Hunt"],bd:["#2e9e5b","✎"],
+{id:"breath",ic:"😮‍💨",cat:"gen",p:1,r:c=>c.arch=="competent"||c.insp&&c.ratio>=.6&&c.ratio<.85,p1:2,hint:["當個稱職的工安，或巡檢拿中等分數","Be a competent officer, or score mid-range in Hazard Hunt"],bd:["#2e9e5b","✎"],
  head:["本工地最新規定","New site rule"],
  body:{t:"form",ti:["呼吸作業許可單","Breathing Work Permit"],rows:[[["作業內容","Task"],["吸氣、吐氣（每分鐘約 15 次）","Inhale, exhale (about 15/min)"]],[["危害辨識","Hazards"],["缺氧、粉塵、被主任氣到","Low oxygen, dust, the manager"]],[["防護措施","Controls"],["口罩、深呼吸、不要回嘴","Mask, deep breaths, no talking back"]],[["許可時效","Valid"],["今日 08:00–17:00（加班另簽）","Today 08:00–17:00 (OT: new permit)"]],[["核准","Approved"],["工安小陳","Officer Chen"]]],stamp:["核准","OK"]},
  punch:["安全到連呼吸都要書面程序","So safe, even breathing needs a procedure"],cta:["你今天簽了幾張單？","How many forms did you sign today?"]},
-{id:"habit",cat:"gen",p:1,r:c=>!c.insp&&(c.k=="gold"||c.arch=="competent"||c.days>=2),hint:["稱職或拿金安獎的機會較高","More likely when competent or golden"],bd:["#3a82d6","👁"],
+{id:"habit",ic:"👀",cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit"&&(c.k=="gold"||c.arch=="competent"||c.days>=2),hint:["稱職或拿金安獎的機會較高","More likely when competent or golden"],bd:["#3a82d6","👁"],
  head:["工安的職業病","Safety officer's occupational disease"],
  body:{t:"list",l:[["進餐廳先找逃生門","Find the exits first at restaurants"],["看到別人的梯子，會先數有沒有站到頂","Check whether people stand on the top rung"],["出遊拍照，先看護欄夠不夠 90 公分","On trips, check if railings reach 90 cm"],["家裡的延長線，全被換成有開關的","Every power strip at home now has a switch"],["看到路人沒戴安全帽，手會癢","Itchy hands when passers-by skip helmets"]]},
  punch:["下班了，眼睛還在巡檢","Off duty, eyes still inspecting"],cta:["你中了幾項？","How many apply to you?"]},
-{id:"rank",cat:"end",p:3,r:c=>!c.insp&&(c.arch=="rushing"||c.arch=="frugal"||c.st=="l2"||c.st=="l3"),hint:["趕工、摳門，或因預算、工期失敗","Rush, penny-pinch, or fail on budget or time"],bd:["#e8721a","5"],
+{id:"rank",ic:"🤡",cat:"end",p:3,r:c=>!c.insp&&(c.arch=="rushing"||c.arch=="frugal"||c.st=="l2"||c.st=="l3"),hint:["趕工、摳門，或因預算、工期失敗","Rush, penny-pinch, or fail on budget or time"],bd:["#e8721a","5"],
  head:["工地標語：安全第一","Site slogan: Safety First"],
  body:{t:"kv",lc:YE,left:1,sub:["實際上的優先順序：","The real order:"],rows:[[["1","1"],["進度","Schedule"]],[["2","2"],["預算","Budget"]],[["3","3"],["業主心情","Owner's mood"]],[["4","4"],["勞檢什麼時候來","When inspectors come"]],[["5","5"],["安全","Safety"],RD]]},
  punch:["安全第一（寫在牆上的時候）","Safety first (when it's on the wall)"],cta:["你的工地把安全排第幾？","Where does your site rank safety?"]},
-{id:"acc_fire",cat:"acc",p:4,r:c=>c.hx.has("acc:fire")||c.hx.has("near:fire"),hint:["遇到一次火災事故或虛驚","Have a fire accident or near miss"],bd:["#e8721a","🔥"],
+{id:"acc_fire",ic:"🔥",cat:"acc",p:4,r:c=>c.hx.has("acc:fire")||c.hx.has("near:fire"),hint:["遇到一次火災事故或虛驚","Have a fire accident or near miss"],bd:["#e8721a","🔥"],
  tag:["🔥 事故：金爐引燃木料","🔥 Accident: burner ignites timber"],head:["今天的金紙，燒得特別旺","Today's joss paper burned extra bright"],
  body:{t:"kv",box:1,vc:"#c2410c",sub:["🧧 好兄弟今日收到：","🧧 The spirits received today:"],rows:[[["金紙","Joss paper"],["×1 疊","×1 stack"]],[["木料","Timber"],["×20 支","×20 pieces"]],[["模板","Formwork"],["×300 片","×300 panels"]],[["工期","Schedule"],["×2 週","×2 weeks"]]]},
  punch:["拜拜很誠心，金爐離太近","Sincere prayers, burner too close"],cta:["你的金爐離木料幾公尺？","How far is your burner from the timber?"]},
-{id:"acc_elec",cat:"acc",p:4,r:c=>c.hx.has("acc:elec")||c.hx.has("near:elec"),hint:["遇到一次感電事故或虛驚","Have an electrical accident or near miss"],bd:["#e8721a","⚡"],
+{id:"acc_elec",ic:"😵‍💫",cat:"acc",p:4,r:c=>c.hx.has("acc:elec")||c.hx.has("near:elec"),hint:["遇到一次感電事故或虛驚","Have an electrical accident or near miss"],bd:["#e8721a","⚡"],
  tag:["⚡ 事故：臨時電箱漏電","⚡ Accident: temporary panel leaks"],head:["臨時用電・現場配置圖","Temporary power: as built"],
  body:{t:"flow",l:[["🔌 → 延長線 → 延長線 → 延長線","🔌 → cord → cord → cord"],["→ 三孔轉兩孔 → 延長線","→ 3-to-2 adapter → cord"],["→ 泡在水裡的延長線 → ✨","→ cord in a puddle → ✨"]]},
  punch:["這不是電箱，是聖誕樹","That's not a panel, it's a Christmas tree"],sub:["漏電斷路器：「我上次被測試，是什麼時候？」","Leakage breaker: \"When was I last tested?\""],cta:["你的工地有幾條延長線？","How many extension cords on your site?"]},
-{id:"acc_crane",cat:"acc",p:4,r:c=>c.hx.has("acc:crane")||c.hx.has("near:crane"),hint:["遇到一次吊掛事故或虛驚","Have a lifting accident or near miss"],bd:["#e8721a","⚠"],
+{id:"acc_crane",ic:"🏗️",cat:"acc",p:4,r:c=>c.hx.has("acc:crane")||c.hx.has("near:crane"),hint:["遇到一次吊掛事故或虛驚","Have a lifting accident or near miss"],bd:["#e8721a","⚠"],
  tag:["🏗️ 事故：吊掛物擺盪","🏗️ Accident: swinging load"],head:["今日吊掛作業群組","Today's lifting group chat"],
  body:{t:"chat",m:[[["吊車司機","Crane operator"],["指揮手人呢？","Where's the signaller?"],0],[["鋼筋工、模板工、監工","Rebar, formwork, foreman"],["👍 👍 先吊啦 👍","👍 👍 Just lift 👍"],1],[["吊車司機","Crane operator"],["……誰在比手勢？","…who's giving signals?"],0]]},
  punch:["手勢很多，指揮手沒有","Lots of signals, no signaller"],cta:["你的吊掛今天誰指揮？","Who's signalling your lifts today?"]},
-{id:"acc_form",cat:"acc",p:4,r:c=>c.hx.has("acc:form")||c.hx.has("near:form"),hint:["遇到一次模板支撐事故或虛驚","Have a formwork accident or near miss"],bd:["#e8721a","⚠"],
+{id:"acc_form",ic:"🧱",cat:"acc",p:4,r:c=>c.hx.has("acc:form")||c.hx.has("near:form"),hint:["遇到一次模板支撐事故或虛驚","Have a formwork accident or near miss"],bd:["#e8721a","⚠"],
  tag:["🧱 事故：模板支撐變形","🧱 Accident: formwork shoring buckles"],head:["拆模的時間，由誰決定？","Who decides when forms come off?"],
  body:{t:"kv",left:1,lc:YE,rows:[[["❌","❌"],["強度試驗","Strength test"]],[["❌","❌"],["施工計畫","Method statement"]],[["❌","❌"],["結構技師","Structural engineer"]],[["✅","✅"],["業主下週要剪綵","Owner's ribbon cutting next week"],RD]]},
  punch:["強度不夠，進度來湊","Not strong enough? Schedule will cover"],sub:["混凝土：「我還沒準備好欸。」","Concrete: \"I'm not ready yet.\""],cta:["你的混凝土準備好了嗎？","Is your concrete ready?"]},
-{id:"helmet",cat:"acc",p:3,r:c=>!c.insp&&(c.near>=1||c.hx.has("acc:fall")||c.hx.has("near:fall")),hint:["遇到一次驚險過關或墜落相關事件","Have a near miss or a fall-related event"],bd:["#e8721a","🪖"],
+{id:"helmet",ic:"🪖",cat:"acc",p:3,r:c=>!c.insp&&(c.near>=1||c.hx.has("acc:fall")||c.hx.has("near:fall")),hint:["遇到一次驚險過關或墜落相關事件","Have a near miss or a fall-related event"],bd:["#e8721a","🪖"],
  tag:["🪖 虛驚：高處掉落扳手","🪖 Near miss: dropped wrench"],head:["安全帽的高光時刻","The hard hat's finest hour"],
  body:{t:"kv",box:1,vc:"#c2410c",rows:[[["📅 戴了","📅 Worn for"],["3 年 2 個月","3 yrs 2 mos"]],[["🙄 被嫌熱、嫌醜、嫌壓髮型","🙄 Called hot, ugly, bad for hair"],["1,284 次","1,284 times"]],[["🔧 接住從 3 樓掉下來的扳手","🔧 Caught a wrench from the 3rd floor"],["1 次","once"]]]},
  punch:["平常嫌它，今天謝它","Hated it daily, thanked it today"],cta:["你的安全帽今天戴了嗎？","Wearing your hard hat today?"]},
-{id:"near_wear",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:fall")||c.hx.has("near:elec")||c.near>=1),hint:["遇到一次驚險過關","Have a near miss"],bd:["#2e9e5b","✓"],
+{id:"near_wear",ic:"🥹",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:fall")||c.hx.has("near:elec")||c.near>=1),hint:["遇到一次驚險過關","Have a near miss"],bd:["#2e9e5b","✓"],
  tag:["😮‍💨 驚險過關","😮‍💨 Near miss"],head:["好險有戴","Glad I wore it"],
  body:{t:"kv",box:1,vc:"#1e7b45",rows:[[["🪖 安全帽","🪖 Hard hat"],["擋住掉落的螺栓","Stopped a falling bolt"]],[["🦺 安全帶","🦺 Harness"],["踩空時拉住了","Caught me when I slipped"]],[["🧤 絕緣手套","🧤 Insulated gloves"],["摸到漏電的外殼","Touched a live casing"]],[["😤 今天被嫌熱、嫌麻煩","😤 Complained about today"],["全部","All of them"],"#c2410c"]]},
  punch:["嫌麻煩的東西，今天救了你","The hassle you hated saved you today"],cta:["你今天有戴好嗎？","Did you gear up today?"]},
-{id:"near_scare",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:fall")||c.hx.has("near:form")),hint:["遇到墜落或模板的驚險過關","Have a fall or formwork near miss"],bd:["#e8721a","!"],
+{id:"near_scare",ic:"🫨",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:fall")||c.hx.has("near:form")),hint:["遇到墜落或模板的驚險過關","Have a fall or formwork near miss"],bd:["#e8721a","!"],
  tag:["😮‍💨 驚險過關","😮‍💨 Near miss"],head:["心有餘悸","Still shaking"],
  body:{t:"chat",m:[[["鋼筋工阿財","Rebar worker Ah-Tsai"],["剛剛那一下，腳真的軟了","My legs just went weak back there"],0],[["工安小陳","Officer Chen"],["所以早上叫你掛安全帶啊","That's why I said clip in this morning"],1],[["鋼筋工阿財","Rebar worker Ah-Tsai"],["……明天請你喝保力達 🙏","…drinks on me tomorrow 🙏"],0]]},
  punch:["心有餘悸，明天乖乖掛好","Still shaking. Clipping in tomorrow"],cta:["你有過心有餘悸的時刻嗎？","Ever had a moment like that?"]},
-{id:"near_hkt",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:crane")||c.hx.has("near:fire")),hint:["遇到吊掛或火災的驚險過關","Have a lifting or fire near miss"],bd:["#d9a400","!"],
+{id:"near_hkt",ic:"😅",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:crane")||c.hx.has("near:fire")),hint:["遇到吊掛或火災的驚險過關","Have a lifting or fire near miss"],bd:["#d9a400","!"],
  tag:["😮‍💨 驚險過關","😮‍💨 Near miss"],head:["今日台語教學","Today's Taiwanese lesson"],
  body:{t:"huge",l:[["好佳哉！","Hó-ka-tsài!"],["hó-ka-tsài","= Phew, lucky!"]]},
  punch:null,sub:["吊物晃過的位置，5 分鐘前還有人站著。因為工安拉了警戒線，現在沒有。","Five minutes ago someone stood where the load swung. Safety taped it off, so nobody was there."],cta:["你今天說了幾次好佳哉？","How many times did you say it today?"]},
-{id:"near_word",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:crane")||c.near>=1&&c.good>=1),hint:["驚險過關，而且做過關鍵判斷","Have a near miss after a key call"],bd:["#2e9e5b","💬"],
+{id:"near_word",ic:"🗣️",cat:"near",p:4,r:c=>!c.insp&&(c.hx.has("near:crane")||c.near>=1&&c.good>=1),hint:["驚險過關，而且做過關鍵判斷","Have a near miss after a key call"],bd:["#2e9e5b","💬"],
  tag:["😮‍💨 驚險過關","😮‍💨 Near miss"],head:["一句話的距離","One sentence away"],
  body:{t:"vs",a:[["🕖 早上 07:30","🕖 07:30"],["工安：「吊車下面先別站。」","Safety: \"Don't stand under the crane.\""],"#5b6572"],b:[["🕑 下午 14:10","🕑 14:10"],["鋼筋束掉在那個位置","A rebar bundle lands right there"],"#c23030"]},
  punch:["那句很煩的話，讓大家平安下班","That annoying line sent everyone home safe"],sub:["被嫌囉唆 100 次，值得","Called a nag 100 times. Worth it."],cta:["你聽過哪一句救命的話？","What line saved someone you know?"]},
-{id:"insp_eye",cat:"insp",p:6,r:c=>c.insp&&c.found==c.nb&&c.fp==0,hint:["巡檢找危害：全部找到、零誤判","Hazard Hunt: find all, no false alarms"],bd:["#d9a400","👁"],
+{id:"insp_eye",ic:"🦅",cat:"insp",p:6,r:c=>c.insp&&c.found==c.nb&&c.fp==0,hint:["巡檢找危害：全部找到、零誤判","Hazard Hunt: find all, no false alarms"],bd:["#d9a400","👁"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["稱號解鎖","Title unlocked"],
  body:{t:"huge",l:[["🔥 火眼金睛 🔥","🔥 Eagle Eye 🔥"]]},
  punch:["危害一個都跑不掉","Not a single hazard got away"],sub:["全部找到、零誤判。勞檢看了都想挖角。","All found, zero false alarms. Inspectors want to hire you."],cta:["你也能全部找到嗎？","Can you find them all?"]},
-{id:"insp_miss",cat:"insp",p:5,r:c=>c.insp&&c.miss>=2,hint:["巡檢找危害：漏掉 2 個以上危害","Hazard Hunt: miss 2+ hazards"],bd:["#d64545","👀"],
+{id:"insp_miss",ic:"🙈",cat:"insp",p:5,r:c=>c.insp&&c.miss>=2,hint:["巡檢找危害：漏掉 2 個以上危害","Hazard Hunt: miss 2+ hazards"],bd:["#d64545","👀"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["危害都到眼球前了","The hazard was right in your face"],
  body:{t:"kv",box:1,vc:"#c2410c",rows:[[["危害與眼睛的距離","Distance to your eyes"],["30 公分","30 cm"]],[["危害的明顯程度","How obvious"],["★★★★★","★★★★★"]],[["你的判斷","Your call"],["「看起來還好」","\"Looks fine\""]]]},
  punch:["危害不會自己舉手","Hazards don't raise their hands"],cta:["換你來找找看？","Your turn to look?"]},
-{id:"insp_fp",cat:"insp",p:5,r:c=>c.insp&&c.fp>=2,hint:["巡檢找危害：誤判 2 次以上","Hazard Hunt: 2+ false alarms"],bd:["#e8721a","?"],
+{id:"insp_fp",ic:"😱",cat:"insp",p:5,r:c=>c.insp&&c.fp>=2,hint:["巡檢找危害：誤判 2 次以上","Hazard Hunt: 2+ false alarms"],bd:["#e8721a","?"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["草木皆兵","Everything looks dangerous"],
  body:{t:"kv",rows:[[["合格的護欄","A compliant guardrail"],["判：危害","Verdict: hazard"]],[["有鏈條固定的鋼瓶","A chained cylinder"],["判：危害","Verdict: hazard"]],[["一塊普通的地板","An ordinary floor"],["差點也判危害","Almost flagged too"]]]},
  punch:["寧可多疑，但會被嫌","Better paranoid, but expect complaints"],sub:["多看一眼沒有錯，判斷要有依據。","Looking twice is fine; back it up with the rules."],cta:["你分得出合格和危害嗎？","Can you tell compliant from hazard?"]},
-{id:"insp_time",cat:"insp",p:5,r:c=>c.insp&&c.to&&c.un>=2,hint:["巡檢找危害：時間到還有 2 處沒檢查","Hazard Hunt: time runs out with 2+ unchecked"],bd:["#3a82d6","⏰"],
+{id:"insp_time",ic:"⏰",cat:"insp",p:5,r:c=>c.insp&&c.to&&c.un>=2,hint:["巡檢找危害：時間到還有 2 處沒檢查","Hazard Hunt: time runs out with 2+ unchecked"],bd:["#3a82d6","⏰"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["巡檢巡到一半","Halfway through the rounds"],
  body:{t:"chat",m:[[["主任","Site manager"],["小陳，來開會","Chen, meeting now"],0],[["工安小陳","Officer Chen"],["還有幾處沒巡完……","I've still got spots to check…"],1],[["主任","Site manager"],["明天再看啦","Check them tomorrow"],0]]},
  punch:["危害不會等你明天","Hazards don't wait for tomorrow"],cta:["你巡得完嗎？","Can you finish the rounds?"]},
-{id:"insp_hi",cat:"insp",p:4,r:c=>c.insp&&c.ratio>=.85,hint:["巡檢找危害拿到 85% 以上分數","Score 85%+ in Hazard Hunt"],bd:["#d9a400","🔍"],
+{id:"insp_hi",ic:"🧐",cat:"insp",p:4,r:c=>c.insp&&c.ratio>=.85,hint:["巡檢找危害拿到 85% 以上分數","Score 85%+ in Hazard Hunt"],bd:["#d9a400","🔍"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["巡檢眼力認證","Certified hazard spotter"],
  body:{t:"kv",lc:YE,left:1,rows:[[["🦅","🦅"],["老鷹：看得到 3 公里外的獵物","Eagle: sees prey 3 km away"]],[["🐱","🐱"],["貓：晚上也看得清楚","Cat: sees well at night"]],[["🦺","🦺"],["你：看得到護欄少了一根","You: notice one missing rail"],YE]]},
  punch:["眼睛比勞檢還利","Sharper eyes than the inspector"],cta:["你能找到幾個危害？","How many hazards can you find?"]},
-{id:"insp_lo",cat:"insp",p:4,r:c=>c.insp&&c.ratio<.6,hint:["巡檢找危害分數低於 60%","Score under 60% in Hazard Hunt"],bd:["#d64545","🔍"],
+{id:"insp_lo",ic:"🌚",cat:"insp",p:4,r:c=>c.insp&&c.ratio<.6,hint:["巡檢找危害分數低於 60%","Score under 60% in Hazard Hunt"],bd:["#d64545","🔍"],
  tag:["🔍 巡檢找危害","🔍 Hazard Hunt"],head:["巡檢的定律","The law of inspections"],
  body:{t:"vs",a:[["🙂 你巡了一整圈","🙂 You walked the whole site"],["「看起來都還好」","\"Looks fine to me\""],"#2e9e5b"],b:[["🕵️ 勞檢走了三步","🕵️ Inspector takes 3 steps"],["「這個、這個、還有這個」","\"This, this, and this\""],"#c23030"]},
  punch:["看漏的那個，勞檢一眼就看到","What you miss, they spot instantly"],cta:["換你來找找看？","Your turn to find them?"]},
-{id:"timeuse",cat:"gen",p:1,r:c=>!c.insp,hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","%"],
+{id:"timeuse",ic:"🫠",cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit",hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","%"],
  head:["工安的一天・時間分配","A safety officer's day, by the hour"],
  body:{t:"bar",rows:[[["補文件、簽名","Paperwork & signatures"],40],[["開會","Meetings"],25],[["被叫去拍照","Called for photos"],15],[["處理突發狀況","Firefighting"],12],[["真正在做安全","Actually doing safety"],8,RD]]},
  punch:["那 8% 是最重要的","That 8% matters most"],cta:["你的時間花在哪？","Where does your time go?"]},
-{id:"catch",cat:"gen",p:1,r:c=>c.good>=2||c.insp&&c.ratio>=.6&&c.ratio<.85,hint:["做出 2 次以上關鍵判斷","Make 2+ key calls"],bd:["#2e9e5b","💬"],
+{id:"catch",ic:"📣",cat:"gen",p:1,r:c=>c.k!="quit"&&c.good>=2||c.insp&&c.ratio>=.6&&c.ratio<.85,hint:["做出 2 次以上關鍵判斷","Make 2+ key calls"],bd:["#2e9e5b","💬"],
  head:["工安的口頭禪 TOP 5","Safety officer catchphrases, top 5"],
  body:{t:"list",l:[["「這個要拍照。」","\"Take a photo of that.\""],["「簽名在這裡，還有這裡。」","\"Sign here, and here.\""],["「安全帽戴好。」","\"Hard hat on.\""],["「等一下，我先看一下。」","\"Hold on, let me check first.\""],["「這個護欄誰拆的？」","\"Who took down this guardrail?\""]]},
  punch:["說了一萬次，還要說第一萬零一次","Said 10,000 times, now 10,001"],cta:["你最常說哪一句？","Which one do you say most?"]},
-{id:"rookie",cat:"end",p:3,r:c=>!c.insp&&(c.k=="quit"&&c.days==0||c.roles.indexOf("新手工安")>=0),hint:["扮演新手工安，或第一天就離職","Play the junior officer, or quit on day one"],bd:["#f472b6","🌱"],
+{id:"rookie",ic:"🌱",cat:"end",p:3,r:c=>!c.insp&&(c.k=="quit"&&c.days==0||c.roles.indexOf("新手工安")>=0),hint:["扮演新手工安，或第一天就離職","Play the junior officer, or quit on day one"],bd:["#f472b6","🌱"],
  head:["工安・第一天 vs 第三年","Safety officer: day 1 vs year 3"],
  body:{t:"vs",a:[["🌱 第一天","🌱 Day 1"],["「我要改變這個工地！」","\"I'll change this site!\""],"#2e9e5b"],b:[["🪨 第三年","🪨 Year 3"],["「今天沒事就好。」","\"Just let today be quiet.\""],"#5b6572"]},
  punch:["熱血會冷，初心別丟","Passion cools; keep the purpose"],cta:["你現在是第幾年？","What year are you in?"]},
-{id:"stopwork",cat:"end",p:3,r:c=>!c.insp&&c.good>=3,hint:["做出 3 次以上關鍵判斷","Make 3+ key calls"],bd:["#2e9e5b","✋"],
+{id:"stopwork",ic:"✋",cat:"end",p:3,r:c=>!c.insp&&c.k!="quit"&&c.good>=3,hint:["做出 3 次以上關鍵判斷","Make 3+ key calls"],bd:["#2e9e5b","✋"],
  head:["停工單的威力","The power of a stop-work order"],
  body:{t:"vs",a:[["📝 開單之前","📝 Before you issue it"],["全工地都討厭你","The whole site hates you"],"#c23030"],b:[["🏠 開單之後","🏠 After"],["全工地平安下班","Everyone goes home safe"],"#2e9e5b"]},
  punch:["被討厭，總比被調查好","Better disliked than investigated"],cta:["你敢開停工單嗎？","Would you issue a stop-work order?"]},
-{id:"rain",cat:"gen",p:1,r:c=>!c.insp,hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","☔"],
+{id:"rain",ic:"🌧️",cat:"gen",p:1,r:c=>!c.insp&&c.k!="quit",hint:["任何結局都可能抽到","Any ending can draw it"],bd:["#3a82d6","☔"],
  head:["下雨天的工地","A rainy day on site"],
  body:{t:"vs",a:[["🦺 工安在擔心","🦺 Safety worries about"],["開挖崩塌、感電、滑倒","Cave-ins, shocks, slips"],"#1d4f91"],b:[["👷 工人在擔心","👷 Workers worry about"],["便當會不會濕","Whether lunch gets wet"],"#5b6572"]},
  punch:["同一場雨，兩種世界","Same rain, different worlds"],cta:["你的工地下雨天怎麼辦？","What does your site do in the rain?"]},
-{id:"budget",cat:"end",p:3,r:c=>!c.insp&&(c.st=="l2"||c.arch=="frugal"||c.cash<0),hint:["預算見底、超支，或摳門型結局","Run out of budget, overspend, or play penny-pincher"],bd:["#e8721a","$"],
+{id:"budget",ic:"💸",cat:"end",p:3,r:c=>!c.insp&&(c.st=="l2"||c.arch=="frugal"||c.cash<0),hint:["預算見底、超支，或摳門型結局","Run out of budget, overspend, or play penny-pincher"],bd:["#e8721a","$"],
  head:["工安預算申請結果","Safety budget request: results"],
  body:{t:"form",ti:["安全設施預算申請單","Safety Equipment Budget Request"],rows:[[["申請項目","Requested"],["護欄、安全網、漏電斷路器","Guardrails, nets, leakage breakers"]],[["申請金額","Amount"],["NT$ 380,000","NT$ 380,000"]],[["核准項目","Approved"],["口罩一箱","One box of masks"]],[["主管意見","Comment"],["「先用現有的。」","\"Use what we have.\""]]],stamp:["退件","Denied"],red:1},
  punch:["省下的錢，可能是下一次的帳單","Money saved may be the next bill"],cta:["你的預算夠用嗎？","Is your safety budget enough?"]},
-{id:"arch_civil",cat:"end",p:4,r:c=>!c.insp&&c.arch=="civil",hint:["當一個文件做足、照表操課的公務員型工安","Play it by the book as a By-the-Book safety officer"],bd:["#3a82d6","✍"],
+{id:"arch_civil",ic:"🗂️",cat:"end",p:4,r:c=>!c.insp&&c.arch=="civil",hint:["當一個文件做足、照表操課的公務員型工安","Play it by the book as a By-the-Book safety officer"],bd:["#3a82d6","✍"],
  head:["本日完成事項","Done today"],
  body:{t:"form",ti:["今日工安文件","Today's safety paperwork"],rows:[[["自動檢查表","Inspection checklists"],["已簽 12 張","12 signed"]],[["危害告知單","Hazard notices"],["已簽","Signed"]],[["協議組織會議紀錄","Coordination minutes"],["已用印","Stamped"]],[["工程進度","Progress"],["……","…"]]],stamp:["簽好簽滿","All signed"]},
  punch:["文件滿分，進度在路上","Paperwork perfect, progress on its way"],cta:["你的工地一天簽幾張？","How many forms a day on your site?"]},
-{id:"arch_retire",cat:"end",p:4,r:c=>!c.insp&&c.arch=="retire",hint:["不惹事、都說好，一次關鍵判斷都沒做也沒出事","Say yes to everything, make no key calls, and still have no accident"],bd:["#8a7a5c","☕"],
+{id:"arch_retire",ic:"☕",cat:"end",p:4,r:c=>!c.insp&&c.arch=="retire",hint:["不惹事、都說好，一次關鍵判斷都沒做也沒出事","Say yes to everything, make no key calls, and still have no accident"],bd:["#8a7a5c","☕"],
  head:["今日工地群組","Today's site group chat"],
  body:{t:"chat",m:[[["監工","Foreman"],["護欄明天再補可以嗎？","Can the guardrail wait till tomorrow?"],0],[["你","You"],["好啊 👍","Sure 👍"],1],[["主任","Manager"],["今天的巡檢先跳過？","Skip today's patrol?"],0],[["你","You"],["好啊 👍","Sure 👍"],1]]},
  punch:["沒做錯什麼，因為什麼都沒做","Nothing went wrong, because nothing was done"],cta:["你今天說了幾次「好啊」？","How many times did you say \"sure\" today?"]},
-{id:"arch_iron",cat:"end",p:4,r:c=>!c.insp&&c.arch=="ironstop",hint:["關鍵判斷 3 次以上、零事故，但信任偏低","3+ key calls and no accident, but low trust"],bd:["#c23030","✋"],
+{id:"arch_iron",ic:"🛑",cat:"end",p:4,r:c=>!c.insp&&c.arch=="ironstop",hint:["關鍵判斷 3 次以上、零事故，但信任偏低","3+ key calls and no accident, but low trust"],bd:["#c23030","✋"],
  head:["鐵血停工型工安的戰績","The Iron-Fist officer's record"],
  body:{t:"kv",rows:[[["今天喊停","Stops called"],["4 次","4 times"]],[["重大職災","Major accidents"],["0","0"]],[["監工的臉色","Foreman's face"],["🌩️","🌩️"]],[["新綽號「停工哥」","New nickname \"Mr Stop\""],["已確認","Confirmed"]]]},
  punch:["沒人喜歡你，但每個人都活著回家","Nobody likes you, but everyone went home"],cta:["你今天喊停幾次？","How many stops did you call today?"]},
-{id:"arch_goat",cat:"end",p:4,r:c=>!c.insp&&c.arch=="scapegoat",hint:["關鍵判斷 2 次以上，事故卻還是發生","Make 2+ key calls and still have an accident"],bd:["#6b4a2f","🍳"],
+{id:"arch_goat",ic:"🍳",cat:"end",p:4,r:c=>!c.insp&&c.arch=="scapegoat",hint:["關鍵判斷 2 次以上，事故卻還是發生","Make 2+ key calls and still have an accident"],bd:["#6b4a2f","🍳"],
  head:["事故調查報告","Accident investigation report"],
  body:{t:"vs",a:[["📋 你做的","📋 What you did"],["教育訓練、巡檢、喊停、寫報告","Training, patrols, stop calls, reports"],"#2e9e5b"],b:[["🧾 報告上寫的","🧾 What the report says"],["工安督導不周","Inadequate safety supervision"],"#c23030"]},
  punch:["鍋很重，但你背得很穩","A heavy load of blame, carried steadily"],cta:["你背過幾個鍋？","How many times have you taken the blame?"]},
-{id:"late",cat:"end",p:3,r:c=>!c.insp&&c.st=="l3",hint:["工期逾期","Miss the deadline"],bd:["#e8721a","⏳"],
+{id:"late",ic:"⏳",cat:"end",p:3,r:c=>!c.insp&&c.st=="l3",hint:["工期逾期","Miss the deadline"],bd:["#e8721a","⏳"],
  head:["工期最後一天","Last day of the schedule"],
  body:{t:"kv",rows:[[["工期剩下","Days left"],["0 天","0"]],[["業主來電","Owner's calls"],["23 通","23"]],[["被要求「通融一下」","Asked to \"bend a little\""],["9 次","9 times"]],[["工安的回答","Safety's answer"],["9 次「不行」","9 × \"No\""],GR]]},
  punch:["快，不能快在安全上","Go fast, but not on safety"],cta:["你頂得住趕工嗎？","Can you hold the line under rush?"]}
@@ -1813,13 +1837,20 @@ const M={CARDS,cur:null,mode:1,last:null};
 const F=(g,w,s)=>{g.font=w+" "+s+"px "+SHF};
 const fit=(g,t,maxW,s,w,min)=>{for(;;){F(g,w,s);if(g.measureText(t).width<=maxW||s<=(min||22))break;s-=2}return s};
 const rr=(g,x,y,w,h,r)=>{shRR(g,x,y,w,h,r)};
-function shield(g,c){g.save();g.translate(540,205);g.scale(.52,.52);
- g.beginPath();g.moveTo(-190,-190);g.lineTo(190,-190);g.lineTo(190,30);g.quadraticCurveTo(190,190,0,250);g.quadraticCurveTo(-190,190,-190,30);g.closePath();g.fillStyle="#15314a";g.fill();g.lineWidth=14;g.strokeStyle="#8c97a3";g.stroke();
- const hc="#a8924a";g.beginPath();g.arc(0,20,120,Math.PI,0);g.closePath();g.fillStyle=hc;g.fill();g.fillStyle="rgba(0,0,0,.18)";rr(g,-20,-98,40,118,10);g.fill();
- g.fillStyle=hc;rr(g,-152,12,304,40,20);g.fill();g.fillStyle="rgba(0,0,0,.16)";rr(g,-152,36,304,16,8);g.fill();
- g.lineWidth=10;g.lineCap="round";g.strokeStyle="rgba(255,255,255,.55)";g.beginPath();g.arc(0,20,92,Math.PI*1.12,Math.PI*1.38);g.stroke();
- g.beginPath();g.arc(150,170,66,0,Math.PI*2);g.fillStyle=c.bd[0];g.fill();g.lineWidth=8;g.strokeStyle="#15314a";g.stroke();
- g.fillStyle="#fff";g.textAlign="center";g.textBaseline="middle";F(g,"900",70);g.fillText(c.bd[1],150,174);g.textBaseline="alphabetic";g.restore()}
+function shield(g,c){const EF='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",'+SHF;
+ const em=(t,x,y,sz)=>{g.font=sz+"px "+EF;g.textAlign="center";g.textBaseline="middle";g.fillText(t,x,y)};
+ if(c.orb){const cx=540,cy=200,pos=[[-250,-86],[-300,6],[-250,96],[250,-86],[300,6],[250,96]];
+  g.save();g.lineCap="round";pos.forEach(p=>{g.strokeStyle="#e9b98c";g.lineWidth=20;g.beginPath();g.moveTo(cx+p[0]*.18,cy+18);g.quadraticCurveTo(cx+p[0]*.55,cy+p[1]*.2+30,cx+p[0]*.86,cy+p[1]);g.stroke();g.strokeStyle="#ff8a3d";g.lineWidth=20;g.beginPath();g.moveTo(cx+p[0]*.18,cy+18);g.lineTo(cx+p[0]*.36,cy+p[1]*.08+22);g.stroke()});
+  c.orb.slice(0,6).forEach((e,k)=>{const p=pos[k],x=cx+p[0],y=cy+p[1];g.fillStyle="#f4f1e8";g.beginPath();g.arc(x,y,48,0,7);g.fill();g.lineWidth=5;g.strokeStyle="#ffcf4a";g.stroke();g.fillStyle="#000";em(e,x,y+3,56)});g.restore()}
+ const warn=c.cat=="acc";g.save();g.translate(540,205);g.scale(.52,.52);
+ if(warn){g.beginPath();g.moveTo(0,-215);g.lineTo(235,215);g.lineTo(-235,215);g.closePath();g.fillStyle="#ffcf4a";g.fill();g.lineJoin="round";g.lineWidth=26;g.strokeStyle="#1b1b1b";g.stroke();
+  g.lineWidth=10;g.strokeStyle="#ffcf4a";g.beginPath();g.moveTo(0,-170);g.lineTo(196,182);g.lineTo(-196,182);g.closePath();g.stroke()}
+ else{g.beginPath();g.moveTo(-190,-190);g.lineTo(190,-190);g.lineTo(190,30);g.quadraticCurveTo(190,190,0,250);g.quadraticCurveTo(-190,190,-190,30);g.closePath();g.fillStyle="#15314a";g.fill();g.lineWidth=14;g.strokeStyle="#8c97a3";g.stroke();
+  g.beginPath();g.arc(0,10,150,0,7);g.fillStyle="rgba(255,255,255,.07)";g.fill()}
+ g.fillStyle="#000";if(c.ic)em(c.ic,0,warn?70:12,warn?210:230);
+ else{const hc="#a8924a";g.beginPath();g.arc(0,20,120,Math.PI,0);g.closePath();g.fillStyle=hc;g.fill();g.fillStyle=hc;rr(g,-152,12,304,40,20);g.fill()}
+ g.beginPath();g.arc(160,175,66,0,Math.PI*2);g.fillStyle=c.bd[0];g.fill();g.lineWidth=8;g.strokeStyle="#15314a";g.stroke();
+ g.fillStyle="#fff";g.textAlign="center";g.textBaseline="middle";F(g,"900",70);g.fillText(c.bd[1],160,179);g.textBaseline="alphabetic";g.restore()}
 function bg(g){const W=1080,H=1350,b=g.createLinearGradient(0,0,0,H);b.addColorStop(0,"#1a1c22");b.addColorStop(1,"#2b303a");g.fillStyle=b;g.fillRect(0,0,W,H);
  g.save();g.translate(540,230);for(let i=0;i<18;i++){g.rotate(Math.PI/9);g.beginPath();g.moveTo(0,0);g.lineTo(-90,-1600);g.lineTo(90,-1600);g.closePath();g.fillStyle="rgba(255,255,255,.035)";g.fill()}g.restore()}
 const L0=70,R0=1010,CW=R0-L0;
@@ -1828,52 +1859,52 @@ const body={
   const n=b.rows.length,rh=n>4?56:62,box=b.box;let x0=L0+(box?30:20),x1=R0-(box?30:20);
   if(box){g.fillStyle="#f4f1e8";rr(g,L0+10,y,CW-20,n*rh+24,18);g.fill();y+=12}
   b.rows.forEach((r,i)=>{const yy=y+i*rh+rh*.68;const a=Z(r[0]),v=Z(r[1]);
-   if(b.left){g.textAlign="left";F(g,"800",32);g.fillStyle=b.lc||OR;g.fillText(a,x0,yy);const aw=Math.max(110,g.measureText(a).width+26);g.fillStyle=r[2]||(box?"#222":"#fff");fit(g,v,x1-x0-aw,32,r[2]?"800":"500");g.fillText(v,x0+aw,yy)}
-   else{g.textAlign="left";g.fillStyle=box?"#222":"#fff";fit(g,a,(x1-x0)*.66,32,"500");g.fillText(a,x0,yy);g.textAlign="right";g.fillStyle=r[2]||b.vc||OR;fit(g,v,(x1-x0)*.33,34,"800");g.fillText(v,x1,yy)}
+   if(b.left){g.textAlign="left";F(g,"800",32);g.fillStyle=b.lc||OR;g.fillText(a,x0,yy);const aw=Math.max(110,g.measureText(a).width+26);g.fillStyle=r[2]||(box?"#222":"#fff");fit(g,v,x1-x0-aw,32,r[2]?"800":"700");g.fillText(v,x0+aw,yy)}
+   else{g.textAlign="left";g.fillStyle=box?"#222":"#fff";fit(g,a,(x1-x0)*.66,32,"700");g.fillText(a,x0,yy);g.textAlign="right";g.fillStyle=r[2]||b.vc||OR;fit(g,v,(x1-x0)*.33,34,"800");g.fillText(v,x1,yy)}
    if(!box){g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([6,6]);g.lineWidth=2;g.beginPath();g.moveTo(x0,y+(i+1)*rh);g.lineTo(x1,y+(i+1)*rh);g.stroke();g.setLineDash([])}});
   return y+n*rh+(box?12:0)},
- list(g,b,y){const rh=60;b.l.forEach((t,i)=>{const yy=y+i*rh+42;g.textAlign="left";g.fillStyle=YE;F(g,"800",32);g.fillText("✔",L0+30,yy);g.fillStyle="#fff";fit(g,Z(t),CW-110,32,"500");g.fillText(Z(t),L0+76,yy);g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([6,6]);g.lineWidth=2;g.beginPath();g.moveTo(L0+30,y+(i+1)*rh);g.lineTo(R0-30,y+(i+1)*rh);g.stroke();g.setLineDash([])});return y+b.l.length*rh},
- grid(g,b,y){const cols=b.cols,gap=14,w=(CW-gap*(cols-1))/cols,h=150;b.c.forEach((c,i)=>{const x=L0+(i%cols)*(w+gap),yy=y+Math.floor(i/cols)*(h+gap);g.fillStyle=i==b.hl?YE:"#f4f1e8";rr(g,x,yy,w,h,16);g.fill();g.textAlign="center";F(g,"400",50);g.fillStyle="#222";g.fillText(c[0],x+w/2,yy+60);g.fillStyle="#777";fit(g,Z(c[1]),w-16,22,"500");g.fillText(Z(c[1]),x+w/2,yy+95);g.fillStyle="#222";fit(g,Z(c[2]),w-16,27,"800");g.fillText(Z(c[2]),x+w/2,yy+132)});return y+Math.ceil(b.c.length/cols)*(h+gap)},
+ list(g,b,y){const rh=60;b.l.forEach((t,i)=>{const yy=y+i*rh+42;g.textAlign="left";g.fillStyle=YE;F(g,"800",32);g.fillText("✔",L0+30,yy);g.fillStyle="#fff";fit(g,Z(t),CW-110,32,"700");g.fillText(Z(t),L0+76,yy);g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([6,6]);g.lineWidth=2;g.beginPath();g.moveTo(L0+30,y+(i+1)*rh);g.lineTo(R0-30,y+(i+1)*rh);g.stroke();g.setLineDash([])});return y+b.l.length*rh},
+ grid(g,b,y){const cols=b.cols,gap=14,w=(CW-gap*(cols-1))/cols,h=150;b.c.forEach((c,i)=>{const x=L0+(i%cols)*(w+gap),yy=y+Math.floor(i/cols)*(h+gap);g.fillStyle=i==b.hl?YE:"#f4f1e8";rr(g,x,yy,w,h,16);g.fill();g.textAlign="center";F(g,"400",50);g.fillStyle="#222";g.fillText(c[0],x+w/2,yy+60);g.fillStyle="#555";fit(g,Z(c[1]),w-16,24,"700");g.fillText(Z(c[1]),x+w/2,yy+95);g.fillStyle="#222";fit(g,Z(c[2]),w-16,27,"800");g.fillText(Z(c[2]),x+w/2,yy+132)});return y+Math.ceil(b.c.length/cols)*(h+gap)},
  ad(g,b,y){const cols=3,rh=40,rows=Math.ceil(b.it.length/cols),h=70+rows*rh+16;g.fillStyle="#fff";rr(g,L0-6,y,CW+12,h,16);g.fill();g.fillStyle="#e8721a";rr(g,L0-6,y,CW+12,12,6);g.fill();
   g.textAlign="left";g.fillStyle="#222";fit(g,Z(b.ti),CW-40,32,"800");g.fillText(Z(b.ti),L0+20,y+56);const cw=(CW-40)/cols;
-  b.it.forEach((t,i)=>{const x=L0+20+(i%cols)*cw,yy=y+70+Math.floor(i/cols)*rh+30;g.fillStyle="#e8721a";F(g,"500",24);g.fillText("☐",x,yy);g.fillStyle="#222";fit(g,Z(t),cw-40,24,"500");g.fillText(Z(t),x+32,yy)});return y+h},
+  b.it.forEach((t,i)=>{const x=L0+20+(i%cols)*cw,yy=y+70+Math.floor(i/cols)*rh+30;g.fillStyle="#e8721a";F(g,"500",24);g.fillText("☐",x,yy);g.fillStyle="#222";fit(g,Z(t),cw-40,25,"700");g.fillText(Z(t),x+32,yy)});return y+h},
  vs(g,b,y){const gap=20,w=(CW-gap)/2,h=300;[b.a,b.b].forEach((p,i)=>{const x=L0+i*(w+gap);g.fillStyle=p[2];rr(g,x,y,w,h,18);g.fill();g.textAlign="center";g.fillStyle="#fff";fit(g,Z(p[0]),w-30,32,"800");g.fillText(Z(p[0]),x+w/2,y+56);F(g,"900",38);const ls=shWrap(g,Z(p[1]),w-40).slice(0,4);ls.forEach((t,k)=>g.fillText(t,x+w/2,y+150+k*50-(ls.length-1)*20))});return y+h},
  form(g,b,y){const rh=52,h=74+b.rows.length*rh+18;g.fillStyle="#fff";rr(g,L0+20,y,CW-40,h,10);g.fill();g.strokeStyle="#555";g.lineWidth=4;rr(g,L0+28,y+8,CW-56,h-16,6);g.stroke();
   g.textAlign="center";g.fillStyle="#222";F(g,"900",34);g.fillText(Z(b.ti),540,y+56);
-  b.rows.forEach((r,i)=>{const yy=y+74+i*rh+36;g.textAlign="left";g.fillStyle="#666";fit(g,Z(r[0]),170,26,"500");g.fillText(Z(r[0]),L0+52,yy);g.fillStyle="#222";fit(g,Z(r[1]),CW-300,26,"500");g.fillText(Z(r[1]),L0+232,yy);g.strokeStyle="#ccc";g.lineWidth=1;g.beginPath();g.moveTo(L0+52,y+74+(i+1)*rh+8);g.lineTo(R0-52,y+74+(i+1)*rh+8);g.stroke()});
+  b.rows.forEach((r,i)=>{const yy=y+74+i*rh+36;g.textAlign="left";g.fillStyle="#555";fit(g,Z(r[0]),170,26,"700");g.fillText(Z(r[0]),L0+52,yy);g.fillStyle="#222";fit(g,Z(r[1]),CW-300,28,"700");g.fillText(Z(r[1]),L0+232,yy);g.strokeStyle="#ccc";g.lineWidth=1;g.beginPath();g.moveTo(L0+52,y+74+(i+1)*rh+8);g.lineTo(R0-52,y+74+(i+1)*rh+8);g.stroke()});
   g.save();g.translate(R0-130,y+h-80);g.rotate(-.26);g.strokeStyle="#c23030";g.lineWidth=6;g.beginPath();g.arc(0,0,58,0,7);g.stroke();g.fillStyle="#c23030";g.textAlign="center";fit(g,Z(b.stamp),90,32,"900");g.fillText(Z(b.stamp),0,11);g.restore();return y+h},
- chat(g,b,y){b.m.forEach(m=>{const r=m[2],nm=Z(m[0]),tx=Z(m[1]);F(g,"500",30);const tw=Math.min(CW*.75,Math.max(g.measureText(tx).width,(F(g,"500",20),g.measureText(nm).width))+44),h=88,x=r?R0-30-tw:L0+30;
-  g.fillStyle=r?"#06c755":"#f4f1e8";rr(g,x,y,tw,h,20);g.fill();g.textAlign="left";g.fillStyle=r?"#e8ffe8":"#777";F(g,"500",20);g.fillText(nm,x+22,y+30);g.fillStyle=r?"#fff":"#222";fit(g,tx,tw-40,30,"500");g.fillText(tx,x+22,y+70);y+=h+14});return y},
+ chat(g,b,y){const cp=b.m.length>3;b.m.forEach(m=>{const r=m[2],nm=Z(m[0]),tx=Z(m[1]);F(g,"700",31);const tw=Math.min(CW*.78,Math.max(g.measureText(tx).width,(F(g,"700",21),g.measureText(nm).width))+44),h=cp?74:88,x=r?R0-30-tw:L0+30;
+  g.fillStyle=r?"#06c755":"#f4f1e8";rr(g,x,y,tw,h,20);g.fill();g.textAlign="left";g.fillStyle=r?"#e8ffe8":"#555";F(g,"700",21);g.fillText(nm,x+22,y+(cp?27:30));g.fillStyle=r?"#fff":"#222";fit(g,tx,tw-40,31,"700");g.fillText(tx,x+22,y+(cp?60:70));y+=h+(cp?8:14)});return y},
  huge(g,b,y){g.textAlign="center";b.l.forEach((t,i)=>{g.fillStyle="rgba(0,0,0,.35)";fit(g,Z(t),CW,120,"900",60);g.fillText(Z(t),543,y+118+i*130);g.fillStyle=YE;g.fillText(Z(t),540,y+112+i*130)});return y+b.l.length*130+10},
  name(g,b,y){const gap=22,w=(CW-gap)/2,h=290;[0,1].forEach(i=>{const x=L0+i*(w+gap);g.fillStyle="#f4f1e8";rr(g,x,y,w,h,16);g.fill();g.textAlign="left";g.fillStyle="#888";F(g,"500",22);g.fillText(i?bi("背面：實際工作內容","Back: the actual job"):bi("正面","Front"),x+22,y+40);
   if(!i){g.fillStyle="#222";fit(g,Z(b.f[0]),w-44,46,"900");g.fillText(Z(b.f[0]),x+22,y+104);fit(g,Z(b.f[1]),w-44,28,"700");g.fillText(Z(b.f[1]),x+22,y+150);g.fillStyle="#888";fit(g,Z(b.f[2]),w-44,22,"500");g.fillText(Z(b.f[2]),x+22,y+h-28)}
-  else b.b.forEach((t,k)=>{g.fillStyle="#222";fit(g,"• "+Z(t),w-44,23,"500");g.fillText("• "+Z(t),x+22,y+90+k*46)})});return y+h},
+  else b.b.forEach((t,k)=>{g.fillStyle="#222";fit(g,"• "+Z(t),w-44,24,"700");g.fillText("• "+Z(t),x+22,y+90+k*46)})});return y+h},
  flow(g,b,y){const h=60+b.l.length*58;g.fillStyle="#f4f1e8";rr(g,L0+10,y,CW-20,h,18);g.fill();g.textAlign="center";g.fillStyle="#222";b.l.forEach((t,i)=>{fit(g,Z(t),CW-80,34,"600");g.fillText(Z(t),540,y+66+i*58)});return y+h},
- bar(g,b,y){const rh=64;b.rows.forEach((r,i)=>{const yy=y+i*rh;g.textAlign="left";g.fillStyle="#fff";fit(g,Z(r[0]),380,28,"500");g.fillText(Z(r[0]),L0+10,yy+40);const bx=L0+400,bw=CW-400-90;g.fillStyle="rgba(255,255,255,.12)";rr(g,bx,yy+18,bw,30,15);g.fill();g.fillStyle=r[2]||OR;rr(g,bx,yy+18,Math.max(30,bw*r[1]/40),30,15);g.fill();g.textAlign="right";g.fillStyle=r[2]||OR;F(g,"800",30);g.fillText(r[1]+"%",R0,yy+44)});return y+b.rows.length*rh}
+ bar(g,b,y){const rh=64;b.rows.forEach((r,i)=>{const yy=y+i*rh;g.textAlign="left";g.fillStyle="#fff";fit(g,Z(r[0]),380,29,"700");g.fillText(Z(r[0]),L0+10,yy+40);const bx=L0+400,bw=CW-400-90;g.fillStyle="rgba(255,255,255,.12)";rr(g,bx,yy+18,bw,30,15);g.fill();g.fillStyle=r[2]||OR;rr(g,bx,yy+18,Math.max(30,bw*r[1]/40),30,15);g.fill();g.textAlign="right";g.fillStyle=r[2]||OR;F(g,"800",30);g.fillText(r[1]+"%",R0,yy+44)});return y+b.rows.length*rh}
 };
 /* stats：{v:[[值,標籤,顏色]...], line} */
-function draw(g,c,S){const W=1080,H=1350;bg(g);g.textAlign="center";g.fillStyle="rgba(255,255,255,.92)";F(g,"800",30);g.fillText("🏗️ "+bi("平安收工，工地工安的一天","Clock Out Safe: A Day on Site"),540,62);
+function draw(g,c,S){const W=1080,H=1350;bg(g);g.textAlign="center";g.fillStyle="#fff";F(g,"800",32);g.fillText("🏗️ "+bi("平安收工，工地工安的一天","Clock Out Safe: A Day on Site"),540,62);
  shield(g,c);let y=360;
- if(c.tag){const t=Z(c.tag);F(g,"600",30);const tw=g.measureText(t).width+60;g.fillStyle="rgba(255,255,255,.08)";rr(g,540-tw/2,y,tw,52,26);g.fill();g.strokeStyle="rgba(255,255,255,.35)";g.lineWidth=2;g.stroke();g.fillStyle="#fff";g.textAlign="center";g.fillText(t,540,y+37);y+=62}else y+=6;
- g.fillStyle="#fff";g.textAlign="center";fit(g,Z(c.head),960,c.tag?58:62,"900",34);g.fillText(Z(c.head),540,y+56);y+=78;
- y=body[c.body.t](g,c.body,y);
- g.textAlign="center";if(c.punch){const p=Z(c.punch);const s=fit(g,p,980,70,"900",36);const py=Math.min(y+82,c.sub?868:896);g.fillStyle="rgba(0,0,0,.4)";g.fillText(p,543,py+4);g.fillStyle=YE;g.fillText(p,540,py);y=py}
- if(c.sub){g.textAlign="center";g.fillStyle="#ddd";const sl=shWrap((F(g,"700",28),g),Z(c.sub),940).slice(0,2);const sy=Math.min(y+(c.punch?50:56),c.punch?910:880);sl.forEach((t,i)=>g.fillText(t,540,sy+i*36))}
+ if(c.tag){const t=Z(c.tag);F(g,"800",32);const tw=g.measureText(t).width+60;g.fillStyle="rgba(255,255,255,.12)";rr(g,540-tw/2,y,tw,54,27);g.fill();g.strokeStyle="rgba(255,255,255,.5)";g.lineWidth=2;g.stroke();g.fillStyle="#fff";g.textAlign="center";g.fillText(t,540,y+39);y+=62}else y+=4;
+ g.textAlign="center";fit(g,Z(c.head),980,c.tag?68:74,"900",36);g.fillStyle="rgba(0,0,0,.45)";g.fillText(Z(c.head),543,y+66);g.fillStyle="#fff";g.fillText(Z(c.head),540,y+63);y+=84;
+ y=body[c.body.t](g,c.body,y);M._by=y;
+ g.textAlign="center";if(c.punch){const p=Z(c.punch);const s=fit(g,p,990,78,"900",38);const py=Math.min(y+82,c.sub?868:896);g.fillStyle="rgba(0,0,0,.4)";g.fillText(p,543,py+4);g.fillStyle=YE;g.fillText(p,540,py);y=py}
+ if(c.sub){g.textAlign="center";g.fillStyle="#ddd";g.fillStyle="#f1f1f1";const sl=shWrap((F(g,"800",30),g),Z(c.sub),960).slice(0,2);const sy=Math.min(y+(c.punch?50:56),c.punch?910:880);sl.forEach((t,i)=>g.fillText(t,540,sy+i*38))}
  const bw=296,gp=24,bx=(W-bw*3-gp*2)/2,by=936,bh=110;
- (S.v||[]).forEach((s,i)=>{const x=bx+i*(bw+gp);g.fillStyle="rgba(255,255,255,.09)";rr(g,x,by,bw,bh,20);g.fill();g.strokeStyle="rgba(255,255,255,.14)";g.lineWidth=2;g.stroke();g.textAlign="center";g.fillStyle=s[2]||"#fff";F(g,"800",50);g.fillText(s[0],x+bw/2,by+58);g.fillStyle="rgba(255,255,255,.72)";fit(g,s[1],bw-24,24,"500");g.fillText(s[1],x+bw/2,by+94)});
- if(S.line){g.fillStyle="rgba(255,255,255,.8)";fit(g,S.line,980,26,"500");g.fillText(S.line,540,1076)}
+ (S.v||[]).forEach((s,i)=>{const x=bx+i*(bw+gp);g.fillStyle="rgba(255,255,255,.09)";rr(g,x,by,bw,bh,20);g.fill();g.strokeStyle="rgba(255,255,255,.14)";g.lineWidth=2;g.stroke();g.textAlign="center";g.fillStyle=s[2]||"#fff";F(g,"800",50);g.fillText(s[0],x+bw/2,by+58);g.fillStyle="rgba(255,255,255,.88)";fit(g,s[1],bw-24,27,"700");g.fillText(s[1],x+bw/2,by+94)});
+ if(S.line){g.fillStyle="rgba(255,255,255,.9)";fit(g,S.line,980,28,"700");g.fillText(S.line,540,1076)}
  const py=1100,ph=214;g.fillStyle="#f5f1e6";rr(g,40,py,W-80,ph,26);g.fill();shQR(g,52,py+(ph-196)/2,196);
  g.textAlign="left";g.fillStyle="#1c2430";const cta=Z(c.cta);fit(g,cta,700,40,"800");g.fillText(cta,272,py+62);
- g.fillStyle="#5b6572";F(g,"500",25);shWrap(g,bi("掃描 QR 或點連結，一起來玩。","Scan the QR or open the link to play."),720).slice(0,2).forEach((t,i)=>g.fillText(t,272,py+104+i*32));
+ g.fillStyle="#3c4552";F(g,"700",26);shWrap(g,bi("掃描 QR 或點連結，一起來玩。","Scan the QR or open the link to play."),720).slice(0,2).forEach((t,i)=>g.fillText(t,272,py+104+i*32));
  g.fillStyle="#b45309";F(g,"700",23);g.fillText(SHARE_URL.replace("https://",""),272,py+ph-24);
- g.textAlign="center";g.fillStyle="rgba(255,255,255,.5)";F(g,"400",21);g.fillText(bi("遊戲情境皆為虛構，與任何企業或機關無關。","All scenarios are fictional and unrelated to any company or agency."),540,1342)}
+ g.textAlign="center";g.fillStyle="rgba(255,255,255,.66)";F(g,"600",21);g.fillText(bi("遊戲情境皆為虛構，與任何企業或機關無關。","All scenarios are fictional and unrelated to any company or agency."),540,1342)}
 M.canvasOf=(c,S,sc)=>{sc=sc||1;const cv=document.createElement("canvas");cv.width=Math.round(1080*sc);cv.height=Math.round(1350*sc);const g=cv.getContext("2d");g.scale(sc,sc);draw(g,c,S);return cv};
 /* ===== 情境與挑選 ===== */
 M.ctxGame=st=>{const t=TL(),R=rankOf(st),A=archOf(st);return{insp:false,k:R.k,st,acc:C.acc,days:C.n,near:t.n||0,good:t.g||0,cash:C.cash,prog:C.prog,arch:A.k,roles:(t.r||[]).slice(),hx:new Set(t.hx||[])}};
 M.statsGame=st=>{const S=shareStats(),R=rankOf(st);return{v:[[S.days?`${S.safe}/${S.days}`:"–",bi("平安下工（天）","Safe days")],[`${S.good}`,bi("關鍵判斷（次）","Key calls")],[`${S.acc}`,bi("重大職災（次）","Major accidents"),S.acc?RD:"#6ee7a0"]],
  line:`${S.site.e} ${L(S.site.n)} · ${bi("進度","Progress")} ${C.prog}%`+(S.days?` · ${bi("安全均分","Avg safety")} ${S.avg}`:""),site:C.site}};
 M.pick=ctx=>{const mm=ST0(),el=CARDS.filter(c=>{try{return c.r(ctx)}catch(e){return false}});if(!el.length)return null;
- let best=null,bs=-1e9;el.forEach(c=>{const s=c.p+(mm[c.id]?0:2.2)+Math.random()*1.6;if(s>bs){bs=s;best=c}});return best};
+ let lst=[];try{lst=JSON.parse(localStorage.getItem("s24mml")||"[]")}catch(e){}let best=null,bs=-1e9;el.forEach(c=>{const ri=lst.indexOf(c.id),s=c.p+(mm[c.id]?0:2.2)+Math.random()*1.6-(ri==0?3:ri>0?1.5:0);if(s>bs){bs=s;best=c}});try{lst=[best.id].concat(lst.filter(x=>x!=best.id)).slice(0,3);localStorage.setItem("s24mml",JSON.stringify(lst))}catch(e){}return best};
 M.unlock=(c,S)=>{const mm=ST0(),isNew=!mm[c.id];mm[c.id]=mm[c.id]||{n:0,t:Date.now()};mm[c.id].n++;mm[c.id].s={v:S.v,line:S.line};try{svS()}catch(e){}return isNew};
 M.count=()=>Object.keys(ST0()).filter(k=>CARDS.some(c=>c.id==k)).length;M.total=()=>CARDS.length;
 /* ===== 成果卡整合 ===== */
