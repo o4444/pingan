@@ -1,0 +1,25 @@
+/**
+ * 全員找找看 AI 代理（Cloudflare Worker）
+ * 用「Deploy to Cloudflare」按鈕部署時，Cloudflare 會自動建立 Workers AI 綁定與 KV，
+ * 並請你填 GEMINI_API_KEY（見 .dev.vars.example）。
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hazard-scouter",
+	"main": "src/index.js",
+	"compatibility_date": "2025-10-08",
+	"workers_dev": true,
+	"keep_vars": true,
+	"observability": {
+		"enabled": false
+	},
+	"ai": {
+		"binding": "AI"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "RL",
+			"id": "5b1f0c7e9a2d4c8e8f3a6b0d2e4c7a91"
+		}
+	]
+}

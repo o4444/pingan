@@ -1,0 +1,28 @@
+{
+	"name": "hazard-scouter",
+	"version": "2.0.0",
+	"private": true,
+	"description": "全員找找看 AI 代理：Gemini 優先、Workers AI 備援，含防盜用限制",
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev"
+	},
+	"devDependencies": {
+		"wrangler": "4.136.1"
+	},
+	"cloudflare": {
+		"label": "全員找找看 AI 代理",
+		"products": ["Workers", "Workers AI", "KV"],
+		"bindings": {
+			"GEMINI_API_KEY": {
+				"description": "Google AI Studio 的 Gemini 金鑰。金鑰所屬的 Google 專案請不要開啟帳單，這樣就算被盜用也不會扣款。"
+			},
+			"AI": {
+				"description": "Workers AI：Gemini 額度用完時的免費備援，不需要金鑰。"
+			},
+			"RL": {
+				"description": "記錄每個 IP 每天用了幾次，用來防止盜用（IP 只存雜湊值，25 小時後自動刪除）。"
+			}
+		}
+	}
+}
