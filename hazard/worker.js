@@ -17,7 +17,7 @@
  *
  * 選填變數
  *   ALLOWED_ORIGINS     允許呼叫的網站，逗號分隔。預設只允許 https://o4444.github.io
- *   DAILY_LIMIT         每個 IP 每天可呼叫幾次（預設 60；開啟放大檢查時一張照片最多用 5 次）
+ *   DAILY_LIMIT         每個 IP 每天可呼叫幾次（預設 100；開啟放大檢查時一張照片最多用 5 次）
  *   GEMINI_MODEL        預設 gemini-3.8-flash
  *   GEMINI_LITE_MODEL   預設 gemini-3.5-flash-lite；填 off 可停用這一層
  *   CF_MODEL            預設 @cf/google/gemma-4-26b-a4b-it
@@ -62,7 +62,7 @@ const OPENAI_LIKE = {
   openrouter: ["https://openrouter.ai/api/v1/chat/completions", "OPENROUTER_API_KEY", "OPENROUTER_MODEL", false],
 };
 
-const dailyLimit = (env) => Math.max(1, parseInt(env.DAILY_LIMIT || "60", 10) || 60);
+const dailyLimit = (env) => Math.max(1, parseInt(env.DAILY_LIMIT || "100", 10) || 100);
 
 export default {
   async fetch(req, env) {
