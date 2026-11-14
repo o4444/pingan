@@ -108,7 +108,7 @@ dl{margin:6px 0 0;display:grid;grid-template-columns:4em 1fr;gap:2px 8px;font-si
    <path d="M60 4v26M60 90v26M4 60h26M90 60h26"/>
    <g class="sw"><path d="M60 60V14A46 46 0 0 1 100 37Z" fill="currentColor" fill-opacity=".3" stroke="none"/><path d="M60 60V14"/></g>
   </svg>
-  <div class="tt"><small class="mono">HAZARD SCOUTER · v0.9-α</small><h1 id="h1"></h1><p class="tag" data-i="tag"></p></div>
+  <div class="tt"><small class="mono">HAZARD SCOUTER · v0.10-α</small><h1 id="h1"></h1><p class="tag" data-i="tag"></p></div>
  </div>
  <div class="chips mono"><span class="chip on" data-i="chipOff"></span><span id="net" class="chip off"></span></div>
  <div class="ctl" role="group" aria-label="settings">
@@ -123,6 +123,7 @@ dl{margin:6px 0 0;display:grid;grid-template-columns:4em 1fr;gap:2px 8px;font-si
   <label class="btn"><span data-i="pick"></span><input id="pick" type="file" accept="image/*,video/*,.heic,.heif,.avif,.tif,.tiff,.jfif,.webp,.bmp,.svg" hidden></label>
  </div>
  <textarea id="ctx" rows="2" data-ip="ctxph"></textarea>
+ <div id="apbox" class="cbox" hidden><p data-i="apT" style="margin:0 0 6px;font-weight:700"></p><ol style="margin:0 0 8px;padding-left:20px;font-size:13px;line-height:1.6"><li data-i="ap1"></li><li data-i="ap2"></li><li data-i="ap3"></li></ol><div class="row"><button id="apShare" class="main" type="button" data-i="apShare"></button><button id="apCopy" type="button" data-i="apCopy"></button></div><textarea id="apPr" rows="3" readonly hidden></textarea><textarea id="apIn" rows="4" data-ip="apPh"></textarea><div class="row" style="margin-top:6px"><button id="apGo" class="main" type="button" data-i="apGo"></button><button id="apX" type="button" data-i="apX"></button></div></div>
  <div id="cbox" class="cbox" hidden><p id="cTx" style="margin:0 0 8px"></p><div class="row"><button id="cOk" class="main" type="button" data-i="cOk"></button><button id="cNo" type="button" data-i="cNo"></button></div></div>
  <div class="row" style="margin-top:10px"><button id="ai" class="main" disabled data-i="ai"></button><button id="go" disabled data-i="go"></button><button id="stop" type="button" hidden data-i="stopB"></button></div>
  <label class="mut" style="display:block;font-size:13px;margin-top:8px"><input id="auto" type="checkbox"> <span data-i="autoL"></span></label>
@@ -240,7 +241,7 @@ intro:["拍一張現場照片或從相簿選一張，裝置會直接在手機上
 cam:["拍照","Take photo"],pick:["選擇照片","Choose photo"],ctxph:["作業情境（選填），例如：屋頂鋼構安裝、化學品倒料作業。用來排出相關的檢查項目，也用於 AI 分析","Task context (optional), e.g. roof steel erection, chemical pouring. Used to prioritise checklist items and for AI analysis"],
 go:["離線掃描","Offline scan"],ai:["AI 深度分析","AI deep analysis"],
 m0:["請先選擇照片。","Please choose a photo first."],m1:["已選好照片，按「離線掃描」。","Photo ready. Press “Offline scan”."],m2:["掃描中…","Scanning…"],m3:["完成（離線）。","Done (offline)."],m4:["掃描失敗，請換一張照片再試。","Scan failed. Try another photo."],
-m5:["AI 分析中，約需 20 到 60 秒…","AI analyzing, about 20–60 s…"],m6:["完成（AI）。","Done (AI)."],m7:["需要你同意使用 Claude 才能分析。","Permission to use Claude is required."],m8:["請求太頻繁，請稍後再試。","Too many requests. Try again later."],m9:["AI 分析失敗，可改用離線掃描，或稍後再試。","AI analysis failed. Use offline scan or retry later."],m10:["這張照片無法讀取，請換一張。","Cannot read this photo. Try another."],
+m5:["AI 分析中，約需 20 到 60 秒…","AI analyzing, about 20–60 s…"],m6:["完成（AI）。","Done (AI)."],m7:["需要你同意使用 Claude 才能分析。","Permission to use Claude is required."],m8:["請求太頻繁，請稍後再試。","Too many requests. Try again later."],m9:["AI 分析失敗。可在「AI 服務」改選「用 AI App 分析」，或用離線掃描。","AI analysis failed. Choose “Analyse with an AI app” under AI service, or use the offline scan."],m10:["這張照片無法讀取，請換一張。","Cannot read this photo. Try another."],
 m11:["已載入圖例，按「離線掃描」或「AI 深度分析」，再和下面的參考答案比較。","Library image loaded. Run a scan, then compare with the reference answers."],
 fmt:["支援：JPG／PNG／WebP／GIF／BMP／AVIF／SVG、影片（擷取畫面）、拖放與貼上。HEIC 需用 Safari 開啟；PDF 請先轉成圖片。","Supported: JPG/PNG/WebP/GIF/BMP/AVIF/SVG, video (frame capture), drag-drop and paste. HEIC needs Safari; convert PDFs to images first."],
 f_heic:["這個檔案實際上是 HEIC/HEIF（iPhone 預設格式），目前的瀏覽器無法開啟，即使副檔名是 .jpg 也一樣。請用 Safari 開啟本頁，或到「設定→相機→格式→最相容」改拍 JPEG，或先轉成 JPG。","This file is actually HEIC/HEIF (iPhone default) and this browser cannot open it, even if named .jpg. Open this page in Safari, set Settings → Camera → Formats → Most Compatible, or convert to JPG."],
@@ -347,6 +348,20 @@ m6zf:["完成（AI）。放大檢查沒有成功，結果只含整張照片的�
 mZoomStop:["已停止放大檢查，保留整張照片的結果。","Zoom check stopped; whole-photo results kept."],
 zoomL:["放大檢查細節（分四塊再看一次，多花約 1 分鐘，較能找到遠處的小問題）","Zoom check (looks again at four close-ups; about 1 extra minute; finds small, distant issues)"],
 zTag:["放大檢查發現","Found in zoom check"],scL:["場所：","Site: "],scW:["　作業：","  Work: "],scP:["　人員：","  People: "],goodL:["良好事項：","Good practice: "],
+detL:["原因：","Reason: "],
+apT:["用手機上的 AI App 分析（本站免登入、免金鑰）","Analyse with an AI app on your phone (no sign-in here, no key)"],
+ap1:["按「分享照片」，選 Gemini 或 ChatGPT（提示詞會同時自動複製）。電腦上：按「複製提示詞」，到 AI 網站貼上並附上這張照片。","Tap “Share photo” and pick Gemini or ChatGPT (the prompt is copied at the same time). On a computer: tap “Copy prompt”, paste it on the AI website and attach this photo."],
+ap2:["在 AI App 的輸入框長按「貼上」提示詞後送出。建議用 Gemini，標框位置通常最準。","In the AI app, long-press the message box, paste the prompt and send. Gemini usually places boxes most accurately."],
+ap3:["複製 AI 的整段回覆，回到這裡貼到下面的框，就會在照片上標出危害。","Copy the AI’s whole reply, come back and paste it below; the hazards are marked on the photo."],
+apShare:["分享照片","Share photo"],apCopy:["複製提示詞","Copy prompt"],apPh:["把 AI 的回覆貼在這裡","Paste the AI reply here"],apGo:["標示到照片上","Mark on photo"],apX:["關閉","Close"],
+mApp:["請依框內三個步驟，用手機上的 AI App 分析這張照片。","Follow the three steps in the box to analyse this photo with an AI app."],
+mApCopied:["提示詞已複製。到 AI App 開新對話貼上，並附上同一張照片。","Prompt copied. Paste it into a new chat in the AI app and attach the same photo."],
+mApShared:["照片已送出。在 AI App 長按輸入框「貼上」提示詞再送出；拿到回覆後複製回來貼上。","Photo sent. In the AI app, paste the prompt into the message box and send; then copy the reply back here."],
+mApNoShare:["這個瀏覽器不能直接分享照片。提示詞已複製，請自己打開 AI App，附上這張照片並貼上提示詞。","This browser can’t share the photo directly. The prompt is copied; open the AI app yourself, attach this photo and paste the prompt."],
+mApCopyFail:["無法自動複製，請在下方提示詞框長按全選後複製。","Couldn’t copy automatically; long-press the prompt box below, select all and copy."],
+mApEmpty:["請先貼上 AI 的回覆。","Paste the AI reply first."],
+mApBad:["看不懂這段回覆。請確認複製的是 AI 的整段回覆（含大括號 { }），或請 AI「只用 JSON 重新回答」。","Couldn’t read this reply. Copy the AI’s whole reply (including the { } braces), or ask the AI to “answer again in JSON only”."],
+mApOk:n=>["已依 AI App 的回覆標出 "+n+" 項，請人工確認。","Marked "+n+" items from the AI app’s reply. Please verify."],
 pxTag:["（網站提供，免設定）"," (provided by this site, no setup)"],login:["登入 ","Sign in to "],logout:["登出 ","Sign out of "],
 netOn:["AI 分析：可用","AI analysis: available"],netNone:["AI 分析：此頁沒有可用的 AI（可用離線掃描）","AI analysis: none on this page (use offline scan)"],netLogin:["AI 分析：第一次使用請登入（點此）","AI analysis: sign in once to start (tap here)"],
 m15:["這個頁面目前沒有可用的 AI，請用離線掃描與檢查表。","No AI is available on this page; use the offline scan and checklist."],
@@ -361,14 +376,14 @@ mOrGo:["前往 OpenRouter 登入中…","Going to OpenRouter to sign in…"],mOr
 mQuota:["免費額度已用完或請求太頻繁，請稍後再試，或改用其他 AI 服務。","Free quota used up or too many requests. Try later or switch AI service."],
 consentL:["AI 分析會把照片（以及你填寫的作業情境文字）傳送到外部 AI 服務，使用你自己登入帳號的免費額度，不需要金鑰。免費服務送出的內容可能被服務商用於改善產品，請勿上傳含人臉、姓名、車牌或公司機密的照片。同意後這個瀏覽器不再詢問；開啟「自動分析」時，選好照片就會直接送出。","AI analysis sends the photo (and your task-context text) to an external AI service on your own signed-in account’s free quota; no key is needed. Free services may use what you send to improve their products, so do not upload photos with faces, names, plates or confidential information. After you agree this browser will not ask again; with auto-analysis on, a chosen photo is sent straight away."]
 });
-const msg=(k,e,...a)=>{MK=[k,e,...a];const m=$("#msg");m.textContent=t(k,...a);m.className=e?"err":"mut";const S2={m1:"stIdle",mZoom:"stRun",m6z:"stAi",m6z0:"stAi",m6zf:"stAi",mZoomStop:"stAi",mStop:"stIdle",m2:"stRun",m5:"stRun",m3:"stOff",m6:"stAi",m4:"stFail",m9:"stFail",m12:"stFail",m13:"stFail",m14:"stFail",m7:"stFail",m8:"stFail"};if(S2[k])ST=S2[k];paintInfo()};
+const msg=(k,e,...a)=>{MK=[k,e,...a];const m=$("#msg");m.textContent=t(k,...a);m.className=e?"err":"mut";const S2={m1:"stIdle",mZoom:"stRun",mApOk:"stAi",m6z:"stAi",m6z0:"stAi",m6zf:"stAi",mZoomStop:"stAi",mStop:"stIdle",m2:"stRun",m5:"stRun",m3:"stOff",m6:"stAi",m4:"stFail",m9:"stFail",m12:"stFail",m13:"stFail",m14:"stFail",m7:"stFail",m8:"stFail"};if(S2[k])ST=S2[k];paintInfo()};
 function paintInfo(){const f=$("#finfo");if(!f)return;const b=INFO.k?t(INFO.k):INFO.n;f.textContent=b?t("infoL")+b+(ST?t("infoS")+t(ST):""):""}
 let lang="zh",theme="green",MK=["m0"],LAST=null,EXK=null;
 const $=s=>document.querySelector(s);let blob=null,sample=null,CUR=null,LH=null,HI=null,FOUND=0,PHASE="",T0=0;
 const t=(k,...a)=>{let v=L[k];if(typeof v==="function")v=v(...a);return v?(lang==="en"?v[1]:v[0]):k};
 const tc=x=>lang==="en"?(CEN[x]||x):x,ts=x=>lang==="en"?(SEN[x]||x):x,tt=e=>lang==="en"?ENT[EX.indexOf(e)]:e.t;
 const lsG=k=>{try{return localStorage.getItem(k)||""}catch(e){return""}},lsS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-const PVN={builtin:"Claude（內建，免設定）",puter:"Puter（登入即用）",openrouter:"OpenRouter（登入即用）",gemini:"Gemini",groq:"Groq（Qwen）",gpt:"GPT",claude:"Claude",cf:"Cloudflare Workers AI"};
+const PVN={app:"用 AI App 分析（Gemini、ChatGPT…）",builtin:"Claude（內建，免設定）",puter:"Puter（登入即用）",openrouter:"OpenRouter（登入即用）",gemini:"Gemini",groq:"Groq（Qwen）",gpt:"GPT",claude:"Claude",cf:"Cloudflare Workers AI"};
 /* ===== 部署設定 / Deploy config =====
    DEFAULT_PROXY：填入你部署的 Worker 網址（見 worker.js），例如 "https://hazard.你的帳號.workers.dev"。
      填了之後，所有訪客不必登入、不必任何設定就能用 AI 分析，費用由你的代理負擔；
@@ -383,11 +398,11 @@ let PXP=null,RUN=0,CTL=null,SIG=null,BUSY=false,TICK=0,PUTER_ST="",ORK=lsG("hs_o
 const proxyUrl=()=>{const u=DEFAULT_PROXY.trim();return /^https:\/\/\S+$/.test(u)?u.replace(/\/+$/,""):""};
 const curPv=()=>$("#prov").value||"";
 const pvName=v=>v.startsWith("px:")?(PVN[v.slice(3)]||v.slice(3))+t("pxTag"):PVN[v];
-function provList(){const a=[];if(sample)a.push("builtin");if(PXP)PXP.forEach(k=>a.push("px:"+k));if(!INCLAUDE&&!PXP){if(PUTER_ST!=="fail")a.push("puter");a.push("openrouter")}return a}
+function provList(){const a=[];if(sample)a.push("builtin");if(PXP)PXP.forEach(k=>a.push("px:"+k));if(!sample&&!PXP)a.push("app");if(!INCLAUDE&&!PXP){if(PUTER_ST!=="fail")a.push("puter");a.push("openrouter")}if(!a.includes("app"))a.push("app");return a}
 const loggedIn=v=>v==="puter"?!!(window.puter&&puter.auth&&puter.auth.isSignedIn()):v==="openrouter"?!!ORK:true;
-const provOK=()=>{const v=curPv();return v==="builtin"?!!sample:v.startsWith("px:")?!!proxyUrl():v==="puter"?PUTER_ST!=="fail":v==="openrouter"};
+const provOK=()=>{const v=curPv();return v==="app"?true:v==="builtin"?!!sample:v.startsWith("px:")?!!proxyUrl():v==="puter"?PUTER_ST!=="fail":v==="openrouter"};
 function showLogin(){const b=$("#login"),v=curPv(),need=v==="puter"||v==="openrouter";b.hidden=!need;if(need){const li=loggedIn(v);b.textContent=t(li?"logout":"login")+(v==="puter"?"Puter":"OpenRouter");b.className=li?"":"main"}}
-function buildProv(){const sl=$("#prov"),cv=sl.value,a=provList(),sv=lsG("hs_pv");sl.innerHTML=a.map(k=>'<option value="'+k+'">'+pvName(k)+"</option>").join("");sl.value=a.includes(cv)?cv:a.includes(sv)?sv:(a[0]||"");sl.parentElement.hidden=a.length<2;showLogin();$("#pvrow").hidden=a.length<2&&$("#login").hidden}
+function buildProv(){const sl=$("#prov"),cv=sl.value,a=provList(),sv=lsG("hs_pv2");sl.innerHTML=a.map(k=>'<option value="'+k+'">'+pvName(k)+"</option>").join("");sl.value=a.includes(sv)?sv:(a[0]||"");sl.parentElement.hidden=a.length<2;showLogin();$("#pvrow").hidden=a.length<2&&$("#login").hidden}
 const ex=(st)=>{const e=new Error("http "+st);e.code=st===429?"rate_limited":(st===401||st===403)?"bad_key":(st===400||st===404||st===422)?"bad_req":"http";return e};
 function b2d(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b)})}
 /* Puter：訪客用自己的 Puter 帳號（有每月免費額度）登入，彈出視窗，不用金鑰 */
@@ -404,20 +419,21 @@ const b64u=a=>btoa(String.fromCharCode(...new Uint8Array(a))).replace(/\+/g,"-")
 async function orLogin(){const v=b64u(crypto.getRandomValues(new Uint8Array(32)).buffer);let ch=v,me="plain";try{ch=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));me="S256"}catch(e){}
  lsS("hs_or_v",v);lsS("hs_or_m",me);msg("mOrGo");location.href="https://openrouter.ai/auth?callback_url="+encodeURIComponent(location.origin+location.pathname)+"&code_challenge="+encodeURIComponent(ch)+"&code_challenge_method="+me}
 async function orReturn(){let code=null;try{code=new URLSearchParams(location.search).get("code")}catch(e){}const v=lsG("hs_or_v");if(!code||!v)return;try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}lsS("hs_or_v","");
- try{const r=await fetch("https://openrouter.ai/api/v1/auth/keys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code,code_verifier:v,code_challenge_method:lsG("hs_or_m")||"S256"})});const j=await r.json();if(!r.ok||!j.key)throw 0;ORK=j.key;lsS("hs_or_key",ORK);lsS("hs_pv","openrouter");buildProv();msg("mOrOk")}catch(e){msg("mOrNo",1)}netChip()}
+ try{const r=await fetch("https://openrouter.ai/api/v1/auth/keys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code,code_verifier:v,code_challenge_method:lsG("hs_or_m")||"S256"})});const j=await r.json();if(!r.ok||!j.key)throw 0;ORK=j.key;lsS("hs_or_key",ORK);lsS("hs_pv2","openrouter");buildProv();msg("mOrOk")}catch(e){msg("mOrNo",1)}netChip()}
+async function rdErr(r){try{const j=await r.json();return String((j.error&&(j.error.message||j.error))||j.detail||j.message||"").slice(0,160)}catch(e){return""}}
 async function viaOR(prompt,b){const d=await b2d(b);const r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",signal:SIG,headers:{"Authorization":"Bearer "+ORK,"Content-Type":"application/json"},body:JSON.stringify({model:OR_MODEL,temperature:0.2,messages:[{role:"user",content:[{type:"text",text:prompt},{type:"image_url",image_url:{url:d}}]}]})});
- if(r.status===401){ORK="";lsS("hs_or_key","");showLogin();const e=new Error("401");e.code="login";throw e}if(!r.ok)throw ex(r.status);const j=await r.json();return(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||""}
+ if(r.status===401){ORK="";lsS("hs_or_key","");showLogin();const e=new Error("401");e.code="login";throw e}if(!r.ok){const e=ex(r.status);e.message="OpenRouter "+r.status+" "+await rdErr(r);throw e}const j=await r.json();if(j.error){const e=new Error("OpenRouter "+(j.error.message||j.error));throw e}return(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||""}
 /* 網站代理：訪客什麼都不用做 */
 async function loadPxp(){PXP=null;const u=proxyUrl();if(u){try{const c=new AbortController(),tm=setTimeout(()=>c.abort(),6000);const r=await fetch(u+"/providers",{signal:c.signal});clearTimeout(tm);if(r.ok){const j=await r.json();if(Array.isArray(j.providers)){const p=j.providers.filter(k=>PXL.includes(k));if(p.length)PXP=p}}}catch(e){}}buildProv();netChip()}
 async function viaProxy(pv,prompt,b){const img=await b2d(b),h={"Content-Type":"application/json"},k=DEFAULT_TOKEN.trim();if(k)h["X-App-Token"]=k;
  const r=await fetch(proxyUrl()+"/analyze",{method:"POST",signal:SIG,headers:h,body:JSON.stringify({provider:pv,prompt:prompt,image:img})});
- if(!r.ok){const e=new Error("proxy "+r.status);e.code=r.status===429?"rate_limited":(r.status===401||r.status===403)?"bad_token":"proxy";throw e}
+ if(!r.ok){const e=new Error("proxy "+r.status+" "+await rdErr(r));e.code=r.status===429?"rate_limited":(r.status===401||r.status===403)?"bad_token":"proxy";throw e}
  const j=await r.json();if(typeof j.text!=="string")throw 0;return j.text}
 const netChip=()=>{const n=$("#net"),on=navigator.onLine,v=curPv(),ok=on&&!!v&&provOK(),li=loggedIn(v);n.className="chip "+(ok&&li?"on":"off");n.textContent=t(!on?"netOff":!ok?"netNone":li?"netOn":"netLogin");n.style.cursor=ok&&!li?"pointer":"";showLogin();$("#ai").disabled=BUSY||!(on&&blob)};
 $("#net").onclick=()=>{const v=curPv();if(provOK()&&!loggedIn(v))$("#login").click()};
 $("#login").onclick=()=>{const v=curPv();if(loggedIn(v)){if(v==="puter"){try{puter.auth.signOut()}catch(e){}}else{ORK="";lsS("hs_or_key","")}showLogin();netChip();return}
  if(v==="puter")puterLogin().then(()=>msg("mPuOk"),()=>{if(window.puter)msg("mLoginNo",1)});else if(v==="openrouter")orLogin()};
-$("#prov").onchange=()=>{lsS("hs_pv",curPv());$("#cbox").hidden=true;showLogin();netChip()};
+$("#prov").onchange=()=>{lsS("hs_pv2",curPv());$("#cbox").hidden=true;if(curPv()!=="app")$("#apbox").hidden=true;showLogin();netChip()};
 function applyLang(){try{renderTrk()}catch(e){}try{buildProv()}catch(e){}document.documentElement.lang=lang==="en"?"en":"zh-Hant";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));document.querySelectorAll("[data-ip]").forEach(e=>e.placeholder=t(e.dataset.ip));
  $("#h1").innerHTML=lang==="en"?'Everyone Spot It<span>Hazard Scouter</span>':'全員找找看<span>危害辨識裝置</span>';document.title=lang==="en"?"Everyone Spot It - Hazard Scouter":"全員找找看-危害辨識裝置";
  $("#thG").textContent=t("thG");$("#thR").textContent=t("thR");$("#tgT").textContent=t("tgT");
@@ -457,7 +473,7 @@ function openVideo(f){const o=$("#out");o.textContent="";const c=ce("div","card"
  const u=URL.createObjectURL(f);v.src=u;c.appendChild(ce("p","mut",t("vidT")));c.appendChild(v);const b=ce("button","main",t("vidB"));b.type="button";b.style.marginTop="8px";
  b.onclick=()=>{try{const w=v.videoWidth,h=v.videoHeight;if(!w)throw 0;const k=Math.min(1,1600/Math.max(w,h)),cv=document.createElement("canvas");cv.width=Math.round(w*k);cv.height=Math.round(h*k);cv.getContext("2d").drawImage(v,0,0,cv.width,cv.height);const url=cv.toDataURL("image/jpeg",.85);let hi=null;if(Math.max(w,h)>1700){const k2=Math.min(1,3200/Math.max(w,h)),c2=document.createElement("canvas");c2.width=Math.round(w*k2);c2.height=Math.round(h*k2);c2.getContext("2d").drawImage(v,0,0,c2.width,c2.height);hi=d2b(c2.toDataURL("image/jpeg",.9))}setPhoto({url,blob:d2b(url),hi});msg("vidOk");window.scrollTo({top:0,behavior:"smooth"})}catch(e){msg("f_video",1)}};
  v.onerror=()=>msg("f_video",1);c.appendChild(b);o.appendChild(c);msg("vidT")}
-function ready(){RUN++;if(CTL)CTL.abort();BUSY=false;$("#cbox").hidden=true;busy(false);netChip()}
+function ready(){RUN++;if(CTL)CTL.abort();BUSY=false;$("#cbox").hidden=true;$("#apbox").hidden=true;$("#apPr").hidden=true;$("#apIn").value="";busy(false);netChip()}
 ["#cam","#pick"].forEach(q=>{$(q).onchange=e=>{const f=e.target.files[0];e.target.value="";take(f)}});
 function ce(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function vb(b){if(!Array.isArray(b)||b.length!==4)return null;b=b.map(Number);if(b.some(v=>!isFinite(v)))return null;b=b.map(v=>Math.max(0,Math.min(1000,v)));return b[2]-b[0]>10&&b[3]-b[1]>10?b:null}
@@ -589,7 +605,7 @@ $("#go").onclick=async()=>{if(!blob)return;const b=$("#go");b.disabled=true;msg(
  b.disabled=false};
 function tick(){if(!BUSY)return;const k=MK[0];if(k!=="m5"&&k!=="mZoom")return;$("#msg").textContent=t(k,...MK.slice(2))+(k==="m5"&&FOUND?t("mFound",FOUND):"")+"（"+Math.round((Date.now()-T0)/1000)+"s）"}
 function busy(on){$("#stop").hidden=!on;$("#ai").disabled=on||!(navigator.onLine&&blob);$("#go").disabled=on||!blob;clearInterval(TICK);if(on){T0=Date.now();TICK=setInterval(tick,1000)}}
-function askAI(){const pv=curPv();if(!blob||BUSY)return;if(!navigator.onLine){msg("netOff",1);return}if(!pv||!provOK()){msg("m15",1);return}
+function askAI(){const pv=curPv();if(!blob||BUSY)return;if(pv==="app"){openApp();return}if(!navigator.onLine){msg("netOff",1);return}if(!pv||!provOK()){msg("m15",1);return}
  if(!AIC[pv]){let hn="";if(pv.startsWith("px:")){try{hn=" via "+new URL(proxyUrl()).host}catch(e){}}else if(HOSTS[pv])hn=" → "+HOSTS[pv];
   const c=$("#cTx");c.style.whiteSpace="pre-line";c.textContent=t(pv==="builtin"?"consentB":(pv==="puter"||pv==="openrouter")?"consentL":"consent")+t("consentP")+pvName(pv)+hn;$("#cbox").hidden=false;try{$("#cbox").scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}return}
  start()}
@@ -620,7 +636,8 @@ function mergeZoom(p,r,tl,x){const con=isCon(p,x),[ty,tx,by,bx]=tl.reg,sy=(by-ty
   const d=p.hazards.find(g=>sameHz(g,h));if(d){if(d.zoom&&(SEVN[h.severity]||0)>(SEVN[d.severity]||0))d.severity=h.severity;return}p.hazards.push(h);n++});return n}
 async function pool(a,n,f){let i=0;const w=async()=>{while(i<a.length){const k=i++;await f(a[k])}};await Promise.all(Array.from({length:Math.min(n,a.length)},w))}
 function scanOn(){const w=$("#out .pw");if(w&&!w.querySelector(".sl")){w.classList.add("scan");w.appendChild(ce("div","sl"))}}
-function aiErr(e,sig){const st=sig.aborted||(e&&(e.code==="cancelled"||e.name==="AbortError"));msg(st?"mStop":e&&e.code==="quota"?"mQuota":e&&e.code==="login"?"mLoginNo":e&&e.code==="not_granted"?"m7":e&&e.code==="rate_limited"?"m8":e&&e.code==="bad_key"?"m13":e&&e.code==="bad_req"?"m16":e&&e.code==="bad_token"?"m17":(e===0||e instanceof SyntaxError)?"m12":e instanceof TypeError?"m14":"m9",!st)}
+const errDet=e=>{if(!e||e===0)return"";if(e instanceof SyntaxError)return"";let s=errTxt(e);if(e instanceof TypeError&&/fetch|network|load/i.test(s))s+=" (network/CORS)";return s.replace(/\s+/g," ").trim().slice(0,160)};
+function aiErr(e,sig){const st=sig.aborted||(e&&(e.code==="cancelled"||e.name==="AbortError"));msg(st?"mStop":e&&e.code==="quota"?"mQuota":e&&e.code==="login"?"mLoginNo":e&&e.code==="not_granted"?"m7":e&&e.code==="rate_limited"?"m8":e&&e.code==="bad_key"?"m13":e&&e.code==="bad_req"?"m16":e&&e.code==="bad_token"?"m17":(e===0||e instanceof SyntaxError)?"m12":e instanceof TypeError?"m14":"m9",!st);const d=st?"":errDet(e);if(d)$("#msg").textContent+="（"+t("detL")+d+"）"}
 async function doAI(){const pv=curPv();if(!blob||BUSY)return;const my=++RUN,ctl=new AbortController(),sig=ctl.signal;CTL=ctl;SIG=sig;BUSY=true;FOUND=0;PHASE="main";msg("m5");busy(true);CKS={};ACT=null;
  const o=$("#out");o.textContent="";const w=wrap([]);w.classList.add("scan");w.appendChild(ce("div","sl"));o.appendChild(w);
  const x=$("#ctx").value.trim().slice(0,200),b=blob,hi=HI,src0=CUR.src,pr=PROMPT+(x?"\n作業情境："+x:"")+(lang==="en"?EN_OUT:"");
@@ -639,6 +656,19 @@ async function doAI(){const pv=curPv();if(!blob||BUSY)return;const my=++RUN,ctl=
  if(add){sortHz(p);fixOverall(p)}
  if(LAST&&LAST.r===p)rr(p,LAST.src,LAST.tap);
  end(!ok?"m6zf":add?"m6z":"m6z0",add)}
+/* ===== 用 AI App 分析：分享照片＋複製提示詞 → 在 Gemini／ChatGPT 等 App 分析 → 貼回回覆，本頁解析並標框 ===== */
+const appPrompt=()=>{const x=$("#ctx").value.trim().slice(0,200);return PROMPT+(x?"\n作業情境："+x:"")+(lang==="en"?EN_OUT:"")+"\n（我會把你的回覆貼回網頁程式解析，請只輸出一個 JSON 物件，可以放在程式碼區塊中。）"};
+function openApp(){if(!blob)return;$("#cbox").hidden=true;$("#apbox").hidden=false;$("#apPr").hidden=true;msg("mApp");try{$("#apbox").scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}}
+function apCopy(silent){const p=appPrompt(),show=()=>{const a=$("#apPr");a.value=p;a.hidden=false;try{a.focus();a.select()}catch(e){}msg("mApCopyFail",1)};
+ try{const w=navigator.clipboard&&navigator.clipboard.writeText(p);if(!w){show();return false}w.then(()=>{if(!silent)msg("mApCopied")},show);return true}catch(e){show();return false}}
+$("#apCopy").onclick=()=>apCopy(false);
+$("#apShare").onclick=()=>{apCopy(true);let f=null;try{f=new File([blob],"hazard-photo.jpg",{type:"image/jpeg"})}catch(e){}
+ if(f&&navigator.canShare&&navigator.share){let ok=false;try{ok=navigator.canShare({files:[f]})}catch(e){}if(ok){navigator.share({files:[f]}).then(()=>msg("mApShared"),e=>{if(!(e&&e.name==="AbortError"))msg("mApNoShare",1)});return}}
+ msg("mApNoShare",1)};
+function apParse(manual){const s=$("#apIn").value;if(!s.trim()){if(manual)msg("mApEmpty",1);return}if(!CUR){msg("m1",1);return}let p;try{p=parse(s)}catch(e){if(manual)msg("mApBad",1);return}
+ const x=$("#ctx").value.trim().slice(0,200);CKS={};ACT=null;tidy(p,x);render(p,CUR.src,null,true);$("#apbox").hidden=true;$("#apPr").hidden=true;$("#apIn").value="";msg("mApOk",0,p.hazards.length);try{$("#out").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}}
+let APT=0;$("#apIn").addEventListener("input",()=>{clearTimeout(APT);if(/"hazards"/.test($("#apIn").value))APT=setTimeout(()=>apParse(false),500)});
+$("#apGo").onclick=()=>apParse(true);$("#apX").onclick=()=>{$("#apbox").hidden=true;$("#apPr").hidden=true};
 $("#ai").onclick=askAI;$("#stop").onclick=()=>{if(!BUSY)return;RUN++;if(CTL)CTL.abort();const z=PHASE==="zoom";BUSY=false;PHASE="";busy(false);const w=$("#out .pw");if(w)w.classList.remove("scan");msg(z?"mZoomStop":"mStop");netChip()};
 $("#cOk").onclick=()=>{const pv=$("#prov").value;AIC[pv]=true;lsS("hs_ok_"+pv,"1");$("#cbox").hidden=true;start()};$("#cNo").onclick=()=>{$("#cbox").hidden=true};
 $("#prov").addEventListener("change",()=>{$("#cbox").hidden=true});
