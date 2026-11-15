@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "WordUnlock｜每日解鎖英文",
+  "short_name": "WordUnlock",
+  "description": "每天解鎖手機，順便背幾個英文單字：今日單字、發音、間隔複習、收藏與學習統計。資料只存在你的手機。",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f7",
+  "theme_color": "#1d4ed8",
+  "categories": ["education"],
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
