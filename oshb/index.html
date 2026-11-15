@@ -113,6 +113,23 @@ main{padding-bottom:250px}
 .spon p{margin:0;flex:1;min-width:200px}
 .spon a{background:var(--ink);color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
 .bd.dr{background:#7a3cd6;color:#fff}
+
+/* v6 考試用計算機 */
+.tutor.cxon img{opacity:.3;pointer-events:none}
+.cxbox{margin-top:14px;border:2px solid var(--ink);border-radius:12px;background:#f3f5fa}
+.cxbox summary{cursor:pointer;font-weight:700;padding:10px 14px;list-style:none}
+.cxbox summary::-webkit-details-marker{display:none}
+.cxbox summary small{color:var(--mute);font-weight:500}
+.cxwrap{padding:0 12px 12px}
+.cxhist{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--mute);text-align:right;min-height:18px;overflow-x:auto;white-space:nowrap}
+.cxin{width:100%;box-sizing:border-box;font-family:"JetBrains Mono",monospace;font-size:18px;padding:10px;border:2px solid var(--line);border-radius:8px;background:#fff;text-align:right}
+.cxout{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:700;text-align:right;padding:6px 4px;color:var(--ink);overflow-x:auto;white-space:nowrap}
+.cxkeys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.cxk{font:inherit;font-weight:700;font-size:16px;min-height:44px;border:1px solid #c9cfdc;border-radius:8px;background:#e6e9f1;color:var(--ink);cursor:pointer}
+.cxk.cxn{background:#fff}
+.cxk.cxs{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cxk:active{transform:translateY(1px)}
+.cxfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;color:var(--mute)}
 </style>
 </head>
 <body>
@@ -872,7 +889,7 @@ const genTitle = g => (S.gens[g] && S.gens[g].t) || G[g]().title;
 let tutorMin = false;
 // v3.1：每次進站都顯示安安老師與對話框（不沿用上次收合狀態）
 function say(pose, html, acts) {
-  const t = $('#tutor'), img = $('#timg');
+  const t = $('#tutor'), img = $('#timg'); t.classList.remove('cxon');
   if (IMG[pose] && img.dataset.p !== pose) { img.src = IMG[pose]; img.dataset.p = pose; }
   $('#tbub').innerHTML = `<button class="x" onclick="tutorToggle()" aria-label="收合">×</button><b class="nm">安安老師</b>${html}${acts && acts.length ? `<div class="act">${acts.map(a => `<button onclick="${a[1]}">${a[0]}</button>`).join('')}</div>` : ''}`;
   $('#tbub').style.animation = 'none'; void $('#tbub').offsetWidth; $('#tbub').style.animation = '';
@@ -973,7 +990,7 @@ const ASK_TIPS = {
 function ask(q) {
   setNav(drill ? '' : 'home'); cur = q; cur.chosen = null;
   const extra = (drill ? `<span class="bd dr">${drill.label} ${drill.i + 1}/${drill.queue.length}</span>` : '') + (isVariant && !drill ? '<span class="bd var">變形題</span>' : '');
-  $('#app').innerHTML = `<div class="panel">${qHead(q, extra)}${optsHtml(q, 'answer')}
+  $('#app').innerHTML = `<div class="panel">${qHead(q, extra)}${optsHtml(q, 'answer')}${q.unit !== 'concept' ? calcBox() : ''}
   <div class="row"><button class="btn ghost" onclick="showHint(this)">💡 給我一點提示</button><button class="btn ghost" onclick="go('home')">${drill ? '結束特訓' : '回單元選單'}</button></div></div><div id="fb"></div>`;
   window.scrollTo(0, 0);
   const g = S.gens[q.gen];
@@ -1029,7 +1046,7 @@ function startMock() {
 }
 function mockQ() {
   const q = mock.list[mock.i]; cur = q;
-  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>`;
+  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${q.unit !== 'concept' ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>`;
   window.scrollTo(0, 0);
 }
 function mockAns(i) {
@@ -1054,6 +1071,61 @@ function mockEnd() {
   else say('clap', '滿分！太厲害了 🎉 換一組題目再考一次確認穩定度？', [['📝 再考一次', 'startMock()']]);
 }
 
+
+
+// ---------- 考試用計算機（v6，計算題下方） ----------
+function cxAway() { const t = document.getElementById('tutor'); if (t) { t.classList.add('min', 'cxon'); clearTimeout(say._t); } }
+let CX = { ans: 0, deg: true, hist: '' };
+function cxEval(src) {
+  const s = src.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/√/g, 'sqrt').replace(/π/g, 'pi').replace(/\s+/g, '');
+  const toks = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    const m = /^(\d+\.?\d*|\.\d+)(E[+-]?\d+)?/.exec(s.slice(i));
+    if (m) { toks.push({ t: 'n', v: parseFloat(m[0].replace('E', 'e')) }); i += m[0].length; continue; }
+    const w = /^(sqrt|sin|cos|tan|log|ln|pi|Ans)/.exec(s.slice(i));
+    if (w) { const n = w[0]; if (n === 'pi') toks.push({ t: 'n', v: Math.PI }); else if (n === 'Ans') toks.push({ t: 'n', v: CX.ans }); else toks.push({ t: 'f', v: n }); i += n.length; continue; }
+    if ('+-*/^()'.includes(c)) { toks.push({ t: c }); i++; continue; }
+    throw new Error('bad');
+  }
+  // 隱含乘法：2π、2(3)、)(、3sin(
+  const T = [];
+  toks.forEach((k, j) => { const p = T[T.length - 1]; if (p && (p.t === 'n' || p.t === ')') && (k.t === 'n' || k.t === '(' || k.t === 'f')) T.push({ t: '*' }); T.push(k); });
+  let depth = 0; T.forEach(k => { if (k.t === '(') depth++; if (k.t === ')') depth--; }); while (depth-- > 0) T.push({ t: ')' });
+  let p = 0; const peek = () => T[p], eat = t => { if (!T[p] || T[p].t !== t) throw new Error('bad'); p++; };
+  const rad = x => CX.deg ? x * Math.PI / 180 : x;
+  const F = { sqrt: Math.sqrt, sin: x => Math.sin(rad(x)), cos: x => Math.cos(rad(x)), tan: x => Math.tan(rad(x)), log: Math.log10, ln: Math.log };
+  function expr() { let v = term(); while (peek() && (peek().t === '+' || peek().t === '-')) { const o = T[p++].t; const r = term(); v = o === '+' ? v + r : v - r; } return v; }
+  function term() { let v = unary(); while (peek() && (peek().t === '*' || peek().t === '/')) { const o = T[p++].t; const r = unary(); v = o === '*' ? v * r : v / r; } return v; }
+  function unary() { if (peek() && peek().t === '-') { p++; return -unary(); } if (peek() && peek().t === '+') { p++; return unary(); } return power(); }
+  function power() { const b = primary(); if (peek() && peek().t === '^') { p++; return Math.pow(b, unary()); } return b; }
+  function primary() { const k = peek(); if (!k) throw new Error('bad'); if (k.t === 'n') { p++; return k.v; } if (k.t === 'f') { p++; eat('('); const v = expr(); eat(')'); return F[k.v](v); } if (k.t === '(') { p++; const v = expr(); eat(')'); return v; } throw new Error('bad'); }
+  const v = expr(); if (p !== T.length) throw new Error('bad'); return v;
+}
+function cxFmt(v) { if (!isFinite(v)) return '錯誤'; if (v === 0) return '0'; const a = Math.abs(v); if (a >= 1e10 || a < 1e-6) return v.toExponential(6).replace('e', ' × 10^'); return String(parseFloat(v.toPrecision(10))); }
+function calcBox() {
+  const K = [['sin(', 'cos(', 'tan(', 'log(', 'ln('], ['√(', '^', '(', ')', 'π'], ['7', '8', '9', '÷', '⌫'], ['4', '5', '6', '×', 'AC'], ['1', '2', '3', '−', 'Ans'], ['0', '.', 'E', '+', '=']];
+  const lab = { 'sin(': 'sin', 'cos(': 'cos', 'tan(': 'tan', 'log(': 'log', 'ln(': 'ln', '√(': '√', '^': 'xʸ', 'E': '×10ⁿ' };
+  return `<details class="cxbox" open><summary>🧮 考試用計算機 <small>（${CX.deg ? 'DEG 度' : 'RAD 弧度'}）</small></summary>
+  <div class="cxwrap"><div class="cxhist" id="cxh">${CX.hist || '&nbsp;'}</div>
+  <input id="cx" class="cxin" type="text" autocomplete="off" spellcheck="false" placeholder="例：16.61*log(112.5/100)+90" onfocus="cxAway()" onkeydown="if(event.key==='Enter'){event.preventDefault();cxKey('=')}">
+  <div class="cxout" id="cxo">= 0</div>
+  <div class="cxkeys">${K.flat().map(k => `<button type="button" class="cxk${'=AC⌫'.includes(k) ? ' cxs' : /[\d.]/.test(k) ? ' cxn' : ''}" onclick="cxKey('${k}')">${lab[k] || k}</button>`).join('')}</div>
+  <div class="cxfoot"><button type="button" class="cxk" style="width:auto;padding:4px 10px" onclick="CX.deg=!CX.deg;this.closest('details').querySelector('summary small').textContent='（'+(CX.deg?'DEG 度':'RAD 弧度')+'）';this.textContent=CX.deg?'切換成 RAD':'切換成 DEG'">${CX.deg ? '切換成 RAD' : '切換成 DEG'}</button><small>可直接用鍵盤輸入，Enter 計算；log＝常用對數、ln＝自然對數</small></div></div></details>`;
+}
+function cxKey(k) {
+  const el = document.getElementById('cx'); if (!el) return;
+  cxAway();
+  if (k === 'AC') { el.value = ''; document.getElementById('cxo').textContent = '= 0'; return; }
+  if (k === '⌫') { el.value = el.value.slice(0, -1); return; }
+  if (k === '=') {
+    if (!el.value.trim()) return;
+    try { const v = cxEval(el.value); CX.ans = v; CX.hist = el.value + ' ='; document.getElementById('cxh').textContent = CX.hist; document.getElementById('cxo').textContent = '= ' + cxFmt(v); el.value = ''; el.placeholder = 'Ans = ' + cxFmt(v); }
+    catch (e) { document.getElementById('cxo').textContent = '算式有誤，請檢查括號或運算符號'; }
+    return;
+  }
+  el.value += k; el.focus({ preventScroll: true });
+}
 
 // ---------- 計算工具（v5） ----------
 const LINKS = [
@@ -1132,6 +1204,7 @@ function records() {
 function foot() { return `<div class="foot">題目由程式依公式隨機產生，作為練習用途；法規條文請以<a href="https://law.moj.gov.tw/" target="_blank" rel="noopener">全國法規資料庫</a>現行版本為準。參考：<a href="https://www.osha.gov.tw/" target="_blank" rel="noopener">勞動部職業安全衛生署</a>、<a href="https://www.wdasec.gov.tw/" target="_blank" rel="noopener">技能檢定中心</a>。快捷鍵：作答時可按 1–4 或 A–D。　<a href="${SPONSOR}" target="_blank" rel="noopener noreferrer sponsored">☕ 贊助作者</a></div>`; }
 
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.closest && e.target.closest('input,select,textarea')) return;
   const m = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, b: 1, c: 2, d: 3 }[e.key.toLowerCase()]; if (m === undefined || !cur) return;
   if (mock && cur.chosen == null) mockAns(m); else if (!mock && document.querySelector('.opt:not(:disabled)')) answer(m);
 });
