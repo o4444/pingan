@@ -117,7 +117,7 @@ main{padding-bottom:250px}
 </head>
 <body>
 <header><div class="hwrap"><div class="logo" onclick="go('home')">⛑️ 職安乙級陪考小家教 <span class="tag">BETA</span></div>
-<nav><button data-v="home" onclick="go('home')">練習</button><button data-v="mock" onclick="startMock()">模擬考</button><button data-v="rec" onclick="go('rec')">學習紀錄</button></nav></div><div class="stripe"></div></header>
+<nav><button data-v="home" onclick="go('home')">練習</button><button data-v="mock" onclick="startMock()">模擬考</button><button data-v="tools" onclick="go('tools')">計算工具</button><button data-v="rec" onclick="go('rec')">學習紀錄</button></nav></div><div class="stripe"></div></header>
 <main id="app"></main>
 <div class="tutor" id="tutor"><div class="tbub" id="tbub"></div><img id="timg" alt="安安老師" title="點我收合／展開"></div>
 <script>
@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => { }); // placeholder
 setTimeout(() => { const im = $('#timg'); if (im) im.onclick = tutorToggle; }, 0);
 
 function setNav(v) { document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); }
-function go(v) { mock = null; drill = null; if (v === 'home') home(); else if (v === 'rec') records(); window.scrollTo(0, 0); }
+function go(v) { mock = null; drill = null; if (v === 'home') home(); else if (v === 'rec') records(); else if (v === 'tools') { toolsView(); return; } window.scrollTo(0, 0); }
 function pct(o) { return o && o.n ? Math.round(o.c / o.n * 100) : null; }
 
 function weakGens() {
@@ -907,7 +907,7 @@ function home() {
   h += `<button class="ucard yel" onclick="startUnit('all')"><span class="ic">🎲</span><b>綜合隨機</b><small>所有考點混著出</small></button>
   <button class="ucard dark" onclick="startMock()"><span class="ic">📝</span><b>模擬考 10 題</b><small>作答完才公布答案與解析</small></button></div>`;
   const w = weakHtml(); if (w) h += `<div class="panel" style="margin-top:16px"><h2>📌 下次建議複習</h2>${w}</div>`;
-  h += sponsor() + foot(); $('#app').innerHTML = h;
+  h += toolsHtml() + sponsor() + foot(); $('#app').innerHTML = h; calcRun();
   if (wk.length) { const te = topErr(); say('wave', `歡迎回來！你有 <b>${wk.length}</b> 個考點還沒練熟${te ? `，最常犯的是「${te[0]}」` : ''}。先來錯題特訓吧！`, [['🎯 開始錯題特訓', 'startDrill()']]); }
   else if (S.total.n) say('face', `目前沒有待加強的考點，表現不錯！來一回模擬考檢驗看看？`, [['📝 模擬考', 'startMock()']]);
   else say('wave', `嗨！我是<b>安安老師</b>，陪你準備職安乙級。<br>先挑一個單元開始；答錯時我會告訴你錯在哪，再出變形題讓你練。`);
@@ -1053,6 +1053,65 @@ function mockEnd() {
   if (wrongGens.length) say('desk', `${sc * 10} 分！錯最多的是<b>${UNITS[wuS[0][0]].name}</b>。我幫你把錯的 ${wrongGens.length} 個考點排成特訓，要現在練嗎？`, [['🎯 開始特訓', `startDrill(${JSON.stringify(wrongGens).replace(/"/g, '&quot;')})`]]);
   else say('clap', '滿分！太厲害了 🎉 換一組題目再考一次確認穩定度？', [['📝 再考一次', 'startMock()']]);
 }
+
+
+// ---------- 計算工具（v5） ----------
+const LINKS = [
+  ['勞動部職業安全衛生署', 'https://www.osha.gov.tw/', '最新法規公告、指引與宣導資料'],
+  ['勞動部勞動法令查詢系統', 'https://laws.mol.gov.tw/', '查條文、修正沿革與尚未生效條文'],
+  ['職業安全衛生法', 'https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060001', '全國法規資料庫'],
+  ['職業安全衛生設施規則', 'https://laws.mol.gov.tw/FLAW/FLAWDAT0201.aspx?id=FL015021', '勞動法令查詢系統（含 116.01.01 施行條文）'],
+  ['勞工作業場所容許暴露標準', 'https://law.moj.gov.tw/LawClass/LawAll.aspx?PCODE=N0060004', '容許濃度、變量係數、相加效應'],
+  ['起重升降機具安全規則', 'https://law.moj.gov.tw/LawClass/LawAll.aspx?PCode=N0060013', '起重機、吊掛、吊鏈與吊鉤'],
+  ['技術士技能檢定中心', 'https://www.wdasec.gov.tw/', '考試公告、試題與規範']
+];
+const num = (id, d) => { const el = document.getElementById(id); const v = el ? parseFloat(el.value) : NaN; return isFinite(v) ? v : d; };
+const sel = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+const R2 = (v, d = 2) => isFinite(v) ? (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString('zh-TW', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
+const ok = (b, y, n) => `<b style="color:${b ? 'var(--ok)' : 'var(--ng)'}">${b ? y : n}</b>`;
+const TOOLS = {
+  sling: { name: '吊索張力（吊角）', f: [['W', '吊物重量', 't', 2], ['n', '吊索條數', '條', 2], ['th', '吊角（吊索夾角）', '°', 60]],
+    run() { const W = num('W', 0), n = Math.max(1, num('n', 1)), th = num('th', 0); const c = Math.cos(th / 2 * Math.PI / 180); if (th >= 180 || c <= 0) return '吊角需小於 180°。'; const T = W / (n * c);
+      return `每條吊索張力 <b>${R2(T)} t</b>（平分重量 ${R2(W / n)} t 的 ${R2(1 / c)} 倍）<br>${th > 60 ? ok(false, '', `吊角 ${th}° 偏大，張力增加明顯，宜縮小吊角或改用吊梁。`) : ok(true, '吊角在 60° 以內。', '')}<br><small>T = W ÷ (n × cos(θ/2))；4 條吊索實務常以 2 條受力估算。吊索額定荷重須大於此張力（含安全係數）。</small>`; } },
+  boom: { name: '吊桿仰角與高壓線距離', f: [['L', '吊桿長度', 'm', 30], ['th', '仰角', '°', 60], ['h0', '吊桿支點離地', 'm', 2], ['hl', '架空線離地高度', 'm', 34], ['sd', '應保持安全距離（依台電／法規）', 'm', 3]],
+    run() { const L = num('L', 0), th = num('th', 0), h0 = num('h0', 0), hl = num('hl', 0), sd = num('sd', 0); const r = th * Math.PI / 180, H = h0 + L * Math.sin(r), Rr = L * Math.cos(r), c = hl - H;
+      return `吊桿頂端高度 <b>${R2(H)} m</b>、作業半徑 <b>${R2(Rr)} m</b><br>與架空線淨距 <b>${R2(c)} m</b> → ${c >= sd ? ok(true, `符合（≥ ${sd} m）`, '') : ok(false, '', c <= 0 ? '吊桿已達或超過電線高度，嚴禁作業！' : `不足（< ${sd} m），應降低仰角／移位、停電或裝設防護線管`)}<br><small>假設電線在吊桿頂端正上方；未計鋼索、吊鉤、吊物擺動與電線垂度，實際淨距更小，現場務必派監視人員。</small>`; } },
+  shock: { name: '感電通過人體電流', f: [['V', '電壓', 'V', 220], ['sys', '系統', '', 'single', [['single', '單相或已是對地電壓'], ['three', '三相線電壓（接觸單一相，÷√3）']]], ['Rb', '人體電阻（含接觸電阻）', 'Ω', 1000]],
+    run() { const V = num('V', 0), Rb = Math.max(1, num('Rb', 1000)), Vg = sel('sys') === 'three' ? V / Math.sqrt(3) : V, I = Vg / Rb * 1000;
+      const lv = I >= 100 ? ok(false, '', '可能引起心室顫動（致命）') : I >= 23 ? ok(false, '', '呼吸困難') : I >= 16 ? ok(false, '', '肌肉無法自由活動、難以脫離') : I >= 1 ? '有刺痛感' : '幾乎無感';
+      return `${sel('sys') === 'three' ? `對地電壓 = ${R2(V, 0)} ÷ √3 = ${R2(Vg, 0)} V<br>` : ''}通過電流 I = ${R2(Vg, 0)} ÷ ${R2(Rb, 0)} = <b>${R2(I, 1)} mA</b> → ${lv}<br><small>參考（60 Hz、成年男性）：約 1 mA 刺痛、16 mA 肌肉無法自由活動、23 mA 呼吸困難、100 mA 可能心室顫動。潮濕時人體電阻大幅下降。高敏感度漏電斷路器：30 mA 以下、0.1 秒內動作。</small>`; } },
+  noise: { name: '噪音劑量與 TWA', f: [['l1', '音壓級 1', 'dBA', 95], ['t1', '時間 1', '小時', 2], ['l2', '音壓級 2', 'dBA', 90], ['t2', '時間 2', '小時', 4], ['l3', '音壓級 3', 'dBA', 85], ['t3', '時間 3', '小時', 2], ['l4', '音壓級 4（可留空）', 'dBA', ''], ['t4', '時間 4', '小時', '']],
+    run() { let D = 0, rows = [], tt = 0; for (let i = 1; i <= 4; i++) { const L = num('l' + i, NaN), t = num('t' + i, NaN); if (!isFinite(L) || !isFinite(t) || t <= 0) continue; tt += t; if (L < 80) { rows.push(`${L} dBA：低於 80 dBA 不納入`); continue; } const T = 8 / Math.pow(2, (L - 90) / 5); D += t / T; rows.push(`${L} dBA：T = ${R2(T)} hr，t/T = ${R2(t / T, 3)}`); }
+      if (!rows.length) return '請輸入至少一組音壓級與時間。'; const Dp = D * 100, TWA = 16.61 * Math.log10(Dp / 100) + 90;
+      return `${rows.join('<br>')}<br>劑量 D = <b>${R2(Dp, 1)} %</b>，八小時日時量平均 <b>${Dp > 0 ? R2(TWA, 1) : '—'} dBA</b><br>${Dp > 100 ? ok(false, '', '超過 90 dBA 容許標準') : TWA >= 85 ? ok(false, '', 'TWA ≥ 85 dBA，應採取聽力保護措施') : ok(true, '低於 85 dBA', '')}${tt > 8 ? '<br><small>時間合計超過 8 小時，仍以 8 小時基準計算劑量。</small>' : ''}<br><small>5 dB 交換率：T = 8 ÷ 2^((L−90)÷5)；TWA = 16.61 log(D/100) + 90。</small>`; } },
+  ppm: { name: 'ppm ↔ mg/m³', f: [['val', '濃度數值', '', 100], ['dir', '換算方向', '', 'p2m', [['p2m', 'ppm → mg/m³'], ['m2p', 'mg/m³ → ppm']]], ['mw', '分子量', 'g/mol', 92.14], ['tc', '條件', '', '25', [['25', '25°C、1 atm（24.45）'], ['0', '0°C、1 atm（22.4）']]]],
+    run() { const v = num('val', 0), mw = num('mw', 1), Vm = sel('tc') === '0' ? 22.4 : 24.45; return sel('dir') === 'p2m' ? `${R2(v, 2)} ppm × ${mw} ÷ ${Vm} = <b>${R2(v * mw / Vm, 2)} mg/m³</b>` : `${R2(v, 2)} mg/m³ × ${Vm} ÷ ${mw} = <b>${R2(v * Vm / mw, 2)} ppm</b>`; } },
+  mix: { name: '混合物相加效應', f: [['c1', '成分 1 濃度', 'ppm', 30], ['p1', '成分 1 容許濃度', 'ppm', 100], ['c2', '成分 2 濃度', 'ppm', 20], ['p2', '成分 2 容許濃度', 'ppm', 50], ['c3', '成分 3 濃度（可留空）', 'ppm', ''], ['p3', '成分 3 容許濃度', 'ppm', '']],
+    run() { let s = 0, rows = []; for (let i = 1; i <= 3; i++) { const c = num('c' + i, NaN), p = num('p' + i, NaN); if (!isFinite(c) || !isFinite(p) || p <= 0) continue; s += c / p; rows.push(`${c} ÷ ${p} = ${R2(c / p, 3)}`); }
+      return rows.length ? `${rows.join('<br>')}<br>總和 = <b>${R2(s, 3)}</b> → ${s > 1 ? ok(false, '', '大於 1，超過容許濃度') : ok(true, '≤ 1，未超過容許濃度', '')}<br><small>勞工作業場所容許暴露標準：相加效應總和大於 1 即屬超出容許濃度。</small>` : '請輸入濃度與容許濃度。'; } },
+  wbgt: { name: 'WBGT 綜合溫度熱指數', f: [['nwb', '自然濕球溫度', '°C', 27], ['g', '黑球溫度', '°C', 35], ['a', '乾球溫度', '°C', 32], ['sun', '環境', '', 'out', [['out', '戶外有日曬'], ['in', '室內或戶外無日曬']]]],
+    run() { const n = num('nwb', 0), g = num('g', 0), a = num('a', 0); return sel('sun') === 'out' ? `0.7×${n} + 0.2×${g} + 0.1×${a} = <b>${R2(0.7 * n + 0.2 * g + 0.1 * a, 1)} °C</b>` : `0.7×${n} + 0.3×${g} = <b>${R2(0.7 * n + 0.3 * g, 1)} °C</b>（乾球不代入）`; } },
+  stat: { name: '職災統計 FR／SR／FSI', f: [['N', '勞工人數', '人', 200], ['dd', '工作日數', '日', 280], ['hh', '每日工時', '小時', 8], ['inj', '失能傷害人次', '人次', 3], ['lost', '總損失工作日數', '日', 120]],
+    run() { const H = num('N', 0) * num('dd', 0) * num('hh', 0); if (H <= 0) return '總經歷工時需大於 0。'; const FR = Math.floor(num('inj', 0) * 1e6 / H * 100 + 1e-9) / 100, SR = Math.floor(num('lost', 0) * 1e6 / H + 1e-9), FSI = Math.floor(Math.sqrt(FR * SR / 1000) * 100 + 1e-9) / 100;
+      return `總經歷工時 = ${H.toLocaleString()} 小時<br>FR = <b>${FR.toFixed(2)}</b>（小數第三位以下不計）<br>SR = <b>${SR}</b>（小數點以下不計）<br>FSI = √(FR×SR÷1000) = <b>${FSI.toFixed(2)}</b>（本工具取兩位，依題目要求）${FR > 0 ? `<br>平均損失日數 = SR ÷ FR = ${R2(SR / FR, 1)} 日` : ''}`; } },
+  hood: { name: '氣罩風量', f: [['V', '控制風速', 'm/s', 0.5], ['W', '開口寬', 'cm', 40], ['Hh', '開口高', 'cm', 30], ['X', '控制點距離（0＝只算開口面風量）', 'cm', 30], ['fl', '凸緣', '', 'no', [['no', '無凸緣'], ['yes', '有凸緣（×0.75）']]]],
+    run() { const V = num('V', 0), A = num('W', 0) * num('Hh', 0) / 1e4, X = num('X', 0) / 100, k = sel('fl') === 'yes' ? 0.75 : 1; const Q0 = 60 * V * A, Q = 60 * k * V * (10 * X * X + A);
+      return `開口面積 A = ${R2(A, 4)} m²<br>開口面風量 Q = 60 × V × A = <b>${R2(Q0)} m³/min</b>${X > 0 ? `<br>外裝式氣罩所需風量 Q = 60 × ${k} × V × (10X² + A) = <b>${R2(Q)} m³/min</b>` : ''}<br><small>Q = V × A 為基本流量關係；外裝式氣罩控制點距離越遠，風量隨距離平方增加。</small>`; } }
+};
+let curTool = 'sling';
+function toolsHtml() {
+  const t = TOOLS[curTool];
+  const fields = t.f.map(([id, lab, u, d, opts]) => opts
+    ? `<label style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)">${lab}<select id="${id}" onchange="calcRun()" style="font:inherit;padding:8px;border:2px solid var(--line);border-radius:8px;background:#fff">${opts.map(o => `<option value="${o[0]}"${o[0] === d ? ' selected' : ''}>${o[1]}</option>`).join('')}</select></label>`
+    : `<label style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)">${lab}${u ? `（${u}）` : ''}<input id="${id}" type="number" step="any" inputmode="decimal" value="${d}" oninput="calcRun()" style="font:inherit;padding:8px;border:2px solid var(--line);border-radius:8px"></label>`).join('');
+  return `<div class="panel" id="tools"><h2>🧮 計算工具</h2><p style="margin:0 0 10px;color:var(--mute);font-size:14px">輸入現場或題目的數字，馬上算出結果。結果僅供學習與初步評估，正式判定請以法規及專業評估為準。</p>
+  <label style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2);margin-bottom:12px">選擇工具<select onchange="curTool=this.value;$('#tools').outerHTML=toolsHtml();calcRun()" style="font:inherit;font-weight:700;padding:10px;border:2px solid var(--ink);border-radius:10px;background:#fff">${Object.entries(TOOLS).map(([k, v]) => `<option value="${k}"${k === curTool ? ' selected' : ''}>${v.name}</option>`).join('')}</select></label>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">${fields}</div>
+  <div id="calcOut" class="card30" style="margin-top:12px;line-height:1.8"></div>
+  <h2 style="margin-top:20px">📎 官方資料</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">${LINKS.map(l => `<a href="${l[1]}" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:var(--ink);background:#fafbfd;border:1px solid var(--line);border-radius:10px;padding:10px 12px"><b>${l[0]}</b><br><small style="color:var(--mute)">${l[2]}</small></a>`).join('')}</div></div>`;
+}
+function calcRun() { const o = document.getElementById('calcOut'); if (!o) return; try { o.innerHTML = TOOLS[curTool].run(); } catch (e) { o.innerHTML = '請確認輸入的數字。'; } }
+function toolsView() { mock = null; drill = null; setNav('tools'); $('#app').innerHTML = `<h1>計算工具</h1><p class="sub">練習題算完想驗證，或現場想快速估算，都可以用這裡。</p>` + toolsHtml() + sponsor() + foot(); calcRun(); window.scrollTo(0, 0); say('present', '選一個工具、輸入數字就會即時算出來。下面有勞動部和法規的官方連結，要查條文可以直接點。'); }
 
 // ---------- 學習紀錄 ----------
 let confirmReset = false;
