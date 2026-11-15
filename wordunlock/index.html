@@ -41,7 +41,8 @@ main{padding:6px 14px 20px;max-width:560px;margin:0 auto}
 .muted{color:var(--sub);font-size:13px}
 .small{font-size:12px}
 button{font-family:inherit;font-size:15px;border:0;border-radius:12px;padding:11px 14px;background:var(--chip);color:var(--text);cursor:pointer}
-button.primary{background:var(--accent);color:var(--accent-ink);font-weight:600}
+button.primary,.btnlink.primary{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.btnlink{display:block;flex:1;text-align:center;text-decoration:none;font-size:15px;border-radius:12px;padding:11px 14px;background:var(--chip);color:var(--text)}
 button.ghost{background:transparent;border:1px solid var(--line)}
 button.icon{padding:8px 10px;font-size:14px}
 button:active{transform:scale(.97)}
@@ -429,7 +430,22 @@ function viewToday(){
       <button data-act="next">下一個單字</button>
       <button class="primary" data-act="wallpaper">製作鎖定畫面桌布</button>
     </div>
-    <p class="note" style="margin:10px 0 0">網頁版無法放 iPhone 鎖定畫面小工具（iOS 只開放給 App Store 的 App）。替代方式：產生今日單字桌布 → 儲存影像 → 設為鎖定畫面，一樣不用開 App 就看得到。</p>
+  </div>
+
+  <div class="card">
+    <h2>讓單字出現在鎖定畫面</h2>
+    <p class="note" style="margin-top:0">網頁本身不能放鎖定畫面小工具，下面三種方法都可以，選一種就好。</p>
+    <p class="note"><b>方法一：行事曆小工具（不用裝 App，推薦）</b><br>
+    1. 按下方「訂閱單字行事曆」→「訂閱」→「加入」。<br>
+    2. 鎖定畫面長按 →「自訂」→「鎖定畫面」→ 點時鐘下方的小工具區 → 選「行事曆」→ 加入長方形的「下一個行程」。<br>
+    之後鎖定畫面每小時（7:00–23:00）會顯示一個單字和中文，不會發出通知。</p>
+    <div class="btns grow"><a class="btnlink primary" href="webcal://o4444.github.io/pingan/wordunlock/words.ics">訂閱單字行事曆</a></div>
+    <p class="note"><b>方法二：Scriptable 小工具（顯示單字＋音標＋中文＋例句）</b><br>
+    1. 到 App Store 安裝免費的「Scriptable」。<br>
+    2. 按下方「複製小工具程式」，打開 Scriptable → 右上「＋」→ 貼上 → 左上改名「WordUnlock」→「完成」。<br>
+    3. 鎖定畫面長按 →「自訂」→ 小工具區加入「Scriptable」→ 點一下那個小工具 →「Script」選 WordUnlock。</p>
+    <div class="btns grow"><a class="btnlink" href="https://apps.apple.com/app/scriptable/id1405459188">安裝 Scriptable</a><button class="primary" data-act="copyscript">複製小工具程式</button></div>
+    <p class="note"><b>方法三：單字桌布</b>按上方「製作鎖定畫面桌布」，存成照片後設為鎖定畫面（不會自己換）。</p>
   </div>`;
 }
 
@@ -600,7 +616,7 @@ function viewSettings(){
     <div class="btns grow"><button data-act="export">複製備份碼</button><button data-act="import">貼上還原</button></div>
     <div class="btns grow" style="margin-top:8px"><button class="ghost" data-act="reset" style="color:var(--bad)">清除所有資料</button></div>
   </div>
-  <p class="note center">WordUnlock 網頁測試版 v3 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
+  <p class="note center">WordUnlock 網頁測試版 v4 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
 }
 
 /* ====================== 初次使用＋程度測驗 ====================== */
@@ -753,6 +769,17 @@ document.addEventListener("click",async e=>{
     case "next": S.manualOffset++; save(); render(); break;
     case "wallpaper": openWallpaper(); break;
     case "soundhelp": openSoundHelp(); break;
+    case "copyscript":{
+      try{
+        if(scriptText){await navigator.clipboard.writeText(scriptText);}
+        else{await navigator.clipboard.write([new ClipboardItem({"text/plain":fetch("words-widget.js").then(r=>{if(!r.ok)throw 0;return r.blob();})})]);}
+        toast("已複製，打開 Scriptable 貼上");
+      }catch(err){
+        try{ if(!scriptText) scriptText=await (await fetch("words-widget.js")).text();
+          sheet(`<h3>小工具程式</h3><p class="muted small">長按 → 全選 → 拷貝</p><textarea readonly style="min-height:240px">${esc(scriptText)}</textarea><button class="opt" data-close>關閉</button>`);
+        }catch(e2){toast("複製失敗，請稍後再試");}
+      }
+      break;}
     case "savewall": saveWallpaper(); break;
     case "prev": {const n=todayWords().length;flash.i=(flash.i-1+n)%n;flash.flipped=false;paintFlash();break;}
     case "skip": flash.i=(flash.i+1)%todayWords().length;flash.flipped=false;paintFlash();break;
@@ -803,6 +830,8 @@ function makeIcon(){
 }
 
 /* 啟動 */
+let scriptText=null;
+if(location.protocol==="https:"||location.hostname==="localhost"){fetch("words-widget.js").then(r=>r.ok?r.text():null).then(t=>{scriptText=t;}).catch(()=>{});}
 loadLocal(); applyTheme(); render(); initCloud();
 if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 // 跨過午夜或回到前景時更新畫面
