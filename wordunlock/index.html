@@ -95,7 +95,6 @@ textarea{width:100%;min-height:90px}
 .setrow:last-child{border-bottom:0}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(17,24,39,.92);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
-.wall img{width:100%;border-radius:18px;display:block;border:1px solid var(--line)}
 .note{font-size:13px;line-height:1.6;color:var(--sub)}
 .note b{color:var(--text)}
 .hide{display:none!important}
@@ -471,7 +470,7 @@ function viewToday(){
 /* ---- 詳細單字卡 ---- */
 function openLockHelp(){
   sheet(`<div class="row between"><h3 style="margin:0;font-size:22px">讓單字出現在鎖定畫面</h3><button class="icon ghost" data-close>關閉</button></div>
-    <p class="note" style="margin-top:0">網頁本身不能放鎖定畫面小工具，下面三種方法都可以，選一種就好。</p>
+    <p class="note" style="margin-top:0">網頁本身不能放鎖定畫面小工具，用下面兩種方法之一，單字就會出現在鎖定畫面並自動更換。</p>
     <p class="note"><b>方法一：行事曆小工具（不用裝 App，推薦）</b><br>
     1. 按下方「訂閱單字行事曆」→「訂閱」→「加入」。<br>
     2. 鎖定畫面長按 →「自訂」→「鎖定畫面」→ 點時鐘下方的小工具區 → 選「行事曆」→ 加入長方形的「下一個行程」。<br>
@@ -482,8 +481,7 @@ function openLockHelp(){
     2. 按下方「複製小工具程式」，打開 Scriptable → 右上「＋」→ 貼上 → 左上改名「WordUnlock」→「完成」。<br>
     3. 鎖定畫面長按 →「自訂」→ 小工具區加入「Scriptable」→ 點一下那個小工具 →「Script」選 WordUnlock。</p>
     <div class="btns grow"><a class="btnlink" href="https://apps.apple.com/app/scriptable/id1405459188">安裝 Scriptable</a><button class="primary" data-act="copyscript">複製小工具程式</button></div>
-    <p class="note"><b>方法三：單字桌布</b>按上方「製作鎖定畫面桌布」，存成照片後設為鎖定畫面（不會自己換）。</p>
-  <div class="btns grow"><button data-act="wallpaper">製作鎖定畫面桌布</button></div>`);
+`);
 }
 function openWord(id){
   const w=BY_ID[id]; if(!w) return;
@@ -645,7 +643,7 @@ function viewSettings(){
   <div class="card"><h2>外觀與輪播</h2>
     <div class="setrow"><span>視覺風格</span>${sel("theme",THEMES,S.theme)}</div>
     <div class="setrow"><span>單字輪播頻率</span>${sel("rotation",ROTATIONS,S.rotation)}</div>
-    <p class="note">輪播用於 App 內鎖定畫面預覽與桌布；網頁無法在背景自動更換手機桌布。</p>
+    <p class="note">輪播頻率用於 App 內的鎖定畫面預覽。鎖定畫面上的行事曆每小時換一次；Scriptable 小工具可在程式開頭改換字間隔。</p>
   </div>
   <div class="card"><details><summary>每日提醒</summary>
     <p class="note">網頁版在這個平台上無法自行推播通知（需要伺服器，且推播必須由使用者同意）。建議用 iPhone 內建功能設定，完全由你控制：</p>
@@ -664,7 +662,7 @@ function viewSettings(){
     <p class="note" style="margin:6px 0 10px">目前完全免費。如果覺得好用，歡迎請作者喝杯咖啡，幫助它做得更好！</p>
     <a class="btnlink primary" href="https://portaly.cc/o4444/support" target="_blank" rel="noopener">☕ 贊助支持</a></div>
   <div class="card"><details><summary>字庫資料來源</summary><p class="note">分級：CEFR-J Wordlist 1.5（東京外國語大學投野研究室）、Octanove Vocabulary Profile C1/C2（CC BY-SA 4.0）。中文翻譯與英式音標：ECDICT（MIT 授權，已轉為台灣繁體）。美式音標：CMU Pronouncing Dictionary。英文解釋、同反義字與例句：Princeton WordNet 3.0。<br>其中 35 個字由人工精修，其餘為程式自動整理，翻譯可能只取最常見的意思，例句尚無中文翻譯；發現錯誤歡迎回報。</p></details></div>
-  <p class="note center">WordUnlock 網頁測試版 v7 · 字庫 ${WORDS.length} 字</p>`;
+  <p class="note center">WordUnlock 網頁測試版 v8 · 字庫 ${WORDS.length} 字</p>`;
 }
 
 /* ====================== 初次使用＋程度測驗 ====================== */
@@ -699,88 +697,6 @@ function paintOnboarding(){
   }
 }
 
-/* ====================== 鎖定畫面桌布 ====================== */
-let wallMode="word";
-function openWallpaper(){
-  sheet(`<div class="row between"><h3 style="margin:0">鎖定畫面桌布</h3><button class="icon ghost" data-close>關閉</button></div>
-    <div class="btns grow" style="margin:10px 0">${[["word","單字極簡"],["full","完整學習"],["five","今日五字"]].map(([k,l])=>`<button class="${wallMode===k?"primary":""}" data-wall="${k}">${l}</button>`).join("")}</div>
-    <div class="wall"><img id="wallImg" alt="今日單字桌布"></div>
-    <p class="note">長按圖片 →「加入照片」，或按下方「儲存圖片」→「儲存影像」。之後到「設定 → 背景圖片」或在鎖定畫面長按 → 新增，選這張照片即可。單字放在時鐘下方，不會被擋住。</p>
-    <div class="btns grow"><button class="primary" data-act="savewall" id="saveWallBtn">儲存圖片</button></div>`);
-  drawWallpaper();
-  if(window.claude&&typeof window.claude.use==="function"){
-    Promise.resolve(window.claude.use("downloads")).then(d=>{if(d) downloadsApi=d;}).catch(()=>{});
-  }
-}
-let downloadsApi=null, wallCanvas=null;
-function wallColors(){
-  const t=S.theme==="auto"?(matchMedia("(prefers-color-scheme: dark)").matches?"darkTech":"blueStudy"):S.theme;
-  return ({
-    minimalWhite:[["#ffffff","#f1f1f1"],"#111111","#666666"],
-    darkTech:[["#050914","#0d1b33"],"#e8f1ff","#4cd9ff"],
-    blackGold:[["#080808","#1a160c"],"#eecd80","#a8a29e"],
-    lightReading:[["#f8f2e3","#ece2c8"],"#33291f","#8c5a26"],
-    blueStudy:[["#1e4fc9","#0b2a6f"],"#ffffff","#cfe0ff"],
-    translucent:[["#c9d6ff","#f3e7ff"],"#1f2937","#4f46e5"]
-  })[t];
-}
-function wrapText(ctx,text,maxW){
-  const out=[]; let line="";
-  for(const ch of text.split(/(\s+)/)){ // 英文以單字斷行
-    const test=line+ch;
-    if(ctx.measureText(test).width>maxW && line){out.push(line.trim());line=ch.trimStart();}
-    else line=test;
-  }
-  if(line.trim()) out.push(line.trim());
-  // 中文長句再以字元斷行
-  return out.flatMap(l=>{ if(ctx.measureText(l).width<=maxW) return [l]; const r=[];let s="";for(const c of l){if(ctx.measureText(s+c).width>maxW){r.push(s);s=c;}else s+=c;} if(s)r.push(s); return r;});
-}
-function drawWallpaper(){
-  const dpr=Math.min(3,window.devicePixelRatio||2);
-  let W=Math.round((screen.width||390)*dpr), H=Math.round((screen.height||844)*dpr);
-  if(W>H) [W,H]=[H,W];
-  const c=wallCanvas=document.createElement("canvas"); c.width=W; c.height=H;
-  const ctx=c.getContext("2d"); const [bg,fg,sub]=wallColors();
-  const g=ctx.createLinearGradient(0,0,W*0.4,H); g.addColorStop(0,bg[0]); g.addColorStop(1,bg[1]);
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  const F='-apple-system,"PingFang TC","Noto Sans TC",sans-serif';
-  const u=W/100, x=8*u, maxW=W-16*u;
-  const ws=todayWords(); const w=ws[rotationIndex(ws.length)];
-  let y=H*0.50;
-  ctx.textBaseline="alphabetic"; ctx.textAlign="left";
-  const text=(s,size,weight,color,lh=1.3)=>{ctx.font=`${weight} ${size}px ${F}`;ctx.fillStyle=color;for(const l of wrapText(ctx,s,maxW)){y+=size*lh;ctx.fillText(l,x,y);} };
-  if(wallMode==="five"){
-    text("TODAY'S WORDS · "+dayKey(),3.4*u,"600",sub);
-    y+=2*u;
-    for(const it of ws){ text(it.w,7*u,"800",fg,1.25); text(it.zh+"　"+posZh(it),3.8*u,"400",sub,1.35); y+=1.6*u; }
-  }else{
-    text(w.lv+" · "+posEn(w),3.6*u,"600",sub);
-    text(w.w,(w.w.length>11?10:13)*u,"800",fg,1.15);
-    text(w.ipa+(w.kk?"   "+w.kk:""),4*u,"400",sub,1.6);
-    text(w.zh,6*u,"600",fg,1.5);
-    if(wallMode==="full"&&w.ex){ y+=3*u; text(w.ex,4.2*u,"italic 400",fg,1.4); if(w.exZh) text(w.exZh,3.8*u,"400",sub,1.45); }
-  }
-  ctx.font=`500 ${2.8*u}px ${F}`; ctx.fillStyle=sub; ctx.globalAlpha=.7; ctx.fillText("WordUnlock",x,H*0.88); ctx.globalAlpha=1;
-  const img=$("#wallImg"); if(img) img.src=c.toDataURL("image/png");
-}
-async function saveWallpaper(){
-  if(!wallCanvas) return;
-  const name=`WordUnlock-${dayKey()}.png`;
-  const blob=await new Promise(r=>wallCanvas.toBlob(r,"image/png"));
-  if(downloadsApi){
-    try{await downloadsApi.save({filename:name,data:blob}); toast("已送出儲存");}
-    catch(e){ if(e&&e.code!=="declined") toast("無法儲存，請改用長按圖片儲存"); }
-    return;
-  }
-  // iPhone Safari：用分享選單，裡面有「儲存影像」
-  try{
-    const file=new File([blob],name,{type:"image/png"});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}
-  }catch(e){ if(e&&e.name==="AbortError") return; }
-  try{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();toast("已下載；也可以長按圖片儲存");}
-  catch(e){toast("請長按圖片 →「儲存到照片」");}
-}
-
 /* ====================== Sheet ====================== */
 let sheetLocked=false;
 function sheet(html,locked=false){sheetLocked=locked;$("#sheet").innerHTML='<div class="grab"></div>'+html;$("#sheetBg").classList.add("show");}
@@ -807,7 +723,6 @@ document.addEventListener("click",async e=>{
   if(d.ans){const w=quiz.items[quiz.i];quiz.answered=d.ans;const ok=d.ans===w.id;if(ok)quiz.score++;
     if(!quiz.practice) rate(w.id,ok?"good":"again"); else if(!ok){S.cards[w.id].wrong=(S.cards[w.id].wrong||0)+1;save();}
     paintQuiz();return;}
-  if(d.wall){wallMode=d.wall;openWallpaper();return;}
   // onboarding
   if(d.oblv){S.level=d.oblv;ob.step="topics";paintOnboarding();return;}
   if(d.obans!==undefined){ob.ans.push(d.obans==="1");ob.opts=null;paintOnboarding();return;}
@@ -815,7 +730,6 @@ document.addEventListener("click",async e=>{
   if(d.obgoal){S.goal=+d.obgoal;paintOnboarding();return;}
   switch(d.act){
     case "next": S.manualOffset++; save(); render(); break;
-    case "wallpaper": openWallpaper(); break;
     case "soundhelp": openSoundHelp(); break;
     case "lockhelp": openLockHelp(); break;
     case "copyscript":{
@@ -829,7 +743,6 @@ document.addEventListener("click",async e=>{
         }catch(e2){toast("複製失敗，請稍後再試");}
       }
       break;}
-    case "savewall": saveWallpaper(); break;
     case "prev": {const n=todayWords().length;flash.i=(flash.i-1+n)%n;flash.flipped=false;paintFlash();break;}
     case "skip": flash.i=(flash.i+1)%todayWords().length;flash.flipped=false;paintFlash();break;
     case "quiz": newQuiz(false);paintQuiz();break;
