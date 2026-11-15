@@ -310,25 +310,59 @@ function pickVoice(lang){
   const list=voices.filter(v=>v.lang&&v.lang.replace("_","-").toLowerCase().startsWith(lang.toLowerCase()));
   return list.find(v=>/premium|enhanced|natural/i.test(v.name))||list.find(v=>/samantha|daniel|karen|serena|ava|google/i.test(v.name))||list[0]||null;
 }
-let speakTimer=null;
+let speakTimer=null, audioUnlocked=false, lastSpeech={};
+// 1x1 秒靜音 WAV：先用 <audio> 播一下，iPhone 才會切到「播放」音訊模式（靜音鍵開著也能出聲）
+function silentWav(){
+  const n=8000,buf=new ArrayBuffer(44+n),v=new DataView(buf);const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));};
+  w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);
+  for(let i=0;i<n;i++)v.setUint8(44+i,128);
+  return URL.createObjectURL(new Blob([buf],{type:"audio/wav"}));
+}
+let silentEl=null;
+function unlockAudio(){
+  try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}
+  if(audioUnlocked) return;
+  try{
+    if(!silentEl){silentEl=new Audio(silentWav());silentEl.setAttribute("playsinline","");}
+    const p=silentEl.play(); if(p&&p.then) p.then(()=>{audioUnlocked=true;}).catch(()=>{});
+  }catch(e){}
+}
 function speak(text,accent,slow){
   const synth=window.speechSynthesis;
   if(!synth||typeof SpeechSynthesisUtterance==="undefined"){toast("這個瀏覽器不支援語音，請用 Safari 開啟");return;}
-  if(!voices.length) loadVoices();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang=accent||S.accent; const v=pickVoice(u.lang); if(v) u.voice=v;
-  u.rate=(slow??S.slow)?0.6:0.95; u.volume=1; u.pitch=1;
-  let started=false;
-  u.onstart=()=>{started=true;clearTimeout(speakTimer);};
-  u.onerror=e=>{const er=e&&e.error; if(er&&er!=="interrupted"&&er!=="canceled") toast("語音播放失敗（"+er+"）");};
-  clearTimeout(speakTimer);
-  speakTimer=setTimeout(()=>{if(!started) toast("沒聲音？請關掉 iPhone 左側靜音鍵、調高音量，並用 Safari 開啟");},2500);
+  unlockAudio();
+  const make=()=>{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=accent||S.accent;              // 只指定語言，不硬指定某個語音（某些 iPhone 語音指定後會沒聲音）
+    u.rate=(slow??S.slow)?0.6:0.95; u.volume=1;
+    u.onstart=()=>{lastSpeech.started=true;clearTimeout(speakTimer);};
+    u.onend=()=>{lastSpeech.ended=true;};
+    u.onerror=e=>{lastSpeech.error=e&&e.error; const er=lastSpeech.error; if(er&&er!=="interrupted"&&er!=="canceled") toast("語音播放失敗（"+er+"）");};
+    return u;
+  };
+  lastSpeech={text,started:false,ended:false,error:null,at:Date.now()};
   try{
-    // Safari 在 cancel() 後立刻 speak() 常常沒聲音，所以只在正在播放時才取消，並稍等一下
-    if(synth.speaking||synth.pending){synth.cancel();setTimeout(()=>synth.speak(u),120);}
-    else synth.speak(u);
+    if(synth.speaking||synth.pending) synth.cancel();
+    synth.speak(make());                   // 在點擊當下直接播放（iPhone 要求）
     if(synth.paused) synth.resume();
+    // Safari 偶爾 cancel 後第一句會被吃掉：0.7 秒還沒開始就再播一次
+    setTimeout(()=>{ if(!lastSpeech.started && !lastSpeech.error){ try{synth.cancel();synth.speak(make());}catch(e){} } },700);
   }catch(e){toast("語音播放失敗");}
+  clearTimeout(speakTimer);
+  speakTimer=setTimeout(()=>{ if(!lastSpeech.started) openSoundHelp(); },2600);
+}
+function openSoundHelp(){
+  const synth=window.speechSynthesis, vs=synth?synth.getVoices():[], en=vs.filter(v=>/^en/i.test(v.lang));
+  const ua=navigator.userAgent, inApp=/Line|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua), standalone=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+  sheet(`<div class="row between"><h3 style="margin:0">沒有聽到聲音？</h3><button class="icon ghost" data-close>關閉</button></div>
+    <p class="note"><b>1.</b> iPhone 左側靜音鍵關掉（看不到橘色），按側邊音量鍵調大。<br>
+    <b>2.</b> 用 <b>Safari</b> 開本頁${inApp?"（你現在在 LINE／FB 等 App 內，請點右上角「用 Safari 開啟」）":""}。<br>
+    <b>3.</b> 藍牙耳機若連著，聲音可能跑到耳機。<br>
+    <b>4.</b> 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」確認有英文語音（可下載 Samantha 等）。</p>
+    <div class="ex small">檢測：語音功能 ${synth?"有":"無"}｜英文語音 ${en.length} 個｜開始播放 ${lastSpeech.started?"是":"否"}｜錯誤 ${esc(lastSpeech.error||"無")}｜${standalone?"主畫面 App":"瀏覽器"}${inApp?"（App 內瀏覽器）":""}</div>
+    <p class="note">上面這行檢測結果截圖給我，我可以更快找到原因。</p>
+    <div class="btns grow"><button class="primary" data-say="Hello, this is a sound test.">再試一次</button></div>`);
 }
 function soundCheck(){
   const ok=("speechSynthesis" in window);
@@ -544,7 +578,7 @@ function viewSettings(){
   <div class="card"><h2>發音</h2>
     <div class="setrow"><span>預設口音</span>${sel("accent",{"en-US":"美式英文","en-GB":"英式英文"},S.accent)}</div>
     <div class="setrow"><span>慢速發音</span>${sel("slow",{0:"正常速度",1:"慢速"},S.slow?"1":"0")}</div>
-    <div class="setrow"><span>語音狀態</span><span class="muted small">${soundCheck()}</span></div>
+    <div class="setrow"><span>語音狀態</span><button class="icon" data-act="soundhelp">檢測</button></div>
     <div class="setrow"><span>試聽</span><button class="icon" data-say="Practice makes perfect.">🔊 Practice makes perfect.</button></div>
     <p class="note">沒有聲音時：iPhone 左側靜音鍵要關掉（看不到橘色），音量調大。發音使用 iPhone 內建語音；到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」可下載更自然的「進階」語音。</p>
   </div>
@@ -566,7 +600,7 @@ function viewSettings(){
     <div class="btns grow"><button data-act="export">複製備份碼</button><button data-act="import">貼上還原</button></div>
     <div class="btns grow" style="margin-top:8px"><button class="ghost" data-act="reset" style="color:var(--bad)">清除所有資料</button></div>
   </div>
-  <p class="note center">WordUnlock 網頁測試版 v2 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
+  <p class="note center">WordUnlock 網頁測試版 v3 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
 }
 
 /* ====================== 初次使用＋程度測驗 ====================== */
@@ -690,6 +724,7 @@ function closeSheet(){$("#sheetBg").classList.remove("show");sheetLocked=false;}
 $("#sheetBg").addEventListener("click",e=>{if(e.target.id==="sheetBg"&&!sheetLocked) closeSheet();});
 
 /* ====================== 事件 ====================== */
+document.addEventListener("touchend",()=>unlockAudio(),{once:true,passive:true});
 document.addEventListener("click",async e=>{
   const t=e.target.closest("button,[data-open],[data-topic],[data-obtopic],[data-blv],[data-flip]"); if(!t) return;
   const d=t.dataset;
@@ -717,6 +752,7 @@ document.addEventListener("click",async e=>{
   switch(d.act){
     case "next": S.manualOffset++; save(); render(); break;
     case "wallpaper": openWallpaper(); break;
+    case "soundhelp": openSoundHelp(); break;
     case "savewall": saveWallpaper(); break;
     case "prev": {const n=todayWords().length;flash.i=(flash.i-1+n)%n;flash.flipped=false;paintFlash();break;}
     case "skip": flash.i=(flash.i+1)%todayWords().length;flash.flipped=false;paintFlash();break;
