@@ -100,6 +100,37 @@ textarea{width:100%;min-height:90px}
 .note b{color:var(--text)}
 .hide{display:none!important}
 .center{text-align:center}
+/* 大字版 */
+body{font-size:18px;line-height:1.55}
+header h1{font-size:28px}
+header .sync{font-size:13px}
+.card{padding:18px;margin:12px 0}
+.card h2{font-size:18px;margin-bottom:12px}
+.muted{font-size:16px}
+.small{font-size:15px}
+button,.btnlink{font-size:18px;padding:14px 16px;border-radius:14px}
+button.icon{font-size:17px;padding:11px 14px}
+.chip{font-size:16px;padding:7px 13px}
+.word-big{font-size:44px}
+.ipa{font-size:17px}
+.zh{font-size:24px}
+.ex{font-size:18px;padding:12px 14px}
+.list-item{padding:14px 2px}
+.list-item .w{font-size:22px}
+.list-item .z{font-size:17px}
+.badge{font-size:14px;padding:3px 9px}
+.ring{width:96px;height:96px}.ring>div{width:76px;height:76px;font-size:22px}
+.stat b{font-size:32px}.stat span{font-size:15px}
+.bars .bar>span{font-size:13px}
+nav button{font-size:13px}nav button .ic{font-size:24px}
+body{padding-bottom:96px}
+.opt{font-size:19px;padding:16px}
+select,input[type=time],textarea{font-size:17px;padding:11px 12px}
+.setrow{padding:13px 0;font-size:18px}
+.note{font-size:16px;line-height:1.7}
+.toast{font-size:16px;bottom:110px}
+.lockprev .w b{font-size:20px}.lockprev .w div{font-size:15px}
+details{margin-top:4px}summary{font-size:18px;font-weight:600;padding:8px 0;cursor:pointer;color:var(--text)}
 </style>
 </head>
 <body data-theme="auto">
@@ -428,12 +459,16 @@ function viewToday(){
     </div>
     <div class="btns grow" style="margin-top:10px">
       <button data-act="next">下一個單字</button>
-      <button class="primary" data-act="wallpaper">製作鎖定畫面桌布</button>
+      <button class="primary" data-act="lockhelp">放到鎖定畫面</button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>讓單字出現在鎖定畫面</h2>
+  <p class="center" style="margin:18px 0"><a href="https://portaly.cc/o4444/support" target="_blank" rel="noopener" style="color:var(--accent);font-size:17px;text-decoration:none">☕ 覺得好用？請作者喝杯咖啡</a></p>`;
+}
+
+/* ---- 詳細單字卡 ---- */
+function openLockHelp(){
+  sheet(`<div class="row between"><h3 style="margin:0;font-size:22px">讓單字出現在鎖定畫面</h3><button class="icon ghost" data-close>關閉</button></div>
     <p class="note" style="margin-top:0">網頁本身不能放鎖定畫面小工具，下面三種方法都可以，選一種就好。</p>
     <p class="note"><b>方法一：行事曆小工具（不用裝 App，推薦）</b><br>
     1. 按下方「訂閱單字行事曆」→「訂閱」→「加入」。<br>
@@ -446,10 +481,8 @@ function viewToday(){
     3. 鎖定畫面長按 →「自訂」→ 小工具區加入「Scriptable」→ 點一下那個小工具 →「Script」選 WordUnlock。</p>
     <div class="btns grow"><a class="btnlink" href="https://apps.apple.com/app/scriptable/id1405459188">安裝 Scriptable</a><button class="primary" data-act="copyscript">複製小工具程式</button></div>
     <p class="note"><b>方法三：單字桌布</b>按上方「製作鎖定畫面桌布」，存成照片後設為鎖定畫面（不會自己換）。</p>
-  </div>`;
+  <div class="btns grow"><button data-act="wallpaper">製作鎖定畫面桌布</button></div>`);
 }
-
-/* ---- 詳細單字卡 ---- */
 function openWord(id){
   const w=BY_ID[id]; if(!w) return;
   const c=S.cards[id];
@@ -483,10 +516,10 @@ function openWord(id){
 let flash={i:0,flipped:false};
 function viewLearn(){
   return `<div class="card"><div id="flash"></div></div>
-  <div class="card"><h2>字庫瀏覽（共 ${WORDS.length} 個）</h2>
+  <div class="card"><details ${browseLv?"open":""}><summary>字庫瀏覽（共 ${WORDS.length} 個）</summary>
     <div style="margin-bottom:8px">${LEVELS.map(l=>`<span class="chip ${browseLv===l?"on":""}" data-blv="${l}">${l}</span>`).join("")}</div>
     ${WORDS.filter(w=>w.lv===browseLv).map(w=>wordRow(w)).join("")}
-  </div>`;
+  </details></div>`;
 }
 let browseLv=null;
 function paintFlash(){
@@ -512,7 +545,7 @@ function viewReview(){
   const wrongs=Object.entries(S.cards).filter(([,c])=>c.wrong>0).sort((a,b)=>b[1].wrong-a[1].wrong).map(([id])=>BY_ID[id]).filter(Boolean);
   return `<div class="card"><div id="quiz"></div></div>
   <div class="card"><h2>錯題本（${wrongs.length}）</h2>${wrongs.length?wrongs.map(w=>wordRow(w,`<span class="badge">錯 ${S.cards[w.id].wrong}</span>`)).join(""):'<p class="muted">還沒有答錯的單字</p>'}</div>
-  <p class="note">複習時間由 SM-2 間隔重複演算法安排：答對間隔逐漸拉長（1 天 → 6 天 → 約 2 週…），答錯就回到隔天再複習。間隔達 21 天視為「已熟悉」。</p>`;
+  <details class="card"><summary>複習怎麼安排？</summary><p class="note">複習時間由 SM-2 間隔重複演算法安排：答對間隔逐漸拉長（1 天 → 6 天 → 約 2 週…），答錯就回到隔天再複習。間隔達 21 天視為「已熟悉」。</p></details>`;
 }
 function newQuiz(practice){
   let items=dueList();
@@ -596,27 +629,30 @@ function viewSettings(){
     <div class="setrow"><span>慢速發音</span>${sel("slow",{0:"正常速度",1:"慢速"},S.slow?"1":"0")}</div>
     <div class="setrow"><span>語音狀態</span><button class="icon" data-act="soundhelp">檢測</button></div>
     <div class="setrow"><span>試聽</span><button class="icon" data-say="Practice makes perfect.">🔊 Practice makes perfect.</button></div>
-    <p class="note">沒有聲音時：iPhone 左側靜音鍵要關掉（看不到橘色），音量調大。發音使用 iPhone 內建語音；到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」可下載更自然的「進階」語音。</p>
+    <details><summary style="font-size:16px;font-weight:500">沒有聲音？</summary><p class="note">沒有聲音時：iPhone 左側靜音鍵要關掉（看不到橘色），音量調大。發音使用 iPhone 內建語音；到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」可下載更自然的「進階」語音。</p></details>
   </div>
   <div class="card"><h2>外觀與輪播</h2>
     <div class="setrow"><span>視覺風格</span>${sel("theme",THEMES,S.theme)}</div>
     <div class="setrow"><span>單字輪播頻率</span>${sel("rotation",ROTATIONS,S.rotation)}</div>
     <p class="note">輪播用於 App 內鎖定畫面預覽與桌布；網頁無法在背景自動更換手機桌布。</p>
   </div>
-  <div class="card"><h2>每日提醒</h2>
+  <div class="card"><details><summary>每日提醒</summary>
     <p class="note">網頁版在這個平台上無法自行推播通知（需要伺服器，且推播必須由使用者同意）。建議用 iPhone 內建功能設定，完全由你控制：</p>
     <p class="note"><b>方法一：提醒事項</b>新增「今天的 5 個英文單字，你學會了嗎？」→ 設定時間（早上／中午／晚上）→ 重複「每天」。<br>
-    <b>方法二：捷徑自動化</b>捷徑 → 自動化 → 特定時間 → 動作選「打開 URL」，貼上本頁網址 → 選「立即執行」。時間到會直接打開本頁。</p>
+    <b>方法二：捷徑自動化</b>捷徑 → 自動化 → 特定時間 → 動作選「打開 URL」，貼上本頁網址 → 選「立即執行」。時間到會直接打開本頁。</p></details>
   </div>
-  <div class="card"><h2>加入主畫面</h2>
-    <p class="note">用 Safari 開啟本頁 → 點下方「分享」→「加入主畫面」，就會像 App 一樣出現在桌面，沒網路也能開。若在 LINE、FB 等 App 內開啟，請先點右上角選單「用 Safari 開啟」。</p>
+  <div class="card"><details><summary>加入主畫面</summary>
+    <p class="note">用 Safari 開啟本頁 → 點下方「分享」→「加入主畫面」，就會像 App 一樣出現在桌面，沒網路也能開。若在 LINE、FB 等 App 內開啟，請先點右上角選單「用 Safari 開啟」。</p></details>
   </div>
-  <div class="card"><h2>資料備份</h2>
+  <div class="card"><details><summary>資料備份</summary>
     <p class="note">學習紀錄只存在這支手機的瀏覽器裡${cloud.ref?"，並自動備份到你的 Claude 帳號（只有你看得到）":""}。換手機或清除 Safari 資料前，請先複製備份碼：</p>
     <div class="btns grow"><button data-act="export">複製備份碼</button><button data-act="import">貼上還原</button></div>
-    <div class="btns grow" style="margin-top:8px"><button class="ghost" data-act="reset" style="color:var(--bad)">清除所有資料</button></div>
+    <div class="btns grow" style="margin-top:8px"><button class="ghost" data-act="reset" style="color:var(--bad)">清除所有資料</button></div></details>
   </div>
-  <p class="note center">WordUnlock 網頁測試版 v4 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
+    <div class="card center"><div style="font-size:28px">☕</div><b>喜歡 WordUnlock 嗎？</b>
+    <p class="note" style="margin:6px 0 10px">目前完全免費。如果覺得好用，歡迎請作者喝杯咖啡，幫助它做得更好！</p>
+    <a class="btnlink primary" href="https://portaly.cc/o4444/support" target="_blank" rel="noopener">☕ 贊助支持</a></div>
+  <p class="note center">WordUnlock 網頁測試版 v6 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
 }
 
 /* ====================== 初次使用＋程度測驗 ====================== */
@@ -769,6 +805,7 @@ document.addEventListener("click",async e=>{
     case "next": S.manualOffset++; save(); render(); break;
     case "wallpaper": openWallpaper(); break;
     case "soundhelp": openSoundHelp(); break;
+    case "lockhelp": openLockHelp(); break;
     case "copyscript":{
       try{
         if(scriptText){await navigator.clipboard.writeText(scriptText);}

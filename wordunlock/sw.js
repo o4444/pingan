@@ -1,5 +1,5 @@
 // WordUnlock 離線快取。更新 index.html 後，請把版本號 v2 改成 v3、v4…，手機才會抓到新版。
-const C = 'wordunlock-v4';
+const C = 'wordunlock-v6';
 const A = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
