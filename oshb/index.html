@@ -740,12 +740,95 @@ CONCEPTS.push(
   { q: '風險評估中，「風險」通常由哪兩項要素組合而成？', a: '危害嚴重度 × 發生可能性', d: [['危害嚴重度 × 勞工人數', ERR.concept, '人數是暴露因子，不是風險基本定義。'], ['發生頻率 × 成本', ERR.concept, '成本不是風險的組成。'], ['可能性 × 法規罰則', ERR.concept, '罰則與風險定義無關。']], ex: '風險 = 嚴重度 × 可能性（風險矩陣）。' }
 );
 
+// ================== v4 新增：吊掛、起重機仰角、感電 ==================
+G.liftSling = () => {
+  const W = pick([1, 1.5, 2, 3, 4, 5]), n = pick([2, 2, 4]), th = pick([30, 60, 90, 120]);
+  const T = W / (n * Math.cos(th / 2 * Math.PI / 180));
+  return {
+    unit: 'mech', level: 3, title: '吊掛｜吊角與吊索張力',
+    stem: `以 ${n} 條吊索等長對稱吊掛重 ${W} 公噸之物件，吊索夾角（吊角）為 ${th}°，每條吊索承受之張力約為多少公噸？`,
+    known: [`W = ${W} t`, `n = ${n} 條`, `吊角 θ = ${th}°（兩吊索間的夾角）`, '求：每條吊索張力 T'],
+    formula: { expr: 'T = W ÷ (n × cos(θ/2))', vars: 'θ：吊索間夾角（吊角）；若題目給吊索與水平面夾角 α，則 T = W ÷ (n × sin α)', cond: '對稱吊掛、各吊索平均受力；4 條吊索實務上常只以 2 條受力估算（依題目）。', plain: '吊索張得越開，斜拉的力越大，每條要出的力就越多。', mnemonic: '「重量除條數，再除 cos 半吊角」' },
+    steps: [`θ/2 = ${th / 2}°，cos ${th / 2}° = ${f(Math.cos(th / 2 * Math.PI / 180), 4)}`, `T = ${W} ÷ (${n} × ${f(Math.cos(th / 2 * Math.PI / 180), 4)}) = <b>${f(T, 2)} t</b>`],
+    check: `吊角 ${th}° 時每條張力是「平分重量」${f(W / n, 2)} t 的 ${f(1 / Math.cos(th / 2 * Math.PI / 180), 2)} 倍；吊角越大倍數越高（120° 時為 2 倍）✔`,
+    answer: T, opts: numOptions(T, [
+      { v: W / n, type: ERR.concept, why: '只把重量平分，沒有考慮吊角造成的斜拉增加。' },
+      { v: Math.cos(th * Math.PI / 180) > 0.2 ? W / (n * Math.cos(th * Math.PI / 180)) : W / (n * Math.sin(th / 2 * Math.PI / 180)), type: ERR.concept, why: '要用「半吊角」θ/2，不是整個吊角。' },
+      { v: W / (n * Math.sin(th / 2 * Math.PI / 180)), type: ERR.math, why: 'θ/2 是和「鉛直線」的夾角，要用 cos，不是 sin。' },
+      { v: W * Math.cos(th / 2 * Math.PI / 180) / n, type: ERR.concept, why: '應該「除以」cos，張力一定大於平分重量。' }
+    ], 2, 't'),
+    card: { [ERR.concept]: '吊角 60° → ×1.15；90° → ×1.41；120° → ×2。吊角越大越危險，實務上吊角宜控制在 60° 以內（依現場吊掛作業規定）。' }
+  };
+};
+
+G.craneBoom = () => {
+  const L = pick([20, 25, 30, 35, 40]), th = pick([50, 55, 60, 65, 70, 75]), h0 = pick([1.5, 2, 2.5]);
+  const rad = th * Math.PI / 180, H = h0 + L * Math.sin(rad), Rr = L * Math.cos(rad);
+  const kv = pick(['11.4', '22.8']), safe = pick([3, 4, 5]);
+  const line = Math.round((H + pick([1, 2, 2.5, 3.5, 5, 7])) * 2) / 2;
+  const clr = line - H;
+  const ok = clr >= safe;
+  const ct = `吊桿頂端高約 ${f(H, 1)} m，距電線 ${f(clr, 1)} m，${ok ? '符合' : '不足'}安全距離`;
+  return {
+    unit: 'mech', level: 4, title: '起重機｜吊桿仰角與高壓線距離',
+    stem: `移動式起重機吊桿長 ${L} m，吊桿底部支點離地 ${h0} m，以仰角 ${th}° 作業（全伸吊桿）。吊桿頂端正上方有 ${kv} kV 架空高壓線，離地 ${f(line, 1)} m，題目給定應保持安全距離 ${safe} m。下列判斷何者正確？`,
+    known: [`L = ${L} m，仰角 θ = ${th}°`, `支點高 h₀ = ${h0} m`, `電線高 ${f(line, 1)} m`, `應保持 ${safe} m（題目給定）`, '求：吊桿頂端高度、與電線距離、是否足夠'],
+    formula: { expr: '頂端高度 H = h₀ + L × sin θ；作業半徑 R = L × cos θ；淨距 = 電線高度 − H', vars: 'θ：吊桿與水平面夾角（仰角）', cond: '未計鋼索、吊鉤與吊物擺動，實際淨距更小；安全距離依台電與法規要求。', plain: '仰角越大，吊桿越直、頂端越高，越靠近上方電線；仰角小則伸得遠但半徑大、容量下降。', mnemonic: '「高看 sin、遠看 cos」' },
+    steps: [`sin ${th}° = ${f(Math.sin(rad), 4)} → L × sin θ = ${f(L * Math.sin(rad), 2)} m`, `H = ${h0} + ${f(L * Math.sin(rad), 2)} = ${f(H, 2)} m`, `淨距 = ${f(line, 1)} − ${f(H, 2)} = ${f(clr, 2)} m ${ok ? '≥' : '<'} ${safe} m → <b>${ok ? '符合' : '不足'}</b>`, `（作業半徑 R = ${L} × cos ${th}° = ${f(Rr, 1)} m）`],
+    check: `${ok ? '即使距離足夠，仍應派監視人員並考慮吊物擺動' : '距離不足：應降低仰角／改變位置、申請停電或裝設防護線管，並派監視人員'} ✔`,
+    answer: null, opts: textOptions(ct, [
+      { text: `吊桿頂端高約 ${f(L * Math.sin(rad), 1)} m，距電線 ${f(line - L * Math.sin(rad), 1)} m，${line - L * Math.sin(rad) >= safe ? '符合' : '不足'}安全距離`, type: ERR.read, why: '漏加吊桿底部支點離地高度 h₀。' },
+      { text: `吊桿頂端高約 ${f(h0 + L * Math.cos(rad), 1)} m，距電線 ${f(line - h0 - L * Math.cos(rad), 1)} m，${line - h0 - L * Math.cos(rad) >= safe ? '符合' : '不足'}安全距離`, type: ERR.concept, why: '高度要用 sin θ；L × cos θ 是作業半徑（水平距離）。' },
+      { text: `吊桿頂端高約 ${f(H, 1)} m，距電線 ${f(clr, 1)} m，${ok ? '不足' : '符合'}安全距離`, type: ERR.law, why: `淨距 ${f(clr, 1)} m 與安全距離 ${safe} m 比較判斷錯誤。` },
+      { text: `吊桿頂端高約 ${f(H * 1.2, 1)} m，距電線 ${f(line - H * 1.2, 1)} m，${line - H * 1.2 >= safe ? '符合' : '不足'}安全距離`, type: ERR.math, why: '三角函數計算有誤，確認計算機在「度（DEG）」模式。' }
+    ]),
+    card: { [ERR.concept]: '仰角 θ：高度 = L sin θ、半徑 = L cos θ。仰角越高越接近上方電線，仰角越低則作業半徑越大、額定荷重越小。', [ERR.math]: '計算機要切到 DEG（度），不是 RAD（弧度）。' }
+  };
+};
+
+G.shock = () => {
+  const cases = [
+    { v: 110, label: '單相 110 V 漏電外殼', phase: false },
+    { v: 220, label: '220 V 電動機具漏電', phase: false },
+    { v: 11400, label: '11.4 kV 架空線（三相，線電壓）', phase: true },
+    { v: 22800, label: '22.8 kV 架空線（三相，線電壓）', phase: true }
+  ];
+  const c = pick(cases), Rb = pick([500, 1000, 2000, 3000]);
+  const Vg = c.phase ? c.v / Math.sqrt(3) : c.v, I = Vg / Rb * 1000;
+  const lvl = I >= 100 ? '可能引起心室顫動（致命）' : I >= 23 ? '呼吸困難' : I >= 16 ? '肌肉無法自由活動、難以脫離' : I >= 1 ? '有刺痛感' : '幾乎無感';
+  const dists = [
+    { v: c.v / Rb, type: ERR.unit, why: 'V ÷ Ω 算出的是安培（A），要 × 1000 才是 mA。' },
+    { v: c.v * Rb / 1000, type: ERR.concept, why: '歐姆定律是 I = V ÷ R，不是 V × R。' }
+  ];
+  if (c.phase) dists.unshift({ v: c.v / Rb * 1000, type: ERR.concept, why: '人站在地面接觸單一相線，承受的是「對地電壓」＝線電壓 ÷ √3，不是線電壓。' });
+  else dists.push({ v: Vg / (Rb * 2) * 1000, type: ERR.math, why: '電阻代入有誤，請直接以題目給的人體電阻計算。' });
+  return {
+    unit: 'mech', level: c.phase ? 3 : 2, title: '電氣｜感電通過人體電流',
+    stem: `勞工站在地面，因${c.label}而感電，假設人體電阻（含接觸電阻）為 ${Rb} Ω，通過人體之電流約為多少 mA？`,
+    known: [`電壓 ${c.v.toLocaleString()} V${c.phase ? `（三相線電壓，對地電壓 = ${c.v.toLocaleString()} ÷ √3 = ${f(Vg, 0)} V）` : '（對地）'}`, `人體電阻 R = ${Rb} Ω`, '求：I（mA）'],
+    formula: { expr: 'I = V ÷ R（三相系統接觸單一相：V = 線電壓 ÷ √3）', vars: 'I：安培（×1000 = mA）；R：人體＋接觸電阻（Ω）', cond: '簡化估算；實際電流受鞋、地面、接觸面積與潮濕程度影響，潮濕時電阻大幅下降。', plain: '電壓越高、身體越濕（電阻越低），通過的電流越大。', mnemonic: '「電流＝電壓除電阻，A 換 mA 乘一千」' },
+    steps: (c.phase ? [`<span class="warn">⚠ 對地電壓 = ${c.v.toLocaleString()} ÷ 1.732 = ${f(Vg, 0)} V</span>`] : []).concat([`I = ${f(Vg, 0)} ÷ ${Rb} = ${f(Vg / Rb, 3)} A`, `<span class="warn">⚠ × 1000 → mA</span>`, `I ≈ <b>${f(I, 0)} mA</b> → ${lvl}`]),
+    check: `參考：約 1 mA 有刺痛感、約 16 mA 肌肉無法自由活動、約 23 mA 呼吸困難、約 100 mA 可能心室顫動（60 Hz、成年男性參考值）。本題 ${f(I, 0)} mA → ${lvl} ✔`,
+    answer: I, opts: numOptions(I, dists, 0, 'mA'),
+    card: { [ERR.concept]: '三相系統：人站在地上碰到一條相線，承受「相電壓（對地電壓）」＝ 線電壓 ÷ √3。22.8 kV → 約 13.2 kV；11.4 kV → 約 6.6 kV。', [ERR.unit]: '1 A = 1000 mA。感電門檻多以 mA 表示，漏電斷路器高敏感度型為 30 mA 以下、0.1 秒內動作。' }
+  };
+};
+
+CONCEPTS.push(
+  { q: '依職業安全衛生設施規則，「高壓」係指何種電壓範圍？', a: '超過 600 伏特至 22,800 伏特', d: [['超過 220 伏特至 600 伏特', ERR.law, '600 V 以下為低壓。'], ['超過 22,800 伏特', ERR.law, '超過 22,800 V 為特高壓。'], ['超過 110 伏特至 11,400 伏特', ERR.law, '非法規定義。']], ex: '設施規則第 3 條：特高壓超過 22,800 V；高壓超過 600 V 至 22,800 V；低壓 600 V 以下。' },
+  { q: '移動式起重機在架空高壓線附近吊掛作業，下列措施何者最優先、最根本？', a: '協調台電停電或移置架空電路', d: [['作業人員戴絕緣手套即可', ERR.concept, '個人防護具是最後一道防線。'], ['加快作業速度縮短暴露時間', ERR.concept, '趕工反而增加誤觸風險。'], ['請吊車司機自行注意', ERR.concept, '司機視線受限，應派監視人員。']], ex: '控制層級：消除（停電、移線）優先；其次裝設防護線管（向台電申請）、設置屏障護圍與警告標示、限制吊桿仰角與作業範圍，並派監視人員；最後才是絕緣防護具。' },
+  { q: '吊車吊桿誤觸高壓線時，車上的操作手最適當的做法是？', a: '留在駕駛室內，設法使吊桿脫離電線，並警告他人勿靠近車體', d: [['立刻跳下車跑開', ERR.concept, '若必須離開，應雙腳併攏跳離、不可同時接觸車體與地面，並以小步跳躍遠離（跨步電壓）。'], ['下車用手推開吊鉤', ERR.concept, '車體與吊鉤都帶電，接觸即感電。'], ['請地面人員扶住車體穩定', ERR.concept, '地面人員接觸車體會成為電流路徑。']], ex: '車體帶電時留在車內相對安全；地面人員應遠離車體及吊物、通知台電斷電。若因起火須離開，雙腳併攏跳離，落地後以小步或單腳跳離，避免跨步電壓。' },
+  { q: '60 Hz 交流電通過成年男性人體時，約多少電流就可能引起心室顫動？', a: '約 100 mA', d: [['約 1 mA', ERR.concept, '約 1 mA 只是刺痛感。'], ['約 16 mA', ERR.concept, '約 16 mA 是肌肉無法自由活動。'], ['約 10 A', ERR.concept, '遠低於此值就可能致命。']], ex: '參考值：約 1 mA 刺痛、16 mA 肌肉無法自由活動、23 mA 呼吸困難、100 mA 可能心室顫動。' },
+  { q: '雙吊索對稱吊掛同一物件，吊角由 60° 增加為 120° 時，每條吊索張力約變為原來的幾倍？', a: '約 1.73 倍', d: [['不變', ERR.concept, '吊角越大，張力越大。'], ['2 倍', ERR.math, '120° 時是「平分重量」的 2 倍；60° 時是 1.155 倍，比值約 1.73。'], ['約 0.58 倍', ERR.concept, '方向相反。']], ex: 'T = W ÷ (n cos(θ/2))：60° → W/(2×0.866)；120° → W/(2×0.5)；比值 0.866/0.5 ≈ 1.73。' }
+);
+
 const UNITS = {
   vent: { name: '通風與換氣', icon: '🌀', gens: ['ventQ', 'ventACH', 'ventDuct', 'ventHood', 'ventFresh', 'solvent', 'dilution'] },
   noise: { name: '噪音危害', icon: '🔊', gens: ['noiseT', 'noiseDose', 'noiseTWA', 'noiseAdd', 'noiseDist'] },
   chem: { name: '化學品與粉塵', icon: '🧪', gens: ['chemPPM', 'chemMix', 'chemDust', 'chemTWA', 'solventAllow'] },
   heat: { name: '溫熱環境', icon: '🌡️', gens: ['heat', 'heatTWA'] },
   stat: { name: '職災統計', icon: '📊', gens: ['statFR', 'statSR', 'statFSI', 'statKR'] },
+  mech: { name: '機械與電氣', icon: '⚙️', gens: ['liftSling', 'craneBoom', 'shock'] },
   concept: { name: '法規觀念', icon: '📘', gens: ['concept'] }
 };
 
