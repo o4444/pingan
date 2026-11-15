@@ -56,7 +56,7 @@ def main():
         for k, h in enumerate(HOURS):
             w = words[order[k % len(words)]]
             begin = dt.datetime(day.year, day.month, day.day, h, 0, tzinfo=TZ)
-            desc = f"{w['ipa']}  KK {w['kk']}\n{w['pos']}（{w['posZh']}）· {w['lv']}\n\n{w['ex']}\n{w['exZh']}"
+            desc = f"{w['ipa']}  KK {w['kk']}\n{w['pos']}（{w['posZh']}）· {w['lv']}" + (f"\n\n{w['ex']}\n{w['exZh']}".rstrip() if w['ex'] else "")
             lines += [
                 "BEGIN:VEVENT",
                 f"UID:wordunlock-{day.isoformat()}-{h:02d}@o4444.github.io",

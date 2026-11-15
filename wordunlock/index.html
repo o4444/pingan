@@ -144,11 +144,12 @@ details{margin-top:4px}summary{font-size:18px;font-weight:600;padding:8px 0;curs
 <div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="words-db.js"></script>
 <script>
 "use strict";
 /* ====================== 單字資料庫 ======================
  欄位：id, 詞性, 美式IPA, 英式IPA, KK, 中文翻譯, 英文解釋, 中文解釋, 例句, 例句翻譯, 同義字, 反義字, CEFR, 主題 */
-const RAW = [
+const RAW_FALLBACK = [
 ["breakfast","noun","/ˈbrɛkfəst/","/ˈbrɛkfəst/","[ˋbrɛkfəst]","早餐","the first meal of the day","一天中的第一餐","I usually have breakfast at seven.","我通常七點吃早餐。",[],[],"A1",["daily","dining"]],
 ["ticket","noun","/ˈtɪkɪt/","/ˈtɪkɪt/","[ˋtɪkɪt]","票；入場券","a piece of paper or card that shows you have paid to travel or enter a place","證明你已付費搭車或入場的票券","I bought two tickets for the concert.","我買了兩張演唱會的票。",[],[],"A1",["travel","daily"]],
 ["hungry","adjective","/ˈhʌŋɡri/","/ˈhʌŋɡri/","[ˋhʌŋgrɪ]","飢餓的；肚子餓的","wanting or needing food","想吃東西或需要食物","I'm hungry. Let's get something to eat.","我餓了，我們去吃點東西吧。",["starving"],["full"],"A1",["daily","dining"]],
@@ -185,9 +186,10 @@ const RAW = [
 ["ubiquitous","adjective","/juːˈbɪkwɪtəs/","/juːˈbɪkwɪtəs/","[juˋbɪkwətəs]","無所不在的；隨處可見的","seeming to be everywhere","好像到處都有","Smartphones have become ubiquitous in modern life.","智慧型手機在現代生活中已經隨處可見。",["everywhere"],["rare"],"C2",["technology","gre"]],
 ["meticulous","adjective","/məˈtɪkjələs/","/məˈtɪkjʊləs/","[məˋtɪkjələs]","一絲不苟的；極其仔細的","paying careful attention to every detail","對每個細節都非常小心注意","She is meticulous about checking her work.","她檢查自己的工作時一絲不苟。",["thorough"],["careless"],"C2",["workplace","gre"]]
 ];
-const WORDS = RAW.map(r=>({id:r[0],w:r[0],pos:r[1],ipa:r[2],ipaUK:r[3],kk:r[4],zh:r[5],defEn:r[6],defZh:r[7],ex:r[8],exZh:r[9],syn:r[10],ant:r[11],lv:r[12],t:r[13]}));
+const RAW_ALL = (typeof RAW!=="undefined" && Array.isArray(RAW) && RAW.length) ? RAW : RAW_FALLBACK;
+const WORDS = RAW_ALL.map(r=>({id:r[0],w:r[0],pos:r[1],ipa:r[2],ipaUK:r[3],kk:r[4],zh:r[5],defEn:r[6],defZh:r[7],ex:r[8],exZh:r[9],syn:r[10],ant:r[11],lv:r[12],t:r[13]}));
 const BY_ID = Object.fromEntries(WORDS.map(w=>[w.id,w]));
-const POS = {noun:["Noun","名詞"],verb:["Verb","動詞"],adjective:["Adjective","形容詞"],adverb:["Adverb","副詞"],phrase:["Phrase","片語"],phrasalVerb:["Phrasal Verb","動詞片語"]};
+const POS = {noun:["Noun","名詞"],verb:["Verb","動詞"],adjective:["Adjective","形容詞"],adverb:["Adverb","副詞"],phrase:["Phrase","片語"],phrasalVerb:["Phrasal Verb","動詞片語"],preposition:["Preposition","介系詞"],pronoun:["Pronoun","代名詞"],conjunction:["Conjunction","連接詞"],determiner:["Determiner","限定詞"],interjection:["Interjection","感嘆詞"],number:["Number","數詞"]};
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 const LEVEL_NAMES = {A1:"初級入門",A2:"基礎英文",B1:"中級英文",B2:"中高級英文",C1:"高級英文",C2:"精通英文"};
 const TOPICS = {daily:"日常生活",business:"商業英文",travel:"旅遊英文",workplace:"職場英文",technology:"科技英文",medical:"醫療英文",dining:"餐飲英文",emotion:"情緒與心理",academic:"學術英文",toeic:"TOEIC 多益",ielts:"IELTS 雅思",toefl:"TOEFL 托福",gre:"GRE 進階",phrases:"常見片語",businessConversation:"商務會話"};
@@ -490,7 +492,7 @@ function openWord(id){
     <div class="row between"><span class="badge">${w.lv} · ${LEVEL_NAMES[w.lv]}</span><button class="icon ghost" data-close>關閉</button></div>
     <div class="word-big" style="margin-top:10px">${esc(w.w)}</div>
     <div class="ipa">${posEn(w)}（${posZh(w)}）</div>
-    <div class="ipa">美 ${esc(w.ipa)}　英 ${esc(w.ipaUK)}　KK ${esc(w.kk)}</div>
+    <div class="ipa">美 ${esc(w.ipa)}${w.ipaUK?"　英 "+esc(w.ipaUK):""}${w.kk?"　KK "+esc(w.kk):""}</div>
     <div class="btns" style="margin-top:10px">
       <button class="icon" data-say="${esc(w.w)}" data-accent="en-US">🔊 美式</button>
       <button class="icon" data-say="${esc(w.w)}" data-accent="en-GB">🔊 英式</button>
@@ -498,10 +500,10 @@ function openWord(id){
     </div>
     <div class="zh">${esc(w.zh)}</div>
     <div class="muted" style="margin-top:8px">${esc(w.defEn)}</div>
-    <div class="muted">${esc(w.defZh)}</div>
-    <div class="ex"><i>${esc(w.ex)}</i>${esc(w.exZh)}
+    ${w.defZh&&w.defZh!==w.zh?`<div class="muted">${esc(w.defZh)}</div>`:""}
+    ${w.ex?`<div class="ex"><i>${esc(w.ex)}</i>${esc(w.exZh||"")}
       <div class="btns" style="margin-top:6px"><button class="icon" data-say="${esc(w.ex)}">🔊 例句</button><button class="icon" data-say="${esc(w.ex)}" data-slow="1">🐢 慢速例句</button></div>
-    </div>
+    </div>`:""}
     ${w.syn.length?`<div style="margin-top:10px"><span class="muted small">同義字</span><br>${w.syn.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>`:""}
     ${w.ant.length?`<div style="margin-top:6px"><span class="muted small">反義字</span><br>${w.ant.map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div>`:""}
     <div style="margin-top:6px"><span class="muted small">主題</span><br>${w.t.map(t=>`<span class="chip">${TOPICS[t]}</span>`).join("")}</div>
@@ -516,12 +518,20 @@ function openWord(id){
 let flash={i:0,flipped:false};
 function viewLearn(){
   return `<div class="card"><div id="flash"></div></div>
-  <div class="card"><details ${browseLv?"open":""}><summary>字庫瀏覽（共 ${WORDS.length} 個）</summary>
-    <div style="margin-bottom:8px">${LEVELS.map(l=>`<span class="chip ${browseLv===l?"on":""}" data-blv="${l}">${l}</span>`).join("")}</div>
-    ${WORDS.filter(w=>w.lv===browseLv).map(w=>wordRow(w)).join("")}
+  <div class="card"><details ${browseLv||browseQ?"open":""}><summary>字庫瀏覽（共 ${WORDS.length} 個）</summary>
+    <div style="margin-bottom:8px">${LEVELS.map(l=>`<span class="chip ${browseLv===l?"on":""}" data-blv="${l}">${l}（${WORDS.filter(w=>w.lv===l).length}）</span>`).join("")}</div>
+    <input id="wsearch" type="search" placeholder="搜尋英文或中文" value="${esc(browseQ)}" style="width:100%;font-size:17px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text)">
+    <div id="wlist">${browseList()}</div>
   </details></div>`;
 }
-let browseLv=null;
+let browseLv=null, browseQ="";
+function browseList(){
+  if(!browseLv&&!browseQ) return '<p class="muted">選一個程度，或輸入關鍵字搜尋</p>';
+  const q=browseQ.trim().toLowerCase();
+  const list=WORDS.filter(w=>(!browseLv||w.lv===browseLv)&&(!q||w.w.toLowerCase().includes(q)||w.zh.includes(q)));
+  return list.slice(0,60).map(w=>wordRow(w)).join("")+(list.length>60?`<p class="muted center">共 ${list.length} 個，只顯示前 60 個，請輸入關鍵字縮小範圍</p>`:"")+(list.length?"":'<p class="muted">找不到</p>');
+}
+document.addEventListener("input",e=>{if(e.target.id==="wsearch"){browseQ=e.target.value;const l=document.getElementById("wlist");if(l)l.innerHTML=browseList();}});
 function paintFlash(){
   const ws=todayWords(); if(flash.i>=ws.length) flash.i=0;
   const w=ws[flash.i];
@@ -530,8 +540,8 @@ function paintFlash(){
     <div class="row between"><span class="muted small">今日第 ${flash.i+1} / ${ws.length} 個</span><button class="icon" data-say="${esc(w.w)}">🔊</button></div>
     <div class="flash" data-flip>
       <div class="word-big">${esc(w.w)}</div>
-      <div class="ipa">${esc(w.ipa)}　${esc(w.kk)}</div>
-      ${flash.flipped?`<div class="zh">${esc(w.zh)}</div><div class="muted">${posZh(w)}</div><div class="ex" style="width:100%;text-align:left"><i>${esc(w.ex)}</i>${esc(w.exZh)}</div>`
+      <div class="ipa">${esc(w.ipa)}　${esc(w.kk||"")}</div>
+      ${flash.flipped?`<div class="zh">${esc(w.zh)}</div><div class="muted">${posZh(w)}</div>${w.ex?`<div class="ex" style="width:100%;text-align:left"><i>${esc(w.ex)}</i>${esc(w.exZh||"")}</div>`:""}`
         :`<div class="muted" style="margin-top:20px">先想想意思，點一下翻面</div>`}
     </div>
     ${flash.flipped?`<div class="btns grow">${["again","hard","good","easy"].map(r=>`<button data-rate="${r}" class="${r==="good"?"primary":""}">${{again:"忘記",hard:"困難",good:"記得",easy:"簡單"}[r]}</button>`).join("")}</div>`
@@ -574,7 +584,8 @@ function paintQuiz(){
   }
   const w=quiz.items[quiz.i];
   if(!quiz.opts){
-    const others=WORDS.filter(x=>x.id!==w.id).sort((a,b)=>(a.pos===w.pos?0:1)-(b.pos===w.pos?0:1)||Math.random()-.5).slice(0,8).sort(()=>Math.random()-.5).slice(0,3);
+    let pool=WORDS.filter(x=>x.id!==w.id&&x.pos===w.pos&&x.lv===w.lv&&x.zh!==w.zh); if(pool.length<3) pool=WORDS.filter(x=>x.id!==w.id&&x.zh!==w.zh);
+    const others=pool.sort(()=>Math.random()-.5).slice(0,3);
     quiz.opts=[w,...others].sort(()=>Math.random()-.5);
   }
   el.innerHTML=`<div class="row between"><span class="muted small">${quiz.practice?"自由練習":"複習"} ${quiz.i+1} / ${quiz.items.length}</span><button class="icon" data-say="${esc(w.w)}">🔊</button></div>
@@ -583,7 +594,7 @@ function paintQuiz(){
       let cls="";
       if(quiz.answered){ if(o.id===w.id) cls="right"; else if(o.id===quiz.answered) cls="wrong"; }
       return `<button class="opt ${cls}" data-ans="${o.id}" ${quiz.answered?"disabled":""}>${esc(o.zh)}</button>`;}).join("")}</div>
-    ${quiz.answered?`<div class="ex"><i>${esc(w.ex)}</i>${esc(w.exZh)}</div><div class="btns grow" style="margin-top:10px"><button class="primary" data-act="qnext">下一題</button></div>`:""}`;
+    ${quiz.answered?`${w.ex?`<div class="ex"><i>${esc(w.ex)}</i>${esc(w.exZh||"")}</div>`:""}<div class="btns grow" style="margin-top:10px"><button class="primary" data-act="qnext">下一題</button></div>`:""}`;
 }
 
 /* ---- 收藏 ---- */
@@ -652,7 +663,8 @@ function viewSettings(){
     <div class="card center"><div style="font-size:28px">☕</div><b>喜歡 WordUnlock 嗎？</b>
     <p class="note" style="margin:6px 0 10px">目前完全免費。如果覺得好用，歡迎請作者喝杯咖啡，幫助它做得更好！</p>
     <a class="btnlink primary" href="https://portaly.cc/o4444/support" target="_blank" rel="noopener">☕ 贊助支持</a></div>
-  <p class="note center">WordUnlock 網頁測試版 v6 · 字庫 ${WORDS.length} 字（測試用，持續擴充中）</p>`;
+  <div class="card"><details><summary>字庫資料來源</summary><p class="note">分級：CEFR-J Wordlist 1.5（東京外國語大學投野研究室）、Octanove Vocabulary Profile C1/C2（CC BY-SA 4.0）。中文翻譯與英式音標：ECDICT（MIT 授權，已轉為台灣繁體）。美式音標：CMU Pronouncing Dictionary。英文解釋、同反義字與例句：Princeton WordNet 3.0。<br>其中 35 個字由人工精修，其餘為程式自動整理，翻譯可能只取最常見的意思，例句尚無中文翻譯；發現錯誤歡迎回報。</p></details></div>
+  <p class="note center">WordUnlock 網頁測試版 v7 · 字庫 ${WORDS.length} 字</p>`;
 }
 
 /* ====================== 初次使用＋程度測驗 ====================== */
@@ -744,9 +756,9 @@ function drawWallpaper(){
   }else{
     text(w.lv+" · "+posEn(w),3.6*u,"600",sub);
     text(w.w,(w.w.length>11?10:13)*u,"800",fg,1.15);
-    text(w.ipa+"   "+w.kk,4*u,"400",sub,1.6);
+    text(w.ipa+(w.kk?"   "+w.kk:""),4*u,"400",sub,1.6);
     text(w.zh,6*u,"600",fg,1.5);
-    if(wallMode==="full"){ y+=3*u; text(w.ex,4.2*u,"italic 400",fg,1.4); text(w.exZh,3.8*u,"400",sub,1.45); }
+    if(wallMode==="full"&&w.ex){ y+=3*u; text(w.ex,4.2*u,"italic 400",fg,1.4); if(w.exZh) text(w.exZh,3.8*u,"400",sub,1.45); }
   }
   ctx.font=`500 ${2.8*u}px ${F}`; ctx.fillStyle=sub; ctx.globalAlpha=.7; ctx.fillText("WordUnlock",x,H*0.88); ctx.globalAlpha=1;
   const img=$("#wallImg"); if(img) img.src=c.toDataURL("image/png");

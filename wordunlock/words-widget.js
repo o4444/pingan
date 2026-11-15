@@ -60,7 +60,7 @@ function build(w, family) {
   } else if (family === "accessoryRectangular") {
     const t = widget.addText(`${w.w}  ${w.ipa}`); t.font = Font.boldSystemFont(15); t.minimumScaleFactor = 0.6; t.lineLimit = 1;
     const z = widget.addText(`${w.posZh}｜${w.zh}`); z.font = Font.systemFont(12); z.lineLimit = 1; z.minimumScaleFactor = 0.7;
-    const e = widget.addText(w.ex); e.font = Font.italicSystemFont(10); e.lineLimit = 1; e.minimumScaleFactor = 0.7; e.textOpacity = 0.85;
+    if (w.ex) { const e = widget.addText(w.ex); e.font = Font.italicSystemFont(10); e.lineLimit = 1; e.minimumScaleFactor = 0.7; e.textOpacity = 0.85; }
   } else {
     // 主畫面小工具
     widget.backgroundColor = new Color("#1d4ed8");
@@ -70,10 +70,10 @@ function build(w, family) {
     const i = widget.addText(`${w.ipa}  ${w.kk}`); i.font = Font.systemFont(11); i.textColor = new Color("#cfe0ff");
     widget.addSpacer(4);
     const z = widget.addText(w.zh); z.font = Font.systemFont(14); z.textColor = Color.white();
-    if (family !== "small") {
+    if (family !== "small" && w.ex) {
       widget.addSpacer(6);
       const e = widget.addText(w.ex); e.font = Font.italicSystemFont(12); e.textColor = Color.white();
-      const ez = widget.addText(w.exZh); ez.font = Font.systemFont(11); ez.textColor = new Color("#cfe0ff");
+      const ez = widget.addText(w.exZh || ""); ez.font = Font.systemFont(11); ez.textColor = new Color("#cfe0ff");
     }
   }
   return widget;
