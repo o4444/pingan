@@ -96,19 +96,19 @@ table.ut td{border-bottom:1px solid #f0d980;padding:4px 6px}
 .confirm{background:var(--ngbg);border-radius:10px;padding:12px;margin-top:10px}
 @media(max-width:560px){.stem{font-size:16px}.lrow{grid-template-columns:96px 1fr 56px}h1{font-size:22px}}
 
-/* v2 安安老師導引 */
-.tutor{position:fixed;right:12px;bottom:0;z-index:20;display:flex;align-items:flex-end;gap:0;pointer-events:none}
-.tutor img{height:300px;width:auto;display:block;filter:drop-shadow(0 8px 18px #14213d40);pointer-events:auto;cursor:pointer;transition:opacity .2s}
-.tbub{pointer-events:auto;max-width:300px;background:#fff;border:2px solid var(--ink);border-radius:16px 16px 4px 16px;padding:12px 14px 10px;margin:0 -6px 210px 0;box-shadow:0 10px 26px #14213d26;font-size:15px;line-height:1.6;position:relative;animation:pop .25s ease}
+/* v2 安安老師導引（v3.1 預設小尺寸，一進站即出現） */
+.tutor{position:fixed;right:10px;bottom:0;z-index:20;display:flex;align-items:flex-end;pointer-events:none}
+.tutor img{height:230px;width:auto;display:block;filter:drop-shadow(0 6px 14px #14213d40);pointer-events:auto;cursor:pointer}
+.tutor img[data-p=think],.tutor img[data-p=pointup],.tutor img[data-p=face]{height:175px}
+.tbub{pointer-events:auto;max-width:270px;background:#fff;border:2px solid var(--ink);border-radius:14px 14px 4px 14px;padding:10px 12px 8px;margin:0 -4px 140px 0;box-shadow:0 8px 22px #14213d26;font-size:14.5px;line-height:1.55;position:relative;animation:pop .25s ease}
 .tbub b.nm{display:block;font-size:12px;color:var(--mute);margin-bottom:2px}
-.tbub .x{position:absolute;top:4px;right:8px;border:0;background:none;font-size:16px;color:var(--mute);cursor:pointer}
-.tbub .act{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
-.tbub .act button{font:inherit;font-size:13px;font-weight:700;border:2px solid var(--ink);background:var(--hi);border-radius:8px;padding:4px 10px;cursor:pointer}
-.tutor img[data-p=think],.tutor img[data-p=pointup],.tutor img[data-p=face]{height:240px}
-.tutor.min .tbub{display:none}.tutor.min img{height:96px;opacity:.95}
+.tbub .x{position:absolute;top:3px;right:7px;border:0;background:none;font-size:15px;color:var(--mute);cursor:pointer}
+.tbub .act{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+.tbub .act button{font:inherit;font-size:13px;font-weight:700;border:2px solid var(--ink);background:var(--hi);border-radius:8px;padding:3px 9px;cursor:pointer}
+.tutor.min .tbub{display:none}
 @keyframes pop{from{transform:translateY(8px) scale(.96);opacity:0}to{transform:none;opacity:1}}
-main{padding-bottom:330px}
-@media(max-width:700px){.tutor img{height:190px}.tutor img[data-p=think],.tutor img[data-p=pointup],.tutor img[data-p=face]{height:150px}.tbub{max-width:min(250px,62vw);margin-bottom:140px;font-size:14px}main{padding-bottom:230px}}
+main{padding-bottom:250px}
+@media(max-width:700px){.tutor{right:4px}.tutor img{height:140px}.tutor img[data-p=think],.tutor img[data-p=pointup],.tutor img[data-p=face]{height:125px}.tbub{max-width:min(230px,60vw);margin-bottom:84px;font-size:13.5px;padding:8px 10px 6px}main{padding-bottom:170px}}
 .spon{background:linear-gradient(135deg,var(--hi2),#fff);border:2px solid #f0d980;border-radius:14px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .spon p{margin:0;flex:1;min-width:200px}
 .spon a{background:var(--ink);color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
@@ -787,7 +787,7 @@ const genTitle = g => (S.gens[g] && S.gens[g].t) || G[g]().title;
 
 // ---------- 安安老師 ----------
 let tutorMin = false;
-try { tutorMin = localStorage.getItem(KEY + '_min') === '1'; } catch (e) { }
+// v3.1：每次進站都顯示安安老師與對話框（不沿用上次收合狀態）
 function say(pose, html, acts) {
   const t = $('#tutor'), img = $('#timg');
   if (IMG[pose] && img.dataset.p !== pose) { img.src = IMG[pose]; img.dataset.p = pose; }
@@ -795,9 +795,9 @@ function say(pose, html, acts) {
   $('#tbub').style.animation = 'none'; void $('#tbub').offsetWidth; $('#tbub').style.animation = '';
   t.classList.toggle('min', tutorMin);
   clearTimeout(say._t);
-  if (!tutorMin && window.innerWidth < 700) say._t = setTimeout(() => t.classList.add('min'), 9000);
+  if (!tutorMin && window.innerWidth < 700) say._t = setTimeout(() => t.classList.add('min'), 12000);
 }
-function tutorToggle() { clearTimeout(say._t); tutorMin = !$('#tutor').classList.contains('min'); $('#tutor').classList.toggle('min', tutorMin); try { localStorage.setItem(KEY + '_min', tutorMin ? '1' : '0'); } catch (e) { } }
+function tutorToggle() { clearTimeout(say._t); tutorMin = !$('#tutor').classList.contains('min'); $('#tutor').classList.toggle('min', tutorMin); }
 document.addEventListener('DOMContentLoaded', () => { }); // placeholder
 setTimeout(() => { const im = $('#timg'); if (im) im.onclick = tutorToggle; }, 0);
 
