@@ -1076,6 +1076,7 @@ function mockEnd() {
 // ---------- 考試用計算機（v6，計算題下方） ----------
 function cxAway() { const t = document.getElementById('tutor'); if (t) { t.classList.add('min', 'cxon'); clearTimeout(say._t); } }
 let CX = { ans: 0, deg: true, hist: '' };
+const CX_TOUCH = (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) || ('ontouchstart' in window);
 function cxEval(src) {
   const s = src.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/√/g, 'sqrt').replace(/π/g, 'pi').replace(/\s+/g, '');
   const toks = []; let i = 0;
@@ -1108,10 +1109,10 @@ function calcBox() {
   const lab = { 'sin(': 'sin', 'cos(': 'cos', 'tan(': 'tan', 'log(': 'log', 'ln(': 'ln', '√(': '√', '^': 'xʸ', 'E': '×10ⁿ' };
   return `<details class="cxbox" open><summary>🧮 考試用計算機 <small>（${CX.deg ? 'DEG 度' : 'RAD 弧度'}）</small></summary>
   <div class="cxwrap"><div class="cxhist" id="cxh">${CX.hist || '&nbsp;'}</div>
-  <input id="cx" class="cxin" type="text" autocomplete="off" spellcheck="false" placeholder="例：16.61*log(112.5/100)+90" onfocus="cxAway()" onkeydown="if(event.key==='Enter'){event.preventDefault();cxKey('=')}">
+  <input id="cx" class="cxin" type="text" autocomplete="off" spellcheck="false" ${CX_TOUCH ? 'inputmode="none" readonly' : ''} placeholder="例：16.61*log(112.5/100)+90" onfocus="cxAway()" onkeydown="if(event.key==='Enter'){event.preventDefault();cxKey('=')}">
   <div class="cxout" id="cxo">= 0</div>
   <div class="cxkeys">${K.flat().map(k => `<button type="button" class="cxk${'=AC⌫'.includes(k) ? ' cxs' : /[\d.]/.test(k) ? ' cxn' : ''}" onclick="cxKey('${k}')">${lab[k] || k}</button>`).join('')}</div>
-  <div class="cxfoot"><button type="button" class="cxk" style="width:auto;padding:4px 10px" onclick="CX.deg=!CX.deg;this.closest('details').querySelector('summary small').textContent='（'+(CX.deg?'DEG 度':'RAD 弧度')+'）';this.textContent=CX.deg?'切換成 RAD':'切換成 DEG'">${CX.deg ? '切換成 RAD' : '切換成 DEG'}</button><small>可直接用鍵盤輸入，Enter 計算；log＝常用對數、ln＝自然對數</small></div></div></details>`;
+  <div class="cxfoot"><button type="button" class="cxk" style="width:auto;padding:4px 10px" onclick="CX.deg=!CX.deg;this.closest('details').querySelector('summary small').textContent='（'+(CX.deg?'DEG 度':'RAD 弧度')+'）';this.textContent=CX.deg?'切換成 RAD':'切換成 DEG'">${CX.deg ? '切換成 RAD' : '切換成 DEG'}</button><small>${CX_TOUCH ? '用上方按鍵輸入（不會跳出手機鍵盤）' : '可直接用鍵盤輸入，Enter 計算'}；log＝常用對數、ln＝自然對數</small></div></div></details>`;
 }
 function cxKey(k) {
   const el = document.getElementById('cx'); if (!el) return;
@@ -1124,7 +1125,8 @@ function cxKey(k) {
     catch (e) { document.getElementById('cxo').textContent = '算式有誤，請檢查括號或運算符號'; }
     return;
   }
-  el.value += k; el.focus({ preventScroll: true });
+  el.value += k;
+  if (!CX_TOUCH) el.focus({ preventScroll: true });
 }
 
 // ---------- 計算工具（v5） ----------
