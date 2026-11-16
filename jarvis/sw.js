@@ -1,5 +1,5 @@
 // JARVIS-ESH offline cache. 更新 index.html 後，請把下面的版本號 v1 改成 v2、v3…，手機才會抓到新版。
-const C = 'jarvis-esh-v48';
+const C = 'jarvis-esh-v49';
 const A = [
   './',
   'index.html',

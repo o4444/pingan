@@ -6516,7 +6516,7 @@ const jvId=()=>JV_TXT[cur]?cur:'dash';
 const jvName=id=>id=='dash'?'戰情室':(((T.find(x=>x.id==id)||{}).name)||'').replace(/^\[MOD-\d+\]\s*/,'');
 const jvWarn=id=>id=='inc'||id=='emerg'||id=='haz';
 let jvState='minimized',jvLast='',jvGreeted=false;
-try{const s=JSON.parse(localStorage.getItem(JV_KEY)||'{}')||{};if(s.state=='closed')jvState='closed'}catch(e){}
+/* v61：每次開頁都出現，不讀上次的關閉狀態 */
 const jvRoot=document.createElement('div');jvRoot.id='jv-esh-assistant';
 jvRoot.innerHTML=`<div class="jv-panel" role="region" aria-label="賈維斯-ESH 小秘書">
  <div class="jv-tab">
@@ -6577,6 +6577,9 @@ jvRoot.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.matches&&e.tar
 {const _r=render;render=function(){const x=_r.apply(this,arguments);try{if(jvState=='expanded'&&jvLast!=jvId())jvCtx()}catch(e){}return x}}
 jvRoot.classList.toggle('jv-minimized',jvState=='minimized');jvRoot.classList.toggle('jv-closed',jvState=='closed');
 window.JarvisESHAssistant={open:()=>jvSet('expanded'),minimize:()=>jvSet('minimized'),close:()=>jvSet('closed'),getState:()=>jvState};
+/* v61：開頁（開機畫面結束後）自動展開；點面板以外的地方就縮到一旁 */
+{let jvT=0;const jvAuto=()=>{if(document.getElementById('boot')&&jvT++<30){setTimeout(jvAuto,200);return}setTimeout(()=>{try{if(jvState=='minimized')jvSet('expanded')}catch(e){}},300)};jvAuto()}
+document.addEventListener('pointerdown',e=>{if(jvState=='expanded'&&!jvRoot.contains(e.target))jvSet('minimized')},true);
 stBanner();seedCheck();render();openHash();
 if(LANG=='en')setLang('en',true);else document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang=='zh')));
 window.addEventListener('hashchange',openHash);
