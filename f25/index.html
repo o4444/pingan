@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 隱私：限制網頁只能連線到程式庫 CDN，不允許把資料送到其他伺服器 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://tessdata.projectnaptha.com; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>F25 白卡體檢報告預審系統（MVP）</title>
+<style>
+  :root{--bg:#f5f7fa;--card:#fff;--ink:#1f2933;--muted:#616e7c;--line:#d9e2ec;
+        --pass:#1e8e3e;--pass-bg:#e6f4ea;--warn:#b26a00;--warn-bg:#fff4e0;--fail:#c5221f;--fail-bg:#fce8e6;--pri:#1a5fb4}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  header{background:#12355b;color:#fff;padding:20px 16px}
+  header h1{margin:0;font-size:1.4rem}
+  header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
+  main{max-width:980px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px}
+  .card h2{margin:0 0 10px;font-size:1.1rem}
+  .step{display:inline-block;background:var(--pri);color:#fff;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:.85rem;margin-right:6px}
+  .notice{background:#eef4fb;border-left:4px solid var(--pri);padding:10px 12px;font-size:.9rem}
+  .notice ul{margin:4px 0 0;padding-left:20px}
+  #drop{border:2px dashed #9fb3c8;border-radius:10px;padding:28px 12px;text-align:center;cursor:pointer;background:#fafcff}
+  #drop.over{background:#e3eefb;border-color:var(--pri)}
+  button{font:inherit;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:var(--pri);color:#fff}
+  button.sec{background:#e4e7eb;color:var(--ink)}
+  button.danger{background:var(--fail)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  .col{flex:1 1 300px;min-width:0}
+  #preview{max-width:100%;border:1px solid var(--line);border-radius:6px;display:block}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+  th{background:#f0f4f8;white-space:nowrap}
+  .tag{display:inline-block;padding:1px 8px;border-radius:12px;font-size:.8rem;font-weight:bold;white-space:nowrap}
+  .pass{background:var(--pass-bg);color:var(--pass)} .warn{background:var(--warn-bg);color:var(--warn)} .fail{background:var(--fail-bg);color:var(--fail)}
+  label.f{display:block;margin:8px 0 2px;font-weight:bold;font-size:.9rem}
+  input[type=text]{width:100%;padding:8px;border:1px solid #bcccdc;border-radius:6px;font:inherit}
+  .chk{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:.92rem}
+  .muted{color:var(--muted);font-size:.85rem}
+  #verdict{font-size:1.3rem;font-weight:bold;padding:12px;border-radius:8px;text-align:center}
+  .hidden{display:none!important}
+  #ocrText{white-space:pre-wrap;max-height:180px;overflow:auto;background:#f8f9fa;border:1px solid var(--line);padding:8px;font-size:.8rem}
+  #report{display:none}
+  @media print{
+    body{background:#fff}
+    header,main{display:none!important}
+    #report{display:block;padding:0 6mm;font-size:11pt}
+    #report h1{font-size:16pt;margin:0 0 4px}
+    #report table{font-size:10pt}
+    #report img{max-width:45%;border:1px solid #999}
+    @page{size:A4;margin:14mm}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>F25 白卡體檢報告預審系統（MVP）</h1>
+  <p>送審前格式自我檢查 · 全程在本機瀏覽器處理 · 不上傳任何文件</p>
+</header>
+
+<main>
+  <!-- 1. 用途說明 -->
+  <section class="card">
+    <h2><span class="step">1</span>用途說明與使用限制</h2>
+    <div class="notice">
+      <ul>
+        <li>本工具只做<strong>格式預審</strong>，結果<strong>不是 F25 正式認證</strong>，正式門檻以 F25 審查窗口為準。</li>
+        <li>目前以「<strong>A4、單頁、彩色</strong>」作為暫定檢查基準，取得正式範例後會再調整。</li>
+        <li>彩色掃描不代表內容真實；偵測到印章或簽章圖案也不代表簽章有效。</li>
+        <li>本工具不會修改醫院的原始報告。</li>
+        <li><strong>隱私：</strong>文件只在你的瀏覽器內分析，不傳送到伺服器、不寫入網址、不保存。重新整理或按「清除文件」後資料就會清除。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2. 上傳 -->
+  <section class="card">
+    <h2><span class="step">2</span>上傳體檢報告</h2>
+    <div id="drop" tabindex="0" role="button" aria-label="選擇或拖曳檔案">
+      <div style="font-size:1.05rem">把檔案拖曳到這裡，或<strong>點擊選擇檔案</strong></div>
+      <div class="muted">支援 PDF、JPG、PNG，單檔上限 30 MB</div>
+    </div>
+    <input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="hidden">
+    <p id="fileMsg" class="muted"></p>
+    <button id="clearBtn" class="danger hidden">清除文件</button>
+  </section>
+
+  <!-- 3. 自動檢查 -->
+  <section class="card hidden" id="autoCard">
+    <h2><span class="step">3</span>自動文件檢查</h2>
+    <div class="row">
+      <div class="col">
+        <canvas id="preview"></canvas>
+        <p class="muted">預覽為第 1 頁（僅在本機顯示）</p>
+      </div>
+      <div class="col">
+        <table><thead><tr><th>項目</th><th>結果</th><th>說明</th></tr></thead><tbody id="autoTable"></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 文字辨識與人工確認 -->
+  <section class="card hidden" id="manualCard">
+    <h2><span class="step">4</span>欄位辨識與人工確認</h2>
+    <p class="muted">可選擇執行「本機 OCR」自動找出姓名、日期與院所。第一次使用需下載中文辨識模型（約 20～40 MB，只下載模型，<strong>文件本身不會上傳</strong>）。辨識結果僅供參考，請務必人工核對。</p>
+    <button id="ocrBtn" class="sec">執行本機 OCR</button>
+    <span id="ocrStatus" class="muted"></span>
+    <details id="ocrDetails" class="hidden" style="margin-top:8px"><summary>查看 OCR 原始文字</summary><div id="ocrText"></div></details>
+
+    <div class="row" style="margin-top:8px">
+      <div class="col">
+        <label class="f" for="fName">姓名</label>
+        <input id="fName" type="text" autocomplete="off" placeholder="請依報告內容填寫">
+        <div class="muted" id="hName"></div>
+        <label class="f" for="fDate">體檢日期</label>
+        <input id="fDate" type="text" autocomplete="off" placeholder="例如 115/10/05 或 2026-10-05">
+        <div class="muted" id="hDate"></div>
+        <label class="f" for="fHosp">醫療院所</label>
+        <input id="fHosp" type="text" autocomplete="off" placeholder="例如 ○○醫院">
+        <div class="muted" id="hHosp"></div>
+      </div>
+      <div class="col">
+        <p style="margin:8px 0 4px;font-weight:bold">請對照報告逐項勾選：</p>
+        <label class="chk"><input type="checkbox" id="cName">姓名清楚可辨識，且與送審人一致</label>
+        <label class="chk"><input type="checkbox" id="cDate">體檢日期清楚可辨識</label>
+        <label class="chk"><input type="checkbox" id="cHosp">醫療院所名稱清楚可辨識</label>
+        <label class="chk"><input type="checkbox" id="cSign">醫師簽章或院所印章存在且清楚</label>
+        <label class="chk"><input type="checkbox" id="cWhole">文件四邊完整，沒有被裁切或遮擋</label>
+        <p class="muted">未勾選的項目會列為「待確認」。</p>
+      </div>
+    </div>
+    <div style="margin-top:12px"><button id="evalBtn">產生預審結果</button></div>
+  </section>
+
+  <!-- 5. 結果 -->
+  <section class="card hidden" id="resultCard">
+    <h2><span class="step">5</span>預審結果</h2>
+    <div id="verdict"></div>
+    <table style="margin-top:10px"><thead><tr><th>項目</th><th>狀態</th><th>原因／改善建議</th></tr></thead><tbody id="resultTable"></tbody></table>
+    <p class="muted">以上依暫定系統規則判斷，正式門檻仍須由 F25 審查窗口確認。</p>
+
+    <h2 style="margin-top:16px"><span class="step">6</span>下載預審報告</h2>
+    <label class="chk"><input type="checkbox" id="optMask" checked>報告中的姓名以遮蔽方式顯示（例如：陳○利）</label>
+    <label class="chk"><input type="checkbox" id="optThumb">報告附上文件縮圖（含個資，預設不附）</label>
+    <button id="pdfBtn">下載預審 PDF</button>
+    <p class="muted">會開啟列印視窗，請在「目的地」選擇「另存為 PDF」。手機請使用分享／列印功能存成 PDF。</p>
+  </section>
+</main>
+
+<!-- 列印用報告 -->
+<div id="report"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+"use strict";
+/* ===== 暫定檢查參數（取得範例後在這裡調整） ===== */
+const RULE = {
+  maxSizeMB: 30,
+  a4Ratio: 297 / 210,        // A4 長寬比
+  ratioTolerance: 0.08,      // 長寬比容許誤差 ±8%
+  minShortSidePx: 1000,      // 影像短邊建議至少 1000 px（約 A4 120dpi）
+  blurThreshold: 60,         // 清晰度（拉普拉斯變異數）低於此值視為模糊
+  colorChroma: 40,           // 單一像素彩度門檻
+  colorRatio: 0.005,         // 彩色像素占比 > 0.5% 判定為彩色
+  blankInkRatio: 0.002,      // 墨跡像素 < 0.2% 判定為空白頁
+  edgeInkRatio: 0.12,        // 邊緣墨跡比例過高 → 可能裁切
+  redStampRatio: 0.0003      // 紅色像素占比 → 疑似印章
+};
+
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+
+const $ = id => document.getElementById(id);
+let state = null;          // 只存在記憶體中，不寫入任何儲存空間
+let ocrWorker = null;
+
+/* ===== 上傳 ===== */
+const drop = $("drop"), fileInput = $("file");
+drop.addEventListener("click", () => fileInput.click());
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => { if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener("change", () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+$("clearBtn").addEventListener("click", clearAll);
+// 頁面關閉或重新整理時釋放資料
+window.addEventListener("pagehide", clearAll);
+
+function fileKind(f) {
+  const n = f.name.toLowerCase();
+  if (f.type === "application/pdf" || n.endsWith(".pdf")) return "pdf";
+  if (["image/jpeg","image/png"].includes(f.type) || /\.(jpe?g|png)$/.test(n)) return "img";
+  return null;
+}
+
+async function handleFile(f) {
+  clearAll();
+  const msg = $("fileMsg");
+  const kind = fileKind(f);
+  if (!kind) { msg.innerHTML = `<span class="tag fail">不支援</span> 只接受 PDF、JPG、PNG 檔案。`; return; }
+  if (f.size === 0) { msg.innerHTML = `<span class="tag fail">空白檔案</span> 檔案大小為 0，請重新選擇。`; return; }
+  if (f.size > RULE.maxSizeMB * 1024 * 1024) { msg.innerHTML = `<span class="tag fail">檔案過大</span> 超過 ${RULE.maxSizeMB} MB。`; return; }
+
+  msg.textContent = "分析中，請稍候…";
+  $("clearBtn").classList.remove("hidden");
+  state = { kind, fileType: kind === "pdf" ? "PDF" : (/png$/i.test(f.name) ? "PNG" : "JPG"), sizeKB: Math.round(f.size / 1024), checks: [], ocr: null };
+
+  try {
+    const canvas = $("preview");
+    if (kind === "pdf") await loadPdf(f, canvas); else await loadImage(f, canvas);
+    analyze(canvas);
+    renderAuto();
+    msg.innerHTML = `<span class="tag pass">已載入</span> ${state.fileType}，${state.sizeKB} KB（檔名不會出現在報告中）`;
+    $("autoCard").classList.remove("hidden");
+    $("manualCard").classList.remove("hidden");
+  } catch (err) {
+    console.warn(err);
+    state.checks = [{ item: "檔案讀取", status: "fail", note: "檔案損毀或無法解析，請重新匯出或重新掃描後再上傳。" }];
+    renderAuto();
+    $("autoCard").classList.remove("hidden");
+    msg.innerHTML = `<span class="tag fail">讀取失敗</span> 檔案可能已損毀。`;
+  } finally {
+    fileInput.value = "";
+  }
+}
+
+async function loadPdf(f, canvas) {
+  if (!window.pdfjsLib) throw new Error("PDF.js 未載入");
+  const buf = await f.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
+  state.pages = pdf.numPages;
+  const page = await pdf.getPage(1);
+  const v1 = page.getViewport({ scale: 1 });
+  state.pageSizePt = { w: v1.width, h: v1.height };
+  const scale = Math.min(1600 / Math.max(v1.width, v1.height) * 1.414, 3);
+  const vp = page.getViewport({ scale });
+  canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  // 估算內嵌影像的原始解析度不易，改用渲染結果判斷清晰度
+  state.srcPx = null;
+  await pdf.destroy();
+}
+
+function loadImage(f, canvas) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(f);
+    const img = new Image();
+    img.onload = () => {
+      state.pages = 1;
+      state.srcPx = { w: img.naturalWidth, h: img.naturalHeight };
+      const s = Math.min(1, 2200 / Math.max(img.naturalWidth, img.naturalHeight));
+      canvas.width = Math.round(img.naturalWidth * s); canvas.height = Math.round(img.naturalHeight * s);
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve();
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("影像損毀")); };
+    img.src = url;
+  });
+}
+
+/* ===== 影像分析 ===== */
+function analyze(canvas) {
+  const C = state.checks = [];
+  const W = canvas.width, H = canvas.height;
+  const data = canvas.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+
+  // 頁數
+  if (state.pages === 1) C.push({ item: "頁數", status: "pass", note: "單頁文件" });
+  else C.push({ item: "頁數", status: "fail", note: `共 ${state.pages} 頁，暫定基準為單頁。請確認是否需整合為單頁。` });
+
+  // 色彩、墨跡、紅色印章、邊緣
+  let color = 0, ink = 0, mid = 0, red = 0, total = 0;
+  const gray = new Float32Array(W * H);
+  const edge = Math.max(4, Math.round(Math.min(W, H) * 0.02));
+  let edgeInk = 0, edgeTotal = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4, r = data[i], g = data[i + 1], b = data[i + 2];
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = 0.299 * r + 0.587 * g + 0.114 * b;
+    gray[y * W + x] = l; total++;
+    if (mx - mn > RULE.colorChroma) color++;
+    if (l < 160) ink++;
+    if (l >= 60 && l <= 200) mid++;
+    if (r > 140 && r - g > 60 && r - b > 50) red++;
+    if (x < edge || y < edge || x >= W - edge || y >= H - edge) { edgeTotal++; if (l < 128) edgeInk++; }
+  }
+  const colorR = color / total, inkR = ink / total;
+
+  if (inkR < RULE.blankInkRatio) {
+    C.push({ item: "內容", status: "fail", note: "幾乎沒有內容，疑似空白頁。" });
+  }
+  let colorType;
+  if (colorR > RULE.colorRatio) colorType = "彩色";
+  else colorType = (mid / Math.max(ink, 1) > 0.25) ? "灰階" : "黑白";
+  state.colorType = colorType;
+  C.push(colorType === "彩色"
+    ? { item: "色彩", status: "pass", note: `判定為彩色（彩色像素約 ${(colorR * 100).toFixed(1)}%）。註：彩色不代表內容真實。` }
+    : { item: "色彩", status: "fail", note: `判定為${colorType}，暫定基準需彩色。請以彩色模式重新掃描或拍攝。` });
+
+  // 方向與比例
+  const w0 = state.pageSizePt ? state.pageSizePt.w : W, h0 = state.pageSizePt ? state.pageSizePt.h : H;
+  if (w0 > h0) C.push({ item: "方向", status: "warn", note: "文件為橫向，A4 報告通常為直向，請確認是否需要旋轉。" });
+  else C.push({ item: "方向", status: "pass", note: "直向" });
+  const ratio = Math.max(w0, h0) / Math.min(w0, h0);
+  const dev = Math.abs(ratio - RULE.a4Ratio) / RULE.a4Ratio;
+  if (dev <= RULE.ratioTolerance) C.push({ item: "版面比例", status: "pass", note: "接近 A4 比例" });
+  else C.push({ item: "版面比例", status: "warn", note: `長寬比 ${ratio.toFixed(2)}，與 A4（1.41）差距較大，可能有裁切或拍攝角度問題。` });
+
+  // 解析度（僅影像檔）
+  if (state.srcPx) {
+    const s = Math.min(state.srcPx.w, state.srcPx.h);
+    C.push(s >= RULE.minShortSidePx
+      ? { item: "解析度", status: "pass", note: `${state.srcPx.w} × ${state.srcPx.h} px` }
+      : { item: "解析度", status: "warn", note: `${state.srcPx.w} × ${state.srcPx.h} px，偏低，建議短邊至少 ${RULE.minShortSidePx} px。` });
+  }
+
+  // 清晰度：拉普拉斯變異數（縮至寬 1000 px 計算）
+  const sharp = laplacianVar(canvas);
+  state.sharpness = sharp;
+  C.push(sharp >= RULE.blurThreshold
+    ? { item: "清晰度", status: "pass", note: `清晰（指標 ${sharp.toFixed(0)}）` }
+    : { item: "清晰度", status: "warn", note: `可能模糊（指標 ${sharp.toFixed(0)}），請確認文字是否清楚可讀。` });
+
+  // 邊緣裁切
+  const eR = edgeInk / Math.max(edgeTotal, 1);
+  C.push(eR < RULE.edgeInkRatio
+    ? { item: "邊緣完整", status: "pass", note: "四邊未發現明顯裁切跡象" }
+    : { item: "邊緣完整", status: "warn", note: "邊緣有大量深色區域，可能被裁切或有掃描黑邊，請人工確認。" });
+
+  // 印章／簽章提示
+  const redR = red / total;
+  state.redStamp = redR > RULE.redStampRatio;
+  C.push(state.redStamp
+    ? { item: "印章區域", status: "warn", note: "偵測到疑似紅色印章區域，仍需人工確認簽章是否清楚完整。（偵測到圖案不代表有效）" }
+    : { item: "印章區域", status: "warn", note: "未偵測到紅色印章，請人工確認是否有醫師簽章或院所印章。" });
+}
+
+function laplacianVar(src) {
+  const s = Math.min(1, 1000 / src.width);
+  const w = Math.max(3, Math.round(src.width * s)), h = Math.max(3, Math.round(src.height * s));
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(src, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const g = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) g[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+  let sum = 0, sum2 = 0, n = 0;
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const k = y * w + x;
+    const v = 4 * g[k] - g[k - 1] - g[k + 1] - g[k - w] - g[k + w];
+    sum += v; sum2 += v * v; n++;
+  }
+  c.width = c.height = 0;
+  const m = sum / n; return sum2 / n - m * m;
+}
+
+const TAG = { pass: '<span class="tag pass">通過</span>', warn: '<span class="tag warn">待確認</span>', fail: '<span class="tag fail">不符合</span>' };
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+function renderAuto() {
+  $("autoTable").innerHTML = state.checks.map(c => `<tr><td>${esc(c.item)}</td><td>${TAG[c.status]}</td><td>${esc(c.note)}</td></tr>`).join("");
+}
+
+/* ===== 本機 OCR（Tesseract.js，按下才載入） ===== */
+$("ocrBtn").addEventListener("click", runOcr);
+
+function loadScript(src) {
+  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("無法載入 " + src)); document.head.appendChild(s); });
+}
+
+async function runOcr() {
+  if (!state) return;
+  const st = $("ocrStatus"), btn = $("ocrBtn");
+  btn.disabled = true;
+  try {
+    if (!window.Tesseract) { st.textContent = "載入 OCR 程式…"; await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"); }
+    st.textContent = "下載中文模型並辨識中（第一次較久）…";
+    if (!ocrWorker) ocrWorker = await Tesseract.createWorker("chi_tra+eng", 1, {
+      logger: m => { if (m.status && m.progress != null) st.textContent = `${m.status} ${(m.progress * 100).toFixed(0)}%`; }
+    });
+    const { data } = await ocrWorker.recognize($("preview"));
+    const text = (data.text || "").replace(/[ \t]+(?=[一-鿿])/g, "").replace(/(?<=[一-鿿])[ \t]+/g, "");
+    state.ocr = { text, conf: data.confidence || 0, fields: extractFields(text) };
+    $("ocrText").textContent = text || "（未辨識到文字）";
+    $("ocrDetails").classList.remove("hidden");
+    applyOcr();
+    st.textContent = `完成，整體信心約 ${Math.round(state.ocr.conf)}%。請逐欄核對。`;
+  } catch (e) {
+    console.warn(e);
+    st.textContent = "OCR 無法執行（可能是網路無法下載模型），請直接人工填寫。";
+  } finally { btn.disabled = false; }
+}
+
+function extractFields(t) {
+  const f = {};
+  let m = t.match(/姓\s*名\s*[:：]?\s*([一-鿿○〇Ｏ＊*]{2,4})/);
+  if (m) f.name = m[1];
+  m = t.match(/(?:民國\s*)?(1[0-2]\d|[89]\d)\s*[年./\-]\s*(\d{1,2})\s*[月./\-]\s*(\d{1,2})\s*日?/) ||
+      t.match(/(20\d{2})\s*[年./\-]\s*(\d{1,2})\s*[月./\-]\s*(\d{1,2})\s*日?/);
+  if (m) f.date = `${m[1]}/${m[2].padStart(2, "0")}/${m[3].padStart(2, "0")}`;
+  m = t.match(/[一-鿿]{2,20}?(?:醫院|診所|醫學中心|衛生所|健康管理中心|健檢中心|醫療社團法人[一-鿿]{0,10})/);
+  if (m) f.hosp = m[0];
+  return f;
+}
+
+function applyOcr() {
+  const f = state.ocr.fields, conf = state.ocr.conf;
+  const hint = (el, v) => { el.textContent = v ? `OCR 找到：${v}（信心約 ${Math.round(conf)}%，請核對）` : "OCR 未找到，請人工填寫"; };
+  [["name", "fName", "hName"], ["date", "fDate", "hDate"], ["hosp", "fHosp", "hHosp"]].forEach(([k, inp, h]) => {
+    if (f[k] && !$(inp).value) $(inp).value = f[k];
+    hint($(h), f[k]);
+  });
+}
+
+/* ===== 預審判定 ===== */
+$("evalBtn").addEventListener("click", evaluate);
+
+function evaluate() {
+  if (!state) return;
+  const rows = state.checks.filter(c => c.item !== "印章區域" && c.item !== "邊緣完整").map(c => ({ ...c }));
+  const man = (item, filled, checked, label, tip) => {
+    if (!filled) return { item, status: "warn", note: `${label}未填寫或無法辨識。${tip}` };
+    if (!checked) return { item, status: "warn", note: `${label}尚未人工確認。${tip}` };
+    return { item, status: "pass", note: `已人工確認` };
+  };
+  const v = id => $(id).value.trim();
+  rows.push(man("姓名", v("fName"), $("cName").checked, "姓名", "請確認報告上的姓名清楚且與送審人一致。"));
+  rows.push(man("體檢日期", v("fDate"), $("cDate").checked, "體檢日期", "請確認日期清楚，並符合送審期限。"));
+  rows.push(man("醫療院所", v("fHosp"), $("cHosp").checked, "醫療院所", "請確認院所名稱清楚可見。"));
+  rows.push($("cSign").checked
+    ? { item: "簽章／印章", status: "pass", note: "已人工確認存在且清楚（本系統不驗證簽章效力）" }
+    : { item: "簽章／印章", status: "warn", note: (state.redStamp ? "系統偵測到疑似印章，" : "系統未偵測到紅色印章，") + "請人工確認醫師簽章或院所印章是否清楚完整。" });
+  const edgeAuto = state.checks.find(c => c.item === "邊緣完整");
+  rows.push($("cWhole").checked
+    ? { item: "邊緣完整", status: "pass", note: "已人工確認四邊完整" + (edgeAuto && edgeAuto.status !== "pass" ? "（系統曾提示可能裁切）" : "") }
+    : { item: "邊緣完整", status: "warn", note: edgeAuto ? edgeAuto.note + " 請人工確認。" : "請人工確認四邊完整。" });
+
+  const order = { fail: 0, warn: 1, pass: 2 };
+  rows.sort((a, b) => order[a.status] - order[b.status]);
+  const overall = rows.some(r => r.status === "fail") ? "fail" : rows.some(r => r.status === "warn") ? "warn" : "pass";
+  state.result = { rows, overall, at: new Date() };
+
+  const vt = $("verdict");
+  vt.className = overall;
+  vt.textContent = { pass: "通過：已符合系統檢查條件", warn: "待確認：有項目需要人工核對", fail: "不符合：發現明確格式問題" }[overall];
+  $("resultTable").innerHTML = rows.map(r => `<tr><td>${esc(r.item)}</td><td>${TAG[r.status]}</td><td>${esc(r.note)}</td></tr>`).join("");
+  $("resultCard").classList.remove("hidden");
+  $("resultCard").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ===== 報告輸出（瀏覽器列印為 PDF，中文顯示正常） ===== */
+$("pdfBtn").addEventListener("click", () => {
+  if (!state || !state.result) return;
+  const r = state.result, pad = n => String(n).padStart(2, "0"), t = r.at;
+  const stamp = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())}`;
+  const mask = s => !s ? "（未填）" : s.length <= 1 ? s : s.length === 2 ? s[0] + "○" : s[0] + "○".repeat(s.length - 2) + s[s.length - 1];
+  const name = $("optMask").checked ? mask(v("fName")) : (v("fName") || "（未填）");
+  function v(id) { return $(id).value.trim(); }
+  let thumb = "";
+  if ($("optThumb").checked) {
+    const c = document.createElement("canvas"), src = $("preview"), s = 600 / src.width;
+    c.width = 600; c.height = Math.round(src.height * s);
+    c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+    thumb = `<p><img alt="文件縮圖" src="${c.toDataURL("image/jpeg", 0.7)}"></p>`;
+    c.width = c.height = 0;
+  }
+  const label = { pass: "通過", warn: "待確認", fail: "不符合" };
+  $("report").innerHTML = `
+    <h1>F25 白卡體檢報告 預審結果</h1>
+    <p>產生時間：${stamp}　｜　本報告由瀏覽器本機產生</p>
+    <table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;width:100%">
+      <tr><th style="width:22%">整體結果</th><td><strong>${label[r.overall]}</strong></td></tr>
+      <tr><th>姓名</th><td>${esc(name)}</td></tr>
+      <tr><th>體檢日期</th><td>${esc(v("fDate") || "（未填）")}</td></tr>
+      <tr><th>醫療院所</th><td>${esc(v("fHosp") || "（未填）")}</td></tr>
+      <tr><th>文件資訊</th><td>${state.fileType}，${state.pages} 頁，${esc(state.colorType || "-")}</td></tr>
+    </table>
+    <h3>檢查明細</h3>
+    <table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;width:100%">
+      <tr><th style="width:18%">項目</th><th style="width:12%">狀態</th><th>原因／改善建議</th></tr>
+      ${r.rows.map(x => `<tr><td>${esc(x.item)}</td><td>${label[x.status]}</td><td>${esc(x.note)}</td></tr>`).join("")}
+    </table>
+    ${thumb}
+    <p style="font-size:9pt;margin-top:12px">聲明：本報告僅為公司內部送審前的格式預審，依暫定規則（A4、單頁、彩色）判斷，<strong>不代表 F25 正式認證</strong>。
+    彩色不代表內容真實，偵測到簽章圖案不代表簽章有效。正式門檻以 F25 審查窗口為準。</p>
+    <p style="font-size:9pt">檢查人簽名：＿＿＿＿＿＿＿＿　　日期：＿＿＿＿＿＿</p>`;
+  window.print();
+});
+window.addEventListener("afterprint", () => { $("report").innerHTML = ""; });
+
+/* ===== 清除 ===== */
+function clearAll() {
+  const c = $("preview");
+  if (c) { c.getContext("2d").clearRect(0, 0, c.width, c.height); c.width = c.height = 0; }
+  state = null;
+  ["fName", "fDate", "fHosp"].forEach(id => $(id).value = "");
+  ["cName", "cDate", "cHosp", "cSign", "cWhole"].forEach(id => $(id).checked = false);
+  ["hName", "hDate", "hHosp", "ocrStatus"].forEach(id => $(id).textContent = "");
+  $("ocrText").textContent = ""; $("ocrDetails").classList.add("hidden");
+  $("autoTable").innerHTML = ""; $("resultTable").innerHTML = ""; $("report").innerHTML = "";
+  ["autoCard", "manualCard", "resultCard", "clearBtn"].forEach(id => $(id).classList.add("hidden"));
+  $("fileMsg").textContent = "";
+}
+</script>
+</body>
+</html>
