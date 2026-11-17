@@ -43,6 +43,11 @@
   .hidden{display:none!important}
   #ocrText{white-space:pre-wrap;max-height:180px;overflow:auto;background:#f8f9fa;border:1px solid var(--line);padding:8px;font-size:.8rem}
   #report{display:none}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:10px}
+  .modalBox{background:#fff;border-radius:10px;padding:14px;max-width:900px;width:100%;max-height:95vh;overflow:auto}
+  #mView{overflow:auto;max-height:80vh;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+  #mView canvas{max-width:100%;max-height:78vh;display:block;margin:auto}
+  #mView.zoom{cursor:zoom-out} #mView.zoom canvas{max-width:none;max-height:none}
   @media print{
     body{background:#fff}
     header,main{display:none!important}
@@ -147,7 +152,57 @@
     <button id="pdfBtn">下載預審 PDF</button>
     <p class="muted">會開啟列印視窗，請在「目的地」選擇「另存為 PDF」。手機請使用分享／列印功能存成 PDF。</p>
   </section>
+
+  <!-- 7. 製成一張 -->
+  <section class="card" id="mergeCard">
+    <h2><span class="step">★</span>製成一張（多頁／多張合併為單張 A4）</h2>
+    <div class="notice">
+      <ul>
+        <li>把多頁 PDF 或多張照片，<strong>原樣縮放排列</strong>在同一張 A4 上，不修改任何內容；原始檔案不會被變更。</li>
+        <li>合併後文字會變小，請確認仍清楚可讀。<strong>合併版是否被接受，請先向 F25 審查窗口確認。</strong></li>
+        <li>可勾選要採用的頁面，也可框選剪裁局部內容。<strong>剪裁時請保留姓名、日期、院所與簽章</strong>，過度剪裁可能被視為文件不完整。</li>
+        <li>全程在本機處理，不上傳。</li>
+      </ul>
+    </div>
+    <p style="margin:10px 0 6px">
+      <button id="mAddBtn" class="sec">加入檔案（可多選）</button>
+      <button id="mUseCur" class="sec hidden">使用目前上傳的文件</button>
+      <button id="mClear" class="sec hidden">清空合併清單</button>
+    </p>
+    <input id="mFile" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="hidden">
+    <p id="mMsg" class="muted"></p>
+    <table id="mTableWrap" class="hidden"><thead><tr><th>採用</th><th>順序</th><th>頁面</th><th>調整</th></tr></thead><tbody id="mTable"></tbody></table>
+    <div id="mOpts" class="hidden" style="margin-top:10px">
+      <label class="f" for="mOrient">紙張方向</label>
+      <select id="mOrient" style="padding:6px;border-radius:6px;font:inherit">
+        <option value="auto">自動（文字最大）</option>
+        <option value="portrait">A4 直向</option>
+        <option value="landscape">A4 橫向</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="mTrim" checked>自動去除四周空白（讓文字盡量放大）</label>
+      <label class="chk"><input type="checkbox" id="mBorder" checked>每頁加細框線，方便辨識頁界</label>
+      <button id="mMake">製成一張</button>
+    </div>
+    <div id="mOut" class="hidden" style="margin-top:12px">
+      <div id="mView" title="點擊可切換原尺寸檢視，確認文字是否清楚"><canvas id="mCanvas"></canvas></div>
+      <p class="muted">點擊預覽圖可放大成實際解析度，檢查小字是否清楚。</p>
+      <p id="mInfo" class="muted"></p>
+      <button id="mPdf">下載單張 PDF</button>
+      <button id="mPng" class="sec">下載 PNG 圖檔</button>
+      <button id="mRecheck" class="sec">用這張重新預審</button>
+    </div>
+  </section>
 </main>
+
+<!-- 剪裁視窗 -->
+<div id="cropModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modalBox">
+    <h3 style="margin:0 0 4px">剪裁：<span id="cropLabel"></span></h3>
+    <p class="muted" style="margin:0 0 8px">在圖上拖曳框選要保留的範圍。請保留姓名、日期、院所與簽章。</p>
+    <div style="overflow:auto;max-height:65vh;text-align:center"><canvas id="cropCanvas" style="touch-action:none;max-width:100%;cursor:crosshair"></canvas></div>
+    <p style="margin:10px 0 0"><button id="cropApply">套用剪裁</button> <button id="cropReset" class="sec">還原整頁</button> <button id="cropCancel" class="sec">取消</button> <span id="cropMsg" class="muted"></span></p>
+  </div>
+</div>
 
 <!-- 列印用報告 -->
 <div id="report"></div>
@@ -206,7 +261,7 @@ async function handleFile(f) {
 
   msg.textContent = "分析中，請稍候…";
   $("clearBtn").classList.remove("hidden");
-  state = { kind, fileType: kind === "pdf" ? "PDF" : (/png$/i.test(f.name) ? "PNG" : "JPG"), sizeKB: Math.round(f.size / 1024), checks: [], ocr: null };
+  state = { file: f, kind, fileType: kind === "pdf" ? "PDF" : (/png$/i.test(f.name) ? "PNG" : "JPG"), sizeKB: Math.round(f.size / 1024), checks: [], ocr: null };
 
   try {
     const canvas = $("preview");
@@ -216,6 +271,7 @@ async function handleFile(f) {
     msg.innerHTML = `<span class="tag pass">已載入</span> ${state.fileType}，${state.sizeKB} KB（檔名不會出現在報告中）`;
     $("autoCard").classList.remove("hidden");
     $("manualCard").classList.remove("hidden");
+    $("mUseCur").classList.remove("hidden");
   } catch (err) {
     console.warn(err);
     state.checks = [{ item: "檔案讀取", status: "fail", note: "檔案損毀或無法解析，請重新匯出或重新掃描後再上傳。" }];
@@ -274,7 +330,7 @@ function analyze(canvas) {
 
   // 頁數
   if (state.pages === 1) C.push({ item: "頁數", status: "pass", note: "單頁文件" });
-  else C.push({ item: "頁數", status: "fail", note: `共 ${state.pages} 頁，暫定基準為單頁。請確認是否需整合為單頁。` });
+  else C.push({ item: "頁數", status: "fail", note: `共 ${state.pages} 頁，暫定基準為單頁。可使用下方「製成一張」功能合併，並先向 F25 窗口確認合併版是否可接受。` });
 
   // 色彩、墨跡、紅色印章、邊緣
   let color = 0, ink = 0, mid = 0, red = 0, total = 0;
@@ -495,6 +551,322 @@ $("pdfBtn").addEventListener("click", () => {
 });
 window.addEventListener("afterprint", () => { $("report").innerHTML = ""; });
 
+/* ===== 製成一張 ===== */
+// 每個項目：orig 原始頁、canvas 剪裁後頁、use 是否採用、crop 剪裁範圍、trim 去白邊範圍（快取）
+let mItems = [];
+let mResult = null;        // { canvas, orient }
+const MAX_PAGES = 8, SRC_MAX = 2600, OUT_DPI = 300;
+
+$("mAddBtn").addEventListener("click", () => $("mFile").click());
+$("mFile").addEventListener("change", async () => { const fs = [...$("mFile").files]; $("mFile").value = ""; await addMergeFiles(fs); });
+$("mUseCur").addEventListener("click", () => { if (state && state.file) addMergeFiles([state.file]); });
+$("mClear").addEventListener("click", clearMerge);
+$("mMake").addEventListener("click", makeOne);
+["mOrient", "mBorder", "mTrim"].forEach(id => $(id).addEventListener("change", () => { if (mResult) makeOne(); }));
+$("mView").addEventListener("click", () => $("mView").classList.toggle("zoom"));
+$("mPdf").addEventListener("click", downloadPdf);
+$("mPng").addEventListener("click", () => mResult && mResult.canvas.toBlob(b => saveBlob(b, "F25_合併單頁.png"), "image/png"));
+$("mRecheck").addEventListener("click", () => {
+  if (!mResult) return;
+  mResult.canvas.toBlob(b => {
+    handleFile(new File([b], "合併單頁.jpg", { type: "image/jpeg" }));
+    $("autoCard").scrollIntoView({ behavior: "smooth" });
+  }, "image/jpeg", 0.95);
+});
+window.addEventListener("pagehide", clearMerge);
+
+function makeItem(c, label) { return { orig: c, canvas: c, label, use: true, crop: null, trim: null }; }
+
+async function addMergeFiles(files) {
+  const msg = $("mMsg");
+  let skipped = false;
+  for (const f of files) {
+    const kind = fileKind(f);
+    if (!kind) { msg.textContent = `已略過不支援的檔案：${f.name}`; continue; }
+    if (f.size === 0) { msg.textContent = `已略過空白檔案：${f.name}`; continue; }
+    try {
+      msg.textContent = `讀取中：${f.name}…`;
+      if (kind === "pdf") {
+        const pdf = await pdfjsLib.getDocument({ data: await f.arrayBuffer(), isEvalSupported: false }).promise;
+        for (let p = 1; p <= pdf.numPages; p++) {
+          if (mItems.length >= MAX_PAGES) { skipped = true; break; }
+          msg.textContent = `讀取中：${f.name} 第 ${p}/${pdf.numPages} 頁…`;
+          const page = await pdf.getPage(p);
+          const v1 = page.getViewport({ scale: 1 });
+          const vp = page.getViewport({ scale: Math.min(SRC_MAX / Math.max(v1.width, v1.height), 5) });
+          const c = document.createElement("canvas");
+          c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+          const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+          await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          mItems.push(makeItem(c, `${f.name}　第 ${p} 頁`));
+        }
+        await pdf.destroy();
+      } else {
+        if (mItems.length >= MAX_PAGES) { skipped = true; break; }
+        mItems.push(makeItem(await fileToCanvas(f, SRC_MAX), f.name));
+      }
+      msg.textContent = "";
+    } catch (e) { console.warn(e); msg.textContent = `無法讀取（可能已損毀）：${f.name}`; }
+  }
+  if (skipped) msg.textContent = `最多加入 ${MAX_PAGES} 頁，超過的頁面已略過。`;
+  renderMergeList();
+}
+
+function fileToCanvas(f, maxSide) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(f), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+      const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("影像損毀")); };
+    img.src = url;
+  });
+}
+
+// 依剪裁範圍重建頁面
+function rebuild(it) {
+  if (it.canvas !== it.orig) it.canvas.width = it.canvas.height = 0;
+  if (!it.crop) it.canvas = it.orig;
+  else {
+    const r = it.crop, c = document.createElement("canvas");
+    c.width = r.w; c.height = r.h;
+    c.getContext("2d").drawImage(it.orig, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
+    it.canvas = c;
+  }
+  it.trim = null;
+}
+
+// 找出內容範圍（去除四周空白），保留一點邊距
+function trimRect(c) {
+  const s = Math.min(1, 600 / Math.max(c.width, c.height));
+  const w = Math.max(1, Math.round(c.width * s)), h = Math.max(1, Math.round(c.height * s));
+  const t = document.createElement("canvas"); t.width = w; t.height = h;
+  const ctx = t.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(c, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const rows = new Uint32Array(h), cols = new Uint32Array(w);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4, r = d[i], g = d[i + 1], b = d[i + 2];
+    const l = 0.299 * r + 0.587 * g + 0.114 * b, ch = Math.max(r, g, b) - Math.min(r, g, b);
+    if (l < 225 || ch > 40) { rows[y]++; cols[x]++; }
+  }
+  t.width = t.height = 0;
+  const minR = Math.max(1, w * 0.004), minC = Math.max(1, h * 0.004);   // 忽略零星雜點
+  let y0 = 0, y1 = h - 1, x0 = 0, x1 = w - 1;
+  while (y0 < h && rows[y0] < minR) y0++;
+  while (y1 > y0 && rows[y1] < minR) y1--;
+  while (x0 < w && cols[x0] < minC) x0++;
+  while (x1 > x0 && cols[x1] < minC) x1--;
+  if (y0 >= y1 || x0 >= x1) return { x: 0, y: 0, w: c.width, h: c.height };
+  const pad = Math.round(Math.max(w, h) * 0.012);
+  x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(w - 1, x1 + pad); y1 = Math.min(h - 1, y1 + pad);
+  const X = Math.floor(x0 / s), Y = Math.floor(y0 / s);
+  return { x: X, y: Y, w: Math.min(c.width - X, Math.ceil((x1 - x0 + 1) / s)), h: Math.min(c.height - Y, Math.ceil((y1 - y0 + 1) / s)) };
+}
+
+function srcRect(it) {
+  if (!$("mTrim").checked) return { x: 0, y: 0, w: it.canvas.width, h: it.canvas.height };
+  if (!it.trim) it.trim = trimRect(it.canvas);
+  return it.trim;
+}
+
+function renderMergeList() {
+  const has = mItems.length > 0;
+  ["mTableWrap", "mOpts", "mClear"].forEach(id => $(id).classList.toggle("hidden", !has));
+  $("mTable").innerHTML = mItems.map((it, i) => `<tr style="${it.use ? "" : "opacity:.5"}">
+    <td><input type="checkbox" data-a="use" data-i="${i}" ${it.use ? "checked" : ""} aria-label="採用此頁"></td>
+    <td>${i + 1}</td>
+    <td>${esc(it.label)}${it.crop ? ' <span class="tag warn">已剪裁</span>' : ""}<br><span class="muted">${it.canvas.width}×${it.canvas.height}</span></td>
+    <td style="white-space:nowrap"><button class="sec" data-a="up" data-i="${i}" ${i === 0 ? "disabled" : ""} title="上移">↑</button>
+    <button class="sec" data-a="down" data-i="${i}" ${i === mItems.length - 1 ? "disabled" : ""} title="下移">↓</button>
+    <button class="sec" data-a="rot" data-i="${i}" title="順時針旋轉 90°">⟳</button>
+    <button class="sec" data-a="crop" data-i="${i}">剪裁</button>
+    <button class="sec" data-a="del" data-i="${i}">移除</button></td></tr>`).join("");
+  if (!has) { $("mOut").classList.add("hidden"); if (mResult) { mResult.canvas.width = mResult.canvas.height = 0; } mResult = null; }
+  else if (mResult) makeOne();
+}
+
+$("mTable").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const i = +b.dataset.i, a = b.dataset.a;
+  if (a === "up" && i > 0) [mItems[i - 1], mItems[i]] = [mItems[i], mItems[i - 1]];
+  if (a === "down" && i < mItems.length - 1) [mItems[i + 1], mItems[i]] = [mItems[i], mItems[i + 1]];
+  if (a === "del") { const [x] = mItems.splice(i, 1); if (x.canvas !== x.orig) x.canvas.width = x.canvas.height = 0; x.orig.width = x.orig.height = 0; }
+  if (a === "rot") {
+    const it = mItems[i], s = it.orig, c = document.createElement("canvas");
+    c.width = s.height; c.height = s.width;
+    const ctx = c.getContext("2d"); ctx.translate(c.width, 0); ctx.rotate(Math.PI / 2); ctx.drawImage(s, 0, 0);
+    if (it.canvas !== it.orig) it.canvas.width = it.canvas.height = 0;
+    s.width = s.height = 0; it.orig = it.canvas = c; it.crop = null; it.trim = null;
+  }
+  if (a === "crop") { openCrop(i); return; }
+  renderMergeList();
+});
+$("mTable").addEventListener("change", e => {
+  const cb = e.target; if (cb.dataset.a !== "use") return;
+  mItems[+cb.dataset.i].use = cb.checked;
+  renderMergeList();
+});
+
+// 找出能讓頁面最大的排列方式（欄 × 列）
+function bestLayout(list, W, H, margin, gap) {
+  let best = null;
+  const n = list.length;
+  for (let cols = 1; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols);
+    const cw = (W - 2 * margin - gap * (cols - 1)) / cols, ch = (H - 2 * margin - gap * (rows - 1)) / rows;
+    if (cw <= 0 || ch <= 0) continue;
+    const scale = Math.min(...list.map(x => Math.min(cw / x.r.w, ch / x.r.h)));
+    if (!best || scale > best.scale) best = { cols, rows, cw, ch, scale };
+  }
+  return best;
+}
+
+function makeOne() {
+  const list = mItems.filter(it => it.use).map(it => ({ it, r: srcRect(it) }));
+  if (!list.length) { $("mMsg").textContent = "請至少勾選一頁採用。"; $("mOut").classList.add("hidden"); return; }
+  $("mMsg").textContent = "";
+  const PW = Math.round(8.27 * OUT_DPI), PH = Math.round(11.69 * OUT_DPI);
+  const margin = Math.round(0.15 * OUT_DPI), gap = Math.round(0.08 * OUT_DPI);
+  const pick = $("mOrient").value, cand = [];
+  if (pick !== "landscape") cand.push({ orient: "portrait", W: PW, H: PH });
+  if (pick !== "portrait") cand.push({ orient: "landscape", W: PH, H: PW });
+  let chosen = null;
+  for (const c of cand) { const L = bestLayout(list, c.W, c.H, margin, gap); if (L && (!chosen || L.scale > chosen.L.scale * 1.02)) chosen = { ...c, L }; }
+  if (!chosen) return;
+
+  const { W, H, L, orient } = chosen;
+  const out = mResult ? mResult.canvas : document.createElement("canvas");
+  out.width = W; out.height = H;
+  const ctx = out.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  const gridW = L.cols * L.cw + (L.cols - 1) * gap, gridH = L.rows * L.ch + (L.rows - 1) * gap;
+  const ox = (W - gridW) / 2, oy = (H - gridH) / 2;
+  let minPct = Infinity, minDpi = Infinity;
+  list.forEach(({ it, r }, i) => {
+    const col = i % L.cols, row = Math.floor(i / L.cols);
+    const s = Math.min(L.cw / r.w, L.ch / r.h);
+    const dw = r.w * s, dh = r.h * s;
+    const x = Math.round(ox + col * (L.cw + gap) + (L.cw - dw) / 2), y = Math.round(oy + row * (L.ch + gap) + (L.ch - dh) / 2);
+    ctx.drawImage(it.canvas, r.x, r.y, r.w, r.h, x, y, Math.round(dw), Math.round(dh));
+    if ($("mBorder").checked) { ctx.strokeStyle = "#9aa5b1"; ctx.lineWidth = 3; ctx.strokeRect(x, y, Math.round(dw), Math.round(dh)); }
+    // 文字大小：假設原頁為 A4，計算合併後相對原尺寸的比例
+    const origInches = it.orig.width > it.orig.height ? 11.69 : 8.27;
+    const origPPI = it.orig.width / origInches;
+    minPct = Math.min(minPct, (dw / OUT_DPI) / (r.w / origPPI));
+    // 有效解析度：來源像素是否足夠撐起輸出
+    minDpi = Math.min(minDpi, Math.min(OUT_DPI, r.w / (dw / OUT_DPI)));
+  });
+  if (!out.isConnected) { out.id = "mCanvas"; $("mCanvas").replaceWith(out); }
+  mResult = { canvas: out, orient };
+
+  const pct = Math.round(minPct * 100), pt = (10 * minPct).toFixed(1), dpi = Math.round(minDpi);
+  const bad = pct < 50 || dpi < 150, reasons = [];
+  if (pct < 70) reasons.push("文字偏小：可取消不必要的頁面，或剪裁掉空白、無關區塊");
+  if (dpi < 200) reasons.push("原始檔解析度偏低：建議改用更高解析度的掃描檔或照片");
+  const tip = !reasons.length ? `<span class="tag pass">清晰</span> 文字大小與解析度都足夠。`
+    : `<span class="tag ${bad ? "fail" : "warn"}">${bad ? "不建議" : "注意"}</span> ${reasons.join("；")}。請點擊預覽放大確認可讀。`;
+  $("mInfo").innerHTML = `A4 ${orient === "portrait" ? "直向" : "橫向"}（${W}×${H} px，${OUT_DPI} dpi），採用 ${list.length} 頁，排成 ${L.cols} 欄 × ${L.rows} 列。<br>` +
+    `最小頁面約為原尺寸 <strong>${pct}%</strong>（原 10 pt 字約變 ${pt} pt），有效解析度約 <strong>${dpi} dpi</strong>。<br>${tip}`;
+  $("mOut").classList.remove("hidden");
+}
+
+/* ----- 剪裁視窗 ----- */
+let cropIdx = -1, cropSel = null, cropS = 1, cropDrag = null;
+const cropCv = $("cropCanvas");
+
+function openCrop(i) {
+  cropIdx = i;
+  const it = mItems[i];
+  cropS = Math.min(1, 1400 / Math.max(it.orig.width, it.orig.height));
+  cropCv.width = Math.round(it.orig.width * cropS); cropCv.height = Math.round(it.orig.height * cropS);
+  cropSel = it.crop ? { x: it.crop.x * cropS, y: it.crop.y * cropS, w: it.crop.w * cropS, h: it.crop.h * cropS } : null;
+  $("cropLabel").textContent = it.label; $("cropMsg").textContent = "";
+  $("cropModal").classList.remove("hidden");
+  drawCrop();
+}
+function drawCrop() {
+  const ctx = cropCv.getContext("2d"), W = cropCv.width, H = cropCv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(mItems[cropIdx].orig, 0, 0, W, H);
+  if (cropSel && cropSel.w > 0 && cropSel.h > 0) {
+    const { x, y, w, h } = cropSel;
+    ctx.fillStyle = "rgba(0,0,0,.45)";
+    ctx.fillRect(0, 0, W, y); ctx.fillRect(0, y + h, W, H - y - h); ctx.fillRect(0, y, x, h); ctx.fillRect(x + w, y, W - x - w, h);
+    ctx.strokeStyle = "#1a5fb4"; ctx.lineWidth = 3; ctx.setLineDash([10, 6]); ctx.strokeRect(x, y, w, h); ctx.setLineDash([]);
+  }
+}
+function cropPt(e) {
+  const b = cropCv.getBoundingClientRect();
+  return { x: Math.max(0, Math.min(cropCv.width, (e.clientX - b.left) * cropCv.width / b.width)),
+           y: Math.max(0, Math.min(cropCv.height, (e.clientY - b.top) * cropCv.height / b.height)) };
+}
+cropCv.addEventListener("pointerdown", e => { e.preventDefault(); cropCv.setPointerCapture(e.pointerId); cropDrag = cropPt(e); cropSel = { ...cropDrag, w: 0, h: 0 }; drawCrop(); });
+cropCv.addEventListener("pointermove", e => {
+  if (!cropDrag) return;
+  const p = cropPt(e);
+  cropSel = { x: Math.min(p.x, cropDrag.x), y: Math.min(p.y, cropDrag.y), w: Math.abs(p.x - cropDrag.x), h: Math.abs(p.y - cropDrag.y) };
+  drawCrop();
+});
+["pointerup", "pointercancel"].forEach(ev => cropCv.addEventListener(ev, () => { cropDrag = null; }));
+function closeCrop() { $("cropModal").classList.add("hidden"); cropCv.width = cropCv.height = 0; cropIdx = -1; cropSel = null; }
+$("cropCancel").addEventListener("click", closeCrop);
+$("cropReset").addEventListener("click", () => { const it = mItems[cropIdx]; it.crop = null; rebuild(it); closeCrop(); renderMergeList(); });
+$("cropApply").addEventListener("click", () => {
+  if (!cropSel || cropSel.w < 20 || cropSel.h < 20) { $("cropMsg").textContent = "請先在圖上拖曳框選範圍。"; return; }
+  const it = mItems[cropIdx];
+  const x = Math.floor(cropSel.x / cropS), y = Math.floor(cropSel.y / cropS);
+  it.crop = { x, y, w: Math.min(it.orig.width - x, Math.ceil(cropSel.w / cropS)), h: Math.min(it.orig.height - y, Math.ceil(cropSel.h / cropS)) };
+  rebuild(it); closeCrop(); renderMergeList();
+});
+
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// 內建極簡 PDF 產生器：單頁 A4，內嵌 JPEG（不需外部程式庫）
+function downloadPdf() {
+  if (!mResult) return;
+  mResult.canvas.toBlob(async b => {
+    const jpg = new Uint8Array(await b.arrayBuffer());
+    const c = mResult.canvas;
+    const pw = mResult.orient === "portrait" ? 595.28 : 841.89, ph = mResult.orient === "portrait" ? 841.89 : 595.28;
+    const enc = new TextEncoder(), parts = [], offsets = [];
+    let len = 0;
+    const push = x => { const u = typeof x === "string" ? enc.encode(x) : x; parts.push(u); len += u.length; };
+    const obj = (n, body) => { offsets[n] = len; push(`${n} 0 obj\n`); body(); push("\nendobj\n"); };
+    push("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+    obj(1, () => push("<< /Type /Catalog /Pages 2 0 R >>"));
+    obj(2, () => push("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
+    obj(3, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw} ${ph}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`));
+    obj(4, () => { push(`<< /Type /XObject /Subtype /Image /Width ${c.width} /Height ${c.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`); push(jpg); push("\nendstream"); });
+    const content = `q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+    obj(5, () => push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`));
+    const xref = len;
+    push(`xref\n0 6\n0000000000 65535 f \n` + [1, 2, 3, 4, 5].map(n => String(offsets[n]).padStart(10, "0") + " 00000 n \n").join(""));
+    push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+    saveBlob(new Blob(parts, { type: "application/pdf" }), "F25_合併單頁.pdf");
+  }, "image/jpeg", 0.95);
+}
+
+function clearMerge() {
+  mItems.forEach(it => { if (it.canvas !== it.orig) it.canvas.width = it.canvas.height = 0; it.orig.width = it.orig.height = 0; });
+  mItems = [];
+  if (mResult) { mResult.canvas.width = mResult.canvas.height = 0; mResult = null; }
+  if (cropIdx >= 0) closeCrop();
+  $("mMsg").textContent = ""; $("mInfo").textContent = "";
+  renderMergeList();
+}
+
 /* ===== 清除 ===== */
 function clearAll() {
   const c = $("preview");
@@ -505,7 +877,7 @@ function clearAll() {
   ["hName", "hDate", "hHosp", "ocrStatus"].forEach(id => $(id).textContent = "");
   $("ocrText").textContent = ""; $("ocrDetails").classList.add("hidden");
   $("autoTable").innerHTML = ""; $("resultTable").innerHTML = ""; $("report").innerHTML = "";
-  ["autoCard", "manualCard", "resultCard", "clearBtn"].forEach(id => $(id).classList.add("hidden"));
+  ["autoCard", "manualCard", "resultCard", "clearBtn", "mUseCur"].forEach(id => $(id).classList.add("hidden"));
   $("fileMsg").textContent = "";
 }
 </script>
