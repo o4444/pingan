@@ -22,7 +22,8 @@
   .notice{background:#eef4fb;border-left:4px solid var(--pri);padding:10px 12px;font-size:.9rem}
   .notice ul{margin:4px 0 0;padding-left:20px}
   #drop{border:2px dashed #9fb3c8;border-radius:10px;padding:28px 12px;text-align:center;cursor:pointer;background:#fafcff}
-  #drop.over{background:#e3eefb;border-color:var(--pri)}
+  #drop.over,#mDrop.over{background:#e3eefb;border-color:var(--pri)}
+  #mDrop{border:2px dashed #9fb3c8;border-radius:10px;padding:22px 12px;text-align:center;cursor:pointer;background:#fafcff;margin-top:10px}
   button{font:inherit;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:var(--pri);color:#fff}
   button.sec{background:#e4e7eb;color:var(--ink)}
   button.danger{background:var(--fail)}
@@ -163,6 +164,10 @@
         <li>可勾選要採用的頁面，也可框選剪裁局部內容。<strong>剪裁時請保留姓名、日期、院所與簽章</strong>，過度剪裁可能被視為文件不完整。</li>
         <li>全程在本機處理，不上傳。</li>
       </ul>
+    </div>
+    <div id="mDrop" tabindex="0" role="button" aria-label="拖曳或選擇要合併的檔案">
+      <div style="font-size:1.05rem">把要合併的檔案<strong>拖曳到這裡</strong>（可一次多個）</div>
+      <div class="muted">PDF、JPG、PNG，最多 8 頁；也可點擊選擇檔案</div>
     </div>
     <p style="margin:10px 0 6px">
       <button id="mAddBtn" class="sec">加入檔案（可多選）</button>
@@ -558,6 +563,14 @@ let mResult = null;        // { canvas, orient }
 const MAX_PAGES = 8, SRC_MAX = 2600, OUT_DPI = 300;
 
 $("mAddBtn").addEventListener("click", () => $("mFile").click());
+const mDrop = $("mDrop");
+mDrop.addEventListener("click", () => $("mFile").click());
+mDrop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("mFile").click(); } });
+["dragenter", "dragover"].forEach(ev => mDrop.addEventListener(ev, e => { e.preventDefault(); mDrop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => mDrop.addEventListener(ev, e => { e.preventDefault(); mDrop.classList.remove("over"); }));
+mDrop.addEventListener("drop", e => { const fs = [...e.dataTransfer.files]; if (fs.length) addMergeFiles(fs); });
+// 檔案拖到拖曳區以外時，避免瀏覽器直接開啟檔案
+["dragover", "drop"].forEach(ev => window.addEventListener(ev, e => { if (!e.target.closest || !e.target.closest("#drop,#mDrop")) e.preventDefault(); }));
 $("mFile").addEventListener("change", async () => { const fs = [...$("mFile").files]; $("mFile").value = ""; await addMergeFiles(fs); });
 $("mUseCur").addEventListener("click", () => { if (state && state.file) addMergeFiles([state.file]); });
 $("mClear").addEventListener("click", clearMerge);
