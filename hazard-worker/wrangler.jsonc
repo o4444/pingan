@@ -16,6 +16,11 @@
 	"ai": {
 		"binding": "AI"
 	},
+	"unsafe": {
+		"bindings": [
+			{ "name": "RLM", "type": "ratelimit", "namespace_id": "4401", "simple": { "limit": 20, "period": 60 } }
+		]
+	},
 	"kv_namespaces": [
 		{
 			"binding": "RL",

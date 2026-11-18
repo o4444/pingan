@@ -1,0 +1,22 @@
+/**
+ * Cloudflare Worker「pingan」的設定檔（GitHub Pages 不會讀這個檔，不影響網站）
+ * 這個 repo 已連到 Cloudflare Workers Builds，每次推送都會依此檔部署
+ * 「全員找找看」AI 代理（程式在 hazard-worker/src/index.js）。
+ * Gemini 金鑰請在 Cloudflare 後台 Settings → Variables and Secrets 自己加（GEMINI_API_KEY），
+ * 不要寫進這個檔案；沒加金鑰時會自動改用免費的 Workers AI。
+ */
+{
+	"name": "pingan",
+	"main": "hazard-worker/src/index.js",
+	"compatibility_date": "2025-10-08",
+	"workers_dev": true,
+	"preview_urls": true,
+	"keep_vars": true,
+	"observability": { "enabled": false },
+	"ai": { "binding": "AI" },
+	"unsafe": {
+		"bindings": [
+			{ "name": "RLM", "type": "ratelimit", "namespace_id": "4401", "simple": { "limit": 20, "period": 60 } }
+		]
+	}
+}
