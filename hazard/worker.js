@@ -74,6 +74,7 @@ export default {
         ok: true,
         engines: autoChain(env, "main").map((s) => s.name),
         perIpDailyLimit: env.RL ? dailyLimit(env) : null,
+        perIpMinuteLimit: env.RLM ? true : null,
       }), { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     }
 
@@ -139,6 +140,15 @@ export default {
       : null;
     if (!m) return json({ error: "bad image" }, 400);
     const p = { prompt, mime: m[1], b64: m[2], dataUrl: image };
+
+    // 每個 IP 每分鐘次數上限（Cloudflare 內建 Rate Limiting 綁定「RLM」，不需另建資料庫；IP 只用雜湊當鍵）
+    if (env.RLM) {
+      try {
+        const ip = req.headers.get("CF-Connecting-IP") || "unknown";
+        const { success } = await env.RLM.limit({ key: await sha(ip) });
+        if (!success) return json({ error: "rate limited", detail: "太頻繁了，請稍等一分鐘再試" }, 429);
+      } catch { /* 綁定故障時不阻擋服務 */ }
+    }
 
     // 每個 IP 每日次數上限（有綁定 KV「RL」才啟用；IP 只存雜湊；計數非原子操作，僅作概略限制）
     if (env.RL) {
