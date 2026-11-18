@@ -1878,7 +1878,7 @@ function ask(q) {
   view = 'q'; setNav(drill ? '' : 'home'); cur = q; cur.chosen = null; cur.sel = [];
   const extra = (drill ? `<span class="bd dr">${drill.label} ${drill.i + 1}/${drill.queue.length}</span>` : '') + (isVariant && !drill ? `<span class="bd var">${L('q.variant')}</span>` : '');
   $('#app').innerHTML = `<div class="panel">${qHead(q, extra)}${optsHtml(q, 'answer')}${q.calc ? calcBox() : ''}
-  <div class="row"><button class="btn ghost" onclick="showHint(this)">${L('q.hint')}</button><button class="btn ghost" onclick="go('home')">${drill ? L('q.endDrill') : L('q.backUnits')}</button></div></div><div id="fb"></div>`;
+  <div class="row"><button class="btn ghost" onclick="showHint(this)">${L('q.hint')}</button><button class="btn ghost" onclick="go('home')">${drill ? L('q.endDrill') : L('q.backUnits')}</button></div></div><div id="fb"></div>` + sponsor();
   window.scrollTo(0, 0);
   const g = S.gens[q.gen];
   let tip = q.multi ? L('q.tipM') : L('q.tip' + (q.level in { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1 } ? q.level : 2));
@@ -1951,7 +1951,7 @@ function startMock() {
 }
 function mockQ() {
   const q = mock.list[mock.i], n = mock.list.length; cur = q; q.sel = [];
-  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i / n * 100}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">${L('m.qn', { i: mock.i + 1, n })}</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${q.calc ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">${L('m.quit')}</button></div></div>`;
+  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i / n * 100}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">${L('m.qn', { i: mock.i + 1, n })}</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${q.calc ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">${L('m.quit')}</button></div></div>` + sponsor();
   window.scrollTo(0, 0);
 }
 function mockAns(i) {

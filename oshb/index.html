@@ -1007,7 +1007,7 @@ function ask(q) {
   setNav(drill ? '' : 'home'); cur = q; cur.chosen = null;
   const extra = (drill ? `<span class="bd dr">${drill.label} ${drill.i + 1}/${drill.queue.length}</span>` : '') + (isVariant && !drill ? '<span class="bd var">變形題</span>' : '');
   $('#app').innerHTML = `<div class="panel">${qHead(q, extra)}${optsHtml(q, 'answer')}${q.unit !== 'concept' ? calcBox() : ''}
-  <div class="row"><button class="btn ghost" onclick="showHint(this)">💡 給我一點提示</button><button class="btn ghost" onclick="go('home')">${drill ? '結束特訓' : '回單元選單'}</button></div></div><div id="fb"></div>`;
+  <div class="row"><button class="btn ghost" onclick="showHint(this)">💡 給我一點提示</button><button class="btn ghost" onclick="go('home')">${drill ? '結束特訓' : '回單元選單'}</button></div></div><div id="fb"></div>` + sponsor();
   window.scrollTo(0, 0);
   const g = S.gens[q.gen];
   let tip = ASK_TIPS[q.level] || ASK_TIPS[2];
@@ -1062,7 +1062,7 @@ function startMock() {
 }
 function mockQ() {
   const q = mock.list[mock.i]; cur = q;
-  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${q.unit !== 'concept' ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>`;
+  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${q.unit !== 'concept' ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>` + sponsor();
   window.scrollTo(0, 0);
 }
 function mockAns(i) {
