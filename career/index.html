@@ -102,6 +102,10 @@ th{background:#f1f2f6}
 .sticky{position:sticky;bottom:10px;z-index:4;margin-top:18px}
 .sticky .play{margin:0;box-shadow:0 6px 18px #14213d55}
 .sticky .play{padding:10px 12px;flex-wrap:nowrap}.sticky .play small,.sticky .play .pi{display:none}.sticky .play b{font-size:15px}.sticky .play .go{width:auto;margin-left:auto;padding:8px 12px}
+.shbox{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start}
+.shbox img{width:100%;border-radius:12px;border:1px solid var(--line);background:#14213d;aspect-ratio:4/5}
+.shbtns{display:flex;flex-direction:column;gap:10px}.shbtns .btn{justify-content:center}
+@media(max-width:620px){.shbox{grid-template-columns:1fr}.shbox img{max-width:340px;margin:0 auto}}
 @media(max-width:620px){.play{flex-wrap:wrap}.play .go{margin-left:0;width:100%;text-align:center}}
 @media(max-width:620px){h1{font-size:23px}.map{grid-template-columns:1fr}.q{font-size:18px}.res .top{flex-wrap:wrap}.match{margin-left:0;text-align:left;width:100%}}
 @media print{header,.stripe,.noprint,.spon{display:none}details{display:block}details>*{display:block}}
@@ -351,11 +355,51 @@ function result(){setNav('quiz');if(!A||A.length!==Q.length){go('quiz');return}
  ${play(true,top[0].k)}
  ${top.map((x,i)=>card(x.k,x.p,i,A)).join('')}
  <h2>其他類別</h2><div class="tw"><table><tr><th>類別</th><th>契合度</th><th>一句話</th></tr>${rest.map(x=>`<tr><td><a href="#" onclick="go('all','${x.k}');return false">${T[x.k].e} ${T[x.k].n}</a></td><td>${x.p}%</td><td>${T[x.k].one}</td></tr>`).join('')}</table></div>
- <div class="row noprint" style="margin-top:16px"><button class="btn" onclick="go('quiz')">重新測驗</button><button class="btn ghost" onclick="go('path')">看證照路徑</button><button class="btn ghost" onclick="share()">分享結果</button></div>
+ <div class="row noprint" style="margin-top:16px"><button class="btn" onclick="go('quiz')">重新測驗</button><button class="btn ghost" onclick="go('path')">看證照路徑</button></div>
+ <h2 id="shareh">📷 分享你的結果</h2>
+ <div class="shbox noprint"><img id="shimg" alt="測驗結果圖卡" src=""><div class="shbtns">
+ <p id="shiab" class="warn" style="display:none"></p>
+ <button class="btn yel" onclick="shareImg()">📷 分享圖卡（LINE／IG／FB）</button>
+ <button class="btn" onclick="fbLink()">🔗 FB 連結貼文</button>
+ <button class="btn ghost" onclick="dlImg()">⬇️ 下載圖卡</button>
+ <button class="btn ghost" onclick="copyTxt(true)">📋 複製介紹文字＋網址</button>
+ <p class="note">手機按「分享圖卡」會開系統分享選單，直接附上圖片；介紹文字會先複製好，貼文時長按貼上即可。Facebook 不允許網站預填文字，電腦版會改成下載圖卡＋複製文字。</p></div></div>
  <p class="note">契合度是依你的答案計算的相對分數，只是起點建議，不代表能力或錄取機會。</p>
  <div class="sticky noprint">${play(true,top[0].k)}</div>
- ${sponsor()}${foot()}`}
+ ${sponsor()}${foot()}`;drawCard()}
 
+const SHURL='https://o4444.github.io/pingan/career/',QRIMG='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASgAAAEoAQAAAADDfFG0AAABQUlEQVR42u2aWw7DIAwEV73/nWka8APxCJ+tOlQVEfHXyCxrE5WTIaKIIoqo74xSHdd8r9zPsXqNl07GP0Qp0MrofbgprcJr4KWK6J5LTjR4bXjJppZs8HrkZbpFfh3ol0u+SRj6Nedl52P/43xc8ErmQi27+hfwGvajQZKpfXtLfs3yq6Hq3WphP6706wbVnkpaJb9W+VXcp1YFK8m5wmvQr7AQcl8htxrwmuuXsmqhXxv/VbzEllfb4VrhNfp7Kx9jDtGH10TvTbwqOzsw0a95vR2ClfWL/FrWQ55aIWTmyuA17MeOWE8RXtP+hB2H1I/n/Qkrua1zSD301P9SdCnorx7cD0VLOt0YwWvVv7daO6UcvDb3acWp2QL7ccsrWCl6h/Ba6Zf/46CE1/5+yFoVUUPCa+G/+PKGKKKI+qGoN9CyqohZyC8FAAAAAElFTkSuQmCC';let SHFILE=null,SHURLIMG='';
+function shText(){const t=T[score(A)[0].k];return `我在平安收工「工安入門建議」測出最適合的工安起點是：${t.e} ${t.n}！你適合當哪一種工安？10 題 2 分鐘測測看 👉 ${SHURL}`}
+function inApp(){const u=navigator.userAgent||'';return /FBAN|FBAV|FB_IAB|Instagram|Line\//i.test(u)}
+function wrapTxt(c,t,x,y,w,lh,max){let line='',n=0;for(const ch of t){if(c.measureText(line+ch).width>w){c.fillText(line,x,y+n*lh);line=ch;if(++n>=max-1){}}else line+=ch}c.fillText(line,x,y+n*lh);return n+1}
+async function drawCard(){const s=score(A),top=s.slice(0,3),t=T[top[0].k];
+ try{await Promise.all(['900','700','500'].map(w=>document.fonts.load(w+' 40px "Noto Sans TC"')))}catch(e){}
+ const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d'),F='"Noto Sans TC",sans-serif';
+ c.fillStyle='#14213d';c.fillRect(0,0,W,H);
+ const stripe=y=>{c.save();c.beginPath();c.rect(0,y,W,26);c.clip();c.fillStyle='#f2b705';for(let x=-60;x<W+60;x+=68){c.beginPath();c.moveTo(x,y+26);c.lineTo(x+34,y+26);c.lineTo(x+60,y);c.lineTo(x+26,y);c.fill()}c.restore()};stripe(0);stripe(H-26);
+ c.fillStyle='#f2b705';c.beginPath();c.roundRect(72,80,430,56,10);c.fill();c.fillStyle='#14213d';c.font='900 30px '+F;c.textBaseline='middle';c.fillText('⛑️ 平安收工・工安入門建議',90,109);
+ c.textBaseline='alphabetic';c.fillStyle='#c9d1e3';c.font='700 40px '+F;c.fillText('我最適合的工安起點是',72,220);
+ c.font='120px '+F;c.fillText(t.e,72,370);c.fillStyle='#f2b705';let fs=96;c.font=`900 ${fs}px ${F}`;while(c.measureText(t.n).width>780&&fs>56){fs-=4;c.font=`900 ${fs}px ${F}`}c.fillText(t.n,220,360);
+ c.fillStyle='#fff';c.font='900 52px '+F;c.fillText(`契合度 ${top[0].p}%`,72,460);
+ c.fillStyle='#c9d1e3';c.font='500 34px '+F;wrapTxt(c,t.one,72,530,936,50,3);
+ c.fillStyle='#ffffff14';c.beginPath();c.roundRect(72,690,936,190,18);c.fill();
+ c.fillStyle='#fff';c.font='700 32px '+F;c.fillText('起步月薪（參考）',100,745);c.fillText(t.pay2[1].replace(/（.*/,''),560,745);
+ c.fillStyle='#f2b705';c.font='900 50px '+F;c.fillText(t.pay[0],100,815);c.font=`900 ${t.pay2[0].length>8?38:50}px ${F}`;c.fillText(t.pay2[0],560,815);
+ c.fillStyle='#c9d1e3';c.font='500 24px '+F;c.fillText('薪資為參考區間，非官方統計',100,860);
+ c.fillStyle='#fff';c.font='700 32px '+F;c.fillText('第 2、3 名',72,950);c.font='500 34px '+F;top.slice(1).forEach((x,i)=>c.fillText(`${T[x.k].e} ${T[x.k].n}　${x.p}%`,72,1005+i*52));
+ c.fillStyle='#f2b705';c.beginPath();c.roundRect(72,1130,560,150,18);c.fill();c.fillStyle='#14213d';c.font='900 40px '+F;c.fillText('你適合哪一種？',100,1195);c.font='700 28px '+F;c.fillText('10 題・2 分鐘，測完體驗一日工安 ▶',100,1245);
+ c.fillStyle='#fff';c.beginPath();c.roundRect(712,990,296,300,18);c.fill();
+ const img=new Image();await new Promise(r=>{img.onload=r;img.onerror=r;img.src=QRIMG});try{c.drawImage(img,734,996,252,252)}catch(e){}
+ c.fillStyle='#14213d';c.font='900 22px '+F;c.textAlign='center';c.fillText('掃碼測驗',860,1274);c.textAlign='left';
+ SHURLIMG=cv.toDataURL('image/png');const im=document.getElementById('shimg');if(im)im.src=SHURLIMG;
+ SHFILE=null;cv.toBlob(b=>{if(b)SHFILE=new File([b],'平安收工_工安入門建議.png',{type:'image/png'})},'image/png');
+ const ia=document.getElementById('shiab');if(ia&&inApp()){ia.style.display='block';ia.textContent='⚠️ 你正在 LINE／FB／IG 的內建瀏覽器，分享圖片可能失敗。請點右上角「⋯」改用 Chrome 或 Safari 開啟。'}}
+function copyTxt(show){const s=shText();try{navigator.clipboard.writeText(s).then(()=>{if(show)toast('已複製介紹文字＋網址')},()=>{if(show)toast(s)})}catch(e){if(show)toast(s)}}
+function dlImg(){if(!SHURLIMG)return;const a=document.createElement('a');a.href=SHURLIMG;a.download='平安收工_工安入門建議.png';document.body.appendChild(a);a.click();a.remove();toast('已下載圖卡')}
+function shareImg(){if(!SHFILE){toast('圖卡產生中，請再按一次');return}copyTxt(false);
+ if(navigator.canShare&&navigator.canShare({files:[SHFILE]})){navigator.share({files:[SHFILE]}).then(()=>toast('介紹文字已複製，貼文時長按貼上')).catch(e=>{if(e&&e.name!=='AbortError'){toast('分享失敗（'+e.name+'），已改為下載圖卡');dlImg()}})}
+ else{dlImg();toast('已下載圖卡並複製介紹文字，到 FB／LINE 貼文時加入圖片、貼上文字')}}
+function fbLink(){copyTxt(false);window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(SHURL),'_blank','noopener');toast('介紹文字已複製，可貼在 FB 貼文裡')}
 function share(){const t=T[score(A)[0].k],txt=`我在平安收工「工安入門建議」測出最適合的工安起點是：${t.e} ${t.n}！你呢？`,url='https://o4444.github.io/pingan/career/';
  if(navigator.share){navigator.share({title:'平安收工・你適合當哪一種工安？',text:txt,url}).catch(()=>{})}
  else{const s=txt+' '+url;try{navigator.clipboard.writeText(s).then(()=>toast('已複製分享文字'),()=>toast(s))}catch(e){toast(s)}}}
