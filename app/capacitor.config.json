@@ -1,0 +1,8 @@
+{
+  "appId": "io.github.o4444.tutors",
+  "appName": "小家教陪考合集",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#f6f4ee"
+  }
+}

@@ -1,0 +1,90 @@
+# 小家教陪考合集 Android App 自動打包
+# 推送 app/ 或任一家教頁時自動執行；也可在 GitHub → Actions → 「Android App」→ Run workflow 手動執行。
+# 產出（在該次執行頁面最下方 Artifacts 下載）：
+#   xiaojiajiao-debug-apk   → 直接裝到手機測試用
+#   xiaojiajiao-release-aab → 上傳 Google Play 用（需先設好下方簽章 Secrets，否則不產出）
+#
+# 上架用簽章（Settings → Secrets and variables → Actions → New repository secret）：
+#   ANDROID_KEYSTORE_BASE64   上傳金鑰 .jks 檔的 base64
+#   ANDROID_KEYSTORE_PASSWORD 金鑰庫密碼
+#   ANDROID_KEY_ALIAS         金鑰別名
+#   ANDROID_KEY_PASSWORD      金鑰密碼
+name: Android App
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/**'
+      - 'oshb/**'
+      - 'esb/**'
+      - 'netzero/**'
+      - 'env/**'
+      - 'icon.png'
+      - '.github/workflows/android-app.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: 準備網頁與 Android 專案
+        run: |
+          npm ci
+          node build-www.mjs
+          npx cap add android
+          npx cap sync android
+
+      - name: 設定版本號（每次執行自動 +1）
+        run: |
+          sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i "s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
+
+      - name: 打包測試版 APK
+        working-directory: app/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xiaojiajiao-debug-apk
+          path: app/android/app/build/outputs/apk/debug/*.apk
+
+      - name: 打包上架版 AAB（有簽章 Secrets 才執行）
+        if: ${{ env.HAS_KS == 'true' }}
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: app/android
+        run: |
+          echo "$KS" | base64 -d > upload.jks
+          ./gradlew bundleRelease --no-daemon
+          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore upload.jks -storepass "$KS_PASS" -keypass "$KEY_PASS" \
+            app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
+          rm upload.jks
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles('app/android/app/build/outputs/bundle/release/*.aab') != '' }}
+        with:
+          name: xiaojiajiao-release-aab
+          path: app/android/app/build/outputs/bundle/release/*.aab
