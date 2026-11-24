@@ -10,6 +10,7 @@ TUTORS = [
     ('netzero', '🌱', '淨零碳規劃管理師', '經濟部 iPAS'),
     ('env', '🌏', '空水廢毒', '環保專責證照'),
     ('wem', '🔬', '作業環境監測乙級', '化學性／物理性因子'),
+    ('pe', '🎓', '工安／職衛技師', '專技高考 工業安全・職業衛生'),
 ]
 START, END = '<!--SERIES-START-->', '<!--SERIES-END-->'
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
