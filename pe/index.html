@@ -2617,7 +2617,7 @@ function foot() { return `<div class="foot">技師考試（工業安全技師、
 // ---------- 申論題 AI 批改 ----------
 // AI 批改服務：Cloudflare Worker「pingan」的網址（例 https://pingan.帳號.workers.dev）。
 // 沒填時頁面只提供「對照評分要點自己評分」；也可在申論題頁下方「AI 批改設定」填入（只存在這台裝置）。
-const GRADE_API_DEFAULT = '';
+const GRADE_API_DEFAULT = 'https://pingan.mrchenshenhao.workers.dev';
 const gradeApi = () => { try { return (localStorage.getItem('pe_grade_api') || GRADE_API_DEFAULT).trim().replace(/\/+$/, ''); } catch (e) { return GRADE_API_DEFAULT; } };
 const ESSAY_MAX = 3000;
 let essayCur = null, essaySubj = null;
