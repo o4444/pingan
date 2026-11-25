@@ -71,6 +71,21 @@ const dailyLimit = (env) => Math.max(1, parseInt(env.DAILY_LIMIT || "100", 10) |
 
 export default {
   async fetch(req, env) {
+    try {
+      return await handle(req, env);
+    } catch (e) {
+      // 未預期錯誤也要帶 CORS 標頭，網頁才看得到錯誤原因（否則瀏覽器只顯示 Failed to fetch）
+      const origin = req.headers.get("Origin") || "";
+      return new Response(JSON.stringify({ error: "worker error", detail: String((e && e.message) || e).slice(0, 200) }), {
+        status: 500,
+        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": origin || "*", Vary: "Origin" },
+      });
+    }
+  },
+};
+
+async function handle(req, env) {
+  {
     const url = new URL(req.url);
 
     // 健康檢查：不需來源檢查，不含任何秘密，方便在瀏覽器直接開來測試
@@ -84,7 +99,8 @@ export default {
     }
 
     const origin = req.headers.get("Origin") || "";
-    const allowed = (env.ALLOWED_ORIGINS || DEFAULT_ORIGINS).split(",").map((s) => s.trim().replace(/\/+$/, "")).filter(Boolean);
+    // 自己的網站（o4444.github.io）一律允許，再加上 ALLOWED_ORIGINS 另外設定的網站
+    const allowed = (DEFAULT_ORIGINS + "," + (env.ALLOWED_ORIGINS || "")).split(",").map((s) => s.trim().replace(/\/+$/, "")).filter(Boolean);
     const openToAll = allowed.includes("*");
     const originOK = openToAll || allowed.includes(origin);
 
@@ -190,8 +206,8 @@ export default {
       const status = e && e.status === 429 ? 429 : 502;
       return json({ error: "upstream failed", detail: String((e && e.detail) || "").slice(0, 300) }, status);
     }
-  },
-};
+  }
+}
 
 async function sha(s) {
   const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("hs-salt:" + s));
