@@ -41,6 +41,11 @@ nav button{white-space:nowrap}
 .etab td:last-child,.etab th:last-child{text-align:right;white-space:nowrap;font-weight:700}.etab small{color:var(--mute)}
 .eok{color:var(--ok)}.ehalf{color:#b07800}.eng{color:var(--ng)}
 .eref{background:var(--bluebg);border-radius:10px;padding:12px 14px;font-size:15px}
+.cnote{background:#fff7e0;border-left:4px solid #e0a800;border-radius:8px;padding:6px 10px;font-size:13px;color:#7a5a00;margin-bottom:10px}
+.cnote a{color:var(--blue);cursor:pointer;text-decoration:underline}
+.bd.src{background:#efe7fb;color:#5b2ca0}.bd.src.past{background:#e6f0ff;color:var(--blue)}.bd.src.hot{background:#fdecea;color:var(--ng)}
+.efil{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}.efil button{font:inherit;font-size:14px;border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ink)}.efil button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.weak{border:2px solid #e0a800}.weak li{margin:6px 0}.weak .btn{padding:4px 10px;font-size:13px;margin:2px}
 main{max-width:880px;margin:0 auto;padding:22px 18px 60px}
 h1{font-size:26px;margin:4px 0 6px;font-weight:900}
 h2{font-size:19px;margin:0 0 10px}
@@ -2214,6 +2219,202 @@ const ESSAYS = [
   ], '一、分布：作業環境暴露濃度受製程、作業、氣流等多重因素影響，多呈右偏的對數常態分布，因此以幾何平均與幾何標準差描述。<br>二、計算：將每筆濃度取自然對數 yᵢ = ln(xᵢ)，求平均 ȳ 與標準差 s_y；GM = e^ȳ，GSD = e^(s_y)。<br>三、推估上限：X95 = GM × GSD^1.645，代表該族群 95% 的暴露在此值以下；也可計算超過容許濃度的機率。<br>四、暴露等級（參考 AIHA 分級）：以 X95 與 OEL 比較：第 0 級 < 1% OEL；第 1 級 1～10%；第 2 級 10～50%；第 3 級 50～100%；第 4 級 > 100% OEL。<br>五、管理：第 4 級應立即採取工程控制、行政管理與呼吸防護，並增加監測頻率；第 3 級加強控制與監測；第 1～2 級維持現有控制並定期確認；第 0 級可降低監測頻率。數據不足（建議 6 筆以上）時，應補充監測以降低不確定性。')
 ];
 
+// ---------- 歷屆題（依考選部試題改寫）與近年可能考題 ----------
+// src：出處；歷屆題題目為改寫，原題請至考選部考畢試題查詢
+const EX = (id, subj, link, score, src, title, pts, ref) => ({ id, subj, link, score, src, title, pts, ref });
+ESSAYS.forEach(q => { q.src = q.src || '基礎練習'; });
+ESSAYS.push(
+  // ===== 歷屆題：法規 =====
+  EX('p113law1', 'law', 'con_lawC', 20, '113 年工業安全技師', '依「危害性化學品標示及通識規則」說明：(一) 危害性化學品之定義；(二) 不適用本規則之化學品有哪些，並說明不適用的理由；(三) 危害性化學品為混合物時，其危害性如何認定？', [
+    ['定義：符合國家標準 CNS 15030 分類，具有物理性危害或健康危害之化學品', 5],
+    ['列出不適用之化學品：事業廢棄物、菸草及菸草製品、食品飲料藥物化粧品、製成品、非工業用途之一般民生消費商品、滅火器、反應槽或製程中正進行化學反應之中間產物等', 6],
+    ['不適用理由：已有其他專法規範，或正常使用下不會釋出危害、無法或不需標示', 4],
+    ['混合物認定：依混合後整體危害性標示；有整體測試資料依測試結果，無者依 CNS 15030 混合物分類規定或具科學根據之資料評估', 5]
+  ], '一、定義：危害性化學品指符合國家標準 CNS 15030 分類，具有物理性危害或健康危害之化學品。<br>二、不適用之化學品：(1) 事業廢棄物；(2) 菸草或菸草製品；(3) 食品、飲料、藥物、化粧品；(4) 製成品；(5) 非工業用途之一般民生消費商品；(6) 滅火器；(7) 在反應槽或製程中正進行化學反應之中間產物；(8) 其他經中央主管機關指定者。<br>三、不適用理由：廢棄物、菸品、食品藥物化粧品等已有廢棄物清理、菸害防制、食品安全、藥事等專法規範標示與管理；製成品在正常使用下不會釋出危害性化學品；中間產物處於反應過程中，無法以容器標示；一般民生消費商品依商品標示相關法規管理。<br>四、混合物危害性認定：應依其混合後之危害性予以標示。混合物已作整體測試者，依測試結果認定；未作整體測試者，依 CNS 15030 混合物分類方式（如加成法、截斷值、架橋原則）或其他具科學根據之資料評估其危害性。'),
+  EX('p110law1', 'law', 'con_lawA', 25, '110 年工業安全技師', '勞動檢查法第 28 條規定勞工有立即發生危險之虞時之處置。請說明立即發生危險之虞的類型，以及雇主、勞工與勞動檢查員各應有之作為。', [
+    ['法源：檢查員發現勞工有立即發生危險之虞，得以書面通知事業單位逕予先行停工', 5],
+    ['類型：墜落、感電、倒塌崩塌、火災爆炸、中毒缺氧（依認定標準）', 8],
+    ['雇主：依通知停工、立即改善，改善後申請復工；平時發現時應即令停止作業並使勞工退避', 4],
+    ['勞工：得在不危及其他工作者安全下自行停止作業並退避至安全場所，立即向直屬主管報告；雇主不得因此為不利處分', 5],
+    ['檢查員：書面通知先行停工並報告機構，必要時追蹤改善與復工審查', 3]
+  ], '一、法源：勞動檢查法第 28 條，勞動檢查機構指派勞動檢查員實施檢查時，發現勞工有立即發生危險之虞，得就該場所以書面通知事業單位逕予先行停工；其情事由中央主管機關定之（「勞動檢查法第二十八條所定勞工有立即發生危險之虞認定標準」）。<br>二、類型：(1) 墜落；(2) 感電；(3) 倒塌、崩塌；(4) 火災、爆炸；(5) 中毒、缺氧。<br>三、雇主：接獲停工通知應立即停止該場所作業，採取改善措施，改善完成後向勞動檢查機構申請復工；依職業安全衛生法第 18 條，工作場所有立即發生危險之虞時，雇主或工作場所負責人應即令停止作業，並使勞工退避至安全場所。<br>四、勞工：執行職務發現有立即發生危險之虞時，得在不危及其他工作者安全情形下，自行停止作業及退避至安全場所，並立即向直屬主管報告；雇主不得對其為不利之處分（除非濫用退避權經查屬實）。<br>五、檢查員：以書面通知先行停工、報告所屬機構，並追蹤改善情形，辦理復工審查。'),
+  EX('p113law2', 'law', 'con_lawA', 10, '113 年職業衛生技師', '請說明甲類及丁類危險性工作場所之定義。', [
+    ['甲類：從事石油產品之裂解反應以製造石化基本原料；製造、處置、使用危險物、有害物達規定數量', 4],
+    ['丁類：建築物高度 80 公尺以上之建築工程；橋墩跨距單跨 75 公尺以上或多跨 50 公尺以上之橋梁工程；壓氣施工；長度 1000 公尺以上或需開挖 15 公尺以上豎坑之隧道工程；開挖深度 18 公尺以上且面積 500 平方公尺以上；模板支撐高度 7 公尺以上且面積 330 平方公尺以上', 6]
+  ], '依勞動檢查法施行細則：<br>一、甲類危險性工作場所：(1) 從事石油產品之裂解反應，以製造石化基本原料之工作場所；(2) 製造、處置、使用危險物、有害物之數量達施行細則附表規定數量之工作場所。<br>二、丁類危險性工作場所（營造工程）：(1) 建築物高度在 80 公尺以上之建築工程；(2) 單跨橋梁之橋墩跨距在 75 公尺以上或多跨橋梁之橋墩跨距在 50 公尺以上之橋梁工程；(3) 採用壓氣施工作業之工程；(4) 長度 1000 公尺以上或需開挖 15 公尺以上豎坑之隧道工程；(5) 開挖深度達 18 公尺以上，且開挖面積達 500 平方公尺以上之工程；(6) 工程中模板支撐高度 7 公尺以上，且面積達 330 平方公尺以上者。<br>（甲類應於使用或作業前、丁類應於施工 30 日前，向勞動檢查機構申請審查；數值以現行條文為準。）'),
+  EX('p113law3', 'law', 'con_lawB', 25, '113 年職業衛生技師', '勞工從事屋頂作業時，可能發生哪些危害？雇主應採取哪些預防設施？', [
+    ['危害辨識：踏穿易踏穿材料（石綿板、浪板、採光罩）墜落、邊緣墜落、滑倒、感電、熱危害、物體飛落', 6],
+    ['規劃安全通道，於屋架上設置適當強度且寬度 30 公分以上之踏板', 5],
+    ['於屋架下方可能墜落範圍裝設堅固格柵或安全網等防墜設施', 5],
+    ['指定專人（屋頂作業主管）於現場指揮或監督', 4],
+    ['其他：邊緣與開口設護欄、安全帶確實鉤掛於安全母索或錨錠、作業前危害告知與檢點、高溫或強風雨暫停作業', 5]
+  ], '一、可能危害：(1) 踏穿石綿板、鐵皮浪板、塑膠採光罩等易踏穿材料而墜落（最常見）；(2) 屋頂邊緣、開口墜落；(3) 斜屋頂或潮濕滑溜而滑落；(4) 接近架空電線或使用電動工具感電；(5) 夏季屋頂高溫造成熱疾病；(6) 材料、工具掉落傷及下方人員。<br>二、預防設施（職業安全衛生設施規則、營造安全衛生設施標準）：雇主使勞工於易踏穿材料構築之屋頂作業時，應(1) 規劃安全通道，於屋架上設置適當強度且寬度在 30 公分以上之踏板；(2) 於屋架下方可能墜落之範圍，裝設堅固格柵或安全網等防墜設施；(3) 指定專人指揮或監督該作業（營造工程應指派屋頂作業主管）。<br>三、其他：屋頂邊緣及開口設置護欄或護蓋；設置安全母索並使勞工確實使用安全帶；斜度大或滑溜屋頂設置適當工作臺與梯子；作業前危害告知、工具材料防落措施及下方警戒管制；高氣溫採熱危害預防，強風、大雨時停止作業。'),
+
+  // ===== 歷屆題：人因工程 =====
+  EX('p113erg1', 'iseErg', 'con_iseErgC', 25, '113 年工業安全技師', '在人體計測的過程中，難免因為某些因素而影響結果的正確性。試說明人體計測之誤差來源。', [
+    ['受測者因素：姿勢不標準、衣著鞋子、呼吸與肌肉放鬆程度、量測時段（早晚身高差）、配合度', 5],
+    ['量測者因素：技術熟練度、體表標記點定位不準、讀數與紀錄錯誤、不同量測者間差異', 5],
+    ['儀器因素：未校正、精度不足、儀器種類不同', 5],
+    ['方法與環境：量測定義與標準姿勢不一致、程序不統一、場地條件', 5],
+    ['抽樣與資料處理：樣本代表性不足、族群與年代差異（長期趨勢）、統計推估與百分位使用錯誤', 5]
+  ], '一、受測者因素：未採標準姿勢（站姿、坐姿挺直程度）、衣著與鞋子厚度、呼吸週期與肌肉緊張程度、量測時間（脊椎椎間盤受壓，傍晚身高較早晨低）、受測者配合度與疲勞。<br>二、量測者因素：量測技術與經驗不足、骨骼標記點定位不準確、讀數視差與紀錄錯誤、多名量測者間的系統性差異（應做量測者間信度檢定）。<br>三、儀器因素：人體測高器、卡尺等未定期校正、刻度精度不足、使用不同型式儀器（接觸式與 3D 掃描）造成差異。<br>四、方法與環境：量測項目定義不一致、未依標準（如 ISO 7250）程序、場地地面不平或空間限制。<br>五、抽樣與資料處理：樣本數不足或不具代表性（年齡、性別、職業分布）、引用他國或過時資料（世代身高長期變化）、資料登錄錯誤、統計推估（平均值與標準差、百分位）使用不當。<br>改善：訓練量測者、標準化程序、儀器校正、重複量測取平均、適當抽樣。'),
+  EX('p113erg2', 'iseErg', 'con_iseErgC', 25, '113 年工業安全技師', '顯示器呈現的資訊可分為「動態的」與「靜態的」兩類。何謂動態資訊？何謂靜態資訊？請舉例說明，並說明兩者在顯示器設計上的考量。', [
+    ['動態資訊定義：會隨時間持續改變的資訊', 6],
+    ['動態資訊舉例：速度表、壓力溫度計、雷達、心電圖、製程監控畫面', 5],
+    ['靜態資訊定義：在一段時間內固定不變的資訊', 6],
+    ['靜態資訊舉例：標誌、標籤、警告標示、地圖、說明書、圖表', 4],
+    ['設計考量：動態重變化趨勢與即時察覺（指針式、警報）；靜態重易讀、易懂與耐久（字體、對比、圖示）', 4]
+  ], '一、動態資訊：資訊內容會隨時間持續改變，操作者需監視其變化，例如車輛速度表、壓力表、溫度計、雷達螢幕、心電圖監視器、中控室製程趨勢畫面。<br>二、靜態資訊：在一段時間內保持固定不變的資訊，例如安全標誌、設備銘牌、警告標示、道路標誌、地圖、操作說明、表格與圖表。<br>三、設計考量：(1) 動態顯示器：依讀值需求選擇數字式（精確讀值）或指針式（看變化方向與趨勢），標示正常與危險範圍，配合聲光警報，顯示更新速率適當，重要者置於視野中央；(2) 靜態顯示器：字體大小與觀看距離相符、對比與照明足夠、用語簡潔、圖示具共通性、材質耐候不褪色、放置於明顯位置。'),
+
+  // ===== 歷屆題：工業衛生概論 =====
+  EX('p113ih1', 'iseIH', 'con_iseIHC', 25, '113 年工業安全技師', '某噪音作業勞工工作日之作業環境噪音：上午 8 時至 10 時為 90 dB、10 時至 12 時為 85 dB、下午 1 時至 5 時為 92 dB。試計算其噪音暴露劑量，並判斷是否超過法令規定。', [
+    ['容許暴露時間公式：T = 8 / 2^((L − 90)/5)，或查法定對照表', 5],
+    ['各時段容許時間：90 dB → 8 小時；85 dB → 16 小時；92 dB → 約 6.06 小時', 6],
+    ['劑量 D = 2/8 + 2/16 + 4/6.06 ≈ 0.25 + 0.125 + 0.66 ≈ 1.03（103%）', 6],
+    ['判定：劑量大於 1（100%），相當 TWA 約 90.2 dBA，超過法令規定', 4],
+    ['後續：應採取工程或管理改善，並實施聽力保護計畫（85 dBA 或 50% 以上）', 4]
+  ], '一、依職業安全衛生設施規則，容許暴露時間 T = 8 / 2^((L − 90)/5) 小時（5 dB 交換率）。<br>二、各時段：90 dB：T = 8 小時，t/T = 2/8 = 0.25；85 dB：T = 16 小時，t/T = 2/16 = 0.125；92 dB：T = 8 / 2^0.4 ≈ 6.06 小時，t/T = 4/6.06 ≈ 0.66。<br>三、暴露劑量 D = 0.25 + 0.125 + 0.66 ≈ 1.035，即約 103.5%。<br>四、換算 8 小時時量平均音壓級 TWA = 16.61 × log(1.035) + 90 ≈ 90.2 dBA。<br>五、判定：D > 1（TWA > 90 dBA），超過法令規定之容許暴露。雇主應採取音源與傳播途徑改善、縮短暴露時間等措施，並因 TWA 超過 85 dBA，實施聽力保護計畫（噪音監測、防音防護具、聽力檢查、教育訓練）。'),
+  EX('p113ih2', 'iseIH', 'con_iseIHC', 25, '113 年工業安全技師', '雇主使勞工從事戶外作業時，應依「高氣溫戶外作業勞工熱危害預防指引」防範熱疾病。請問該指引以哪兩種指標對應出熱指數值？又依職業安全衛生設施規則第 324 條之 6，雇主應採取哪些危害預防措施？', [
+    ['兩種指標：氣溫（乾球溫度）與相對濕度，查表得熱指數並分級', 5],
+    ['降低作業場所溫度、提供陰涼休息場所、提供適當飲料或食鹽水', 5],
+    ['調整作業時間、增加作業場所巡視頻率', 5],
+    ['實施健康管理及適當安排工作、採取熱適應措施、留意作業前及作業中健康狀況', 5],
+    ['實施熱疾病預防教育宣導、建立緊急醫療通報及應變處理機制', 5]
+  ], '一、指標：「高氣溫戶外作業勞工熱危害預防指引」以氣溫（乾球溫度）及相對濕度兩項指標，查表對應出熱指數值，並依熱指數分級（如注意、高度注意、危險、極度危險）採取對應措施。<br>二、職業安全衛生設施規則第 324 條之 6：雇主使勞工從事戶外作業，為防範環境引起之熱疾病，應視天候狀況採取下列危害預防措施：(1) 降低作業場所之溫度；(2) 提供陰涼之休息場所；(3) 提供適當之飲料或食鹽水；(4) 調整作業時間；(5) 增加作業場所巡視之頻率；(6) 實施健康管理及適當安排工作；(7) 採取勞工熱適應相關措施；(8) 留意勞工作業前及作業中之健康狀況；(9) 實施勞工熱疾病預防相關教育宣導；(10) 建立緊急醫療、通報及應變處理機制。'),
+  EX('p113ih3', 'iseIH', 'con_iseIHC', 25, '113 年工業安全技師', '勞工作業環境危害因子的評估方式，一般可採取作業環境監測及生物偵測兩種。請分別說明兩者之意義與其優缺點。', [
+    ['作業環境監測意義：在作業環境或勞工呼吸帶採樣分析，掌握危害因子濃度與暴露實態', 5],
+    ['作業環境監測優缺點：可與容許暴露標準比較、找出發生源並評估控制成效；但只反映吸入途徑，無法反映皮膚吸收、個人差異與防護具效果', 7],
+    ['生物偵測意義：分析勞工血液、尿液、呼氣中之化學物質或代謝物，評估實際吸收劑量', 5],
+    ['生物偵測優缺點：反映所有途徑總吸收量與個人差異、可評估防護具效果；但侵入性、受個人代謝與生活因素干擾、可用指標與標準有限、採樣時間要求嚴格', 8]
+  ], '一、作業環境監測：依監測計畫，以區域或個人採樣方式，量測作業環境中化學性或物理性危害因子之濃度或強度，掌握勞工暴露實態並與容許暴露標準比較。<br>優點：可直接與法定容許暴露標準比較；能找出污染發生源並評估工程控制成效；非侵入性；方法標準化。缺點：只代表吸入途徑的外在暴露，無法反映經皮膚、食入吸收；未考慮個人工作量、呼吸量與代謝差異；無法反映防護具實際保護效果；採樣只代表當時狀況。<br>二、生物偵測：分析勞工生物檢體（尿液、血液、呼氣）中的化學物質本身或其代謝物，評估體內實際吸收劑量，例如血中鉛、尿中馬尿酸（甲苯）、尿中 2,5-己二酮（正己烷）。<br>優點：反映各種途徑之總吸收量；考慮個人差異（工作負荷、衛生習慣）；可評估防護具與個人防護成效。缺點：具侵入性，勞工接受度較低；受個人代謝、飲食、飲酒、吸菸等干擾；有生物暴露指標（BEI）的物質有限；採樣時間點（班末、週末）要求嚴格；屬事後評估。<br>三、兩者互補：以作業環境監測做源頭控制，生物偵測確認實際吸收。'),
+
+  // ===== 歷屆題：風險危害評估 =====
+  EX('p113risk1', 'iseRisk', 'con_iseRiskC', 25, '113 年工業安全技師', '風險評估模式依製程或作業特性選擇：連續製程、管線系統、自動控制系統等採「工作場所導向模式」；批式製程、裝配作業、維修作業等採「作業導向模式」。請說明兩種模式的意涵、適用的評估方法，以及實務上如何選擇。', [
+    ['兩種模式意涵與適用對象：工作場所導向以設備、製程系統為分析單元；作業導向以人員作業步驟為分析單元', 8],
+    ['工作場所導向常用方法：HazOp、What-if、檢核表、FMEA、FTA 等', 6],
+    ['作業導向常用方法：工作安全分析（JSA）或作業危害分析，說明分解步驟、辨識危害、訂定安全方法', 6],
+    ['選擇原則：依製程連續性、人員介入程度、變更與非例行作業，可兩者併用並納入承攬作業', 5]
+  ], '一、工作場所導向模式：以工作場所內的設備、製程單元或系統為分析對象，著重設備失效、製程偏離與控制系統故障，適用於連續製程（石化、半導體）、管線系統、自動控制系統。常用方法：危害與可操作性分析（HazOp）、如果－結果分析（What-if）、檢核表、失誤模式與影響分析（FMEA）、故障樹分析（FTA）、事件樹分析（ETA）。<br>二、作業導向模式：以人員執行的作業或工作步驟為分析對象，著重人員操作行為、作業環境與工具，適用於批式製程、裝配作業、維修保養、營造及非例行作業。常用方法：工作安全分析（JSA，將作業分解為步驟 → 辨識各步驟潛在危害 → 訂定安全工作方法與防護措施）、作業危害分析、任務分析。<br>三、選擇與整合：自動化程度高、人員介入少者採工作場所導向；人員操作比重高、變化多、非例行者採作業導向；同一事業單位常兩者併用，例如製程以 HazOp 評估、歲修與承攬作業以 JSA 評估，並依控制層級決定改善措施、定期及變更時重新評估。'),
+  EX('p110risk1', 'iseRisk', 'con_iseRiskC', 25, '110 年工業安全技師', '某新型病毒快篩檢驗：有病者有 0.9 機率呈陽性；無病者有 0.05 機率呈陽性；盛行率為每 100 人有 1 人罹病，陽性者須住院一週檢查。試求：有病且被篩出、無病且被篩出、有病未被篩出、無病未被篩出之機率，並分析部分國家不鼓勵大量篩檢的原因。', [
+    ['有病且陽性：0.01 × 0.9 = 0.009', 4],
+    ['無病且陽性（偽陽性）：0.99 × 0.05 = 0.0495', 4],
+    ['有病且陰性（偽陰性）：0.01 × 0.1 = 0.001', 4],
+    ['無病且陰性：0.99 × 0.95 = 0.9405', 4],
+    ['陽性預測值 0.009 / 0.0585 ≈ 15.4%，陽性者多數為偽陽性', 4],
+    ['不鼓勵大量篩檢原因：盛行率低時偽陽性比例高、浪費醫療資源與住院成本、造成恐慌與社會成本、偽陰性造成假安心', 5]
+  ], '設 P(病) = 0.01，P(無病) = 0.99；P(陽|病) = 0.9，P(陽|無病) = 0.05。<br>一、有病且被篩出：0.01 × 0.9 = 0.009。<br>二、無病且被篩出（偽陽性）：0.99 × 0.05 = 0.0495。<br>三、有病沒被篩出（偽陰性）：0.01 × 0.1 = 0.001。<br>四、無病沒被篩出：0.99 × 0.95 = 0.9405。（四者合計為 1）<br>五、陽性者中真正有病的比例（陽性預測值）= 0.009 / (0.009 + 0.0495) ≈ 0.154，約 15%；也就是被篩出的人約 85% 其實沒有病。<br>六、不鼓勵大量篩檢的原因：盛行率低時偽陽性遠多於真陽性，大量健康者須住院一週，浪費醫療量能與成本、排擠真正病患；造成不必要的恐慌與工作損失；偽陰性者可能誤以為安全而降低防護。較佳做法是針對高風險族群篩檢，或以二次確認檢驗提高陽性預測值。'),
+  EX('p114risk1', 'iseRisk', 'con_iseRiskC', 25, '114 年高考三級職業安全衛生（相關考試）', '某蒸餾塔溫度保護跳俥系統由溫度量測元件（年失誤率 0.20 次/年）、溫度控制器（0.12 次/年）及緊急遮斷閥（0.15 次/年）三個元件串聯組成。以 1 年為計算基準，該系統失效機率為多少？（R(t) = e^(−λt)，P = 1 − R）並說明如何提高系統可靠度。', [
+    ['串聯系統：任一元件失效即系統失效，系統可靠度為各元件可靠度相乘，總失誤率 = 各失誤率相加', 8],
+    ['λ總 = 0.20 + 0.12 + 0.15 = 0.47 次/年，R = e^(−0.47) ≈ 0.625', 9],
+    ['失效機率 P = 1 − 0.625 ≈ 0.375', 5],
+    ['提高可靠度：關鍵元件並聯冗餘（如 2oo3 表決）、選用低失誤率元件、縮短測試間隔、定期維護', 3]
+  ], '一、串聯系統中任一元件失效則系統失效，系統可靠度 R系 = R₁ × R₂ × R₃ = e^(−λ₁t) × e^(−λ₂t) × e^(−λ₃t) = e^(−(λ₁+λ₂+λ₃)t)。<br>二、λ總 = 0.20 + 0.12 + 0.15 = 0.47 次/年；t = 1 年時 R = e^(−0.47) ≈ 0.625。<br>三、失效機率 P = 1 − R ≈ 0.375，即一年內約有 37.5% 機率失效。<br>四、改善：對失誤率高的量測元件與遮斷閥採並聯冗餘或表決邏輯（如 2 選 1、3 選 2），選用較可靠的元件，縮短功能測試週期以降低需求時失效機率，落實預防保養與機械完整性管理。'),
+
+  // ===== 歷屆題：工業安全工程 =====
+  EX('p113eng1', 'iseEng', 'con_iseEngC', 25, '113 年高考三級職業安全衛生（相關考試）', '112 年 9 月屏東某工廠大火，救災人員因不清楚現場化學品資訊而罹難。依「公共危險物品及可燃性高壓氣體製造儲存處理場所設置標準暨安全管理辦法」，公共危險物品分為幾類？名稱為何？請各舉二例。', [
+    ['第一類 氧化性固體（如氯酸鹽類、過錳酸鹽類、硝酸鹽類），並說明共分六類', 5],
+    ['第二類 易燃固體（如硫化磷、紅磷、硫磺、金屬粉）', 4],
+    ['第三類 發火性液體、發火性固體及禁水性物質（如鉀、鈉、烷基鋁、黃磷）', 4],
+    ['第四類 易燃液體及可燃液體（如汽油、乙醚、酒精類、燈油）', 4],
+    ['第五類 自反應物質及有機過氧化物（如有機過氧化物、硝酸酯類）', 4],
+    ['第六類 氧化性液體（如過氯酸、過氧化氫、硝酸）', 4]
+  ], '公共危險物品共分六類：<br>一、第一類：氧化性固體，例：氯酸鹽類、過氯酸鹽類、過錳酸鹽類、硝酸鹽類。<br>二、第二類：易燃固體，例：硫化磷、紅磷、硫磺、鐵粉、金屬粉、鎂。<br>三、第三類：發火性液體、發火性固體及禁水性物質，例：鉀、鈉、烷基鋁、烷基鋰、黃磷。<br>四、第四類：易燃液體及可燃液體，例：特殊易燃物（乙醚、二硫化碳）、第一石油類（汽油、丙酮）、酒精類、第二石油類（燈油、柴油）。<br>五、第五類：自反應物質及有機過氧化物，例：有機過氧化物、硝酸酯類、硝基化合物。<br>六、第六類：氧化性液體，例：過氯酸、過氧化氫、硝酸。<br>（實務：應依類別分區儲存、管制數量，並主動提供消防救災單位化學品種類、數量與位置資訊。）'),
+  EX('p113eng2', 'iseEng', 'con_iseEngC', 25, '113 年職業衛生技師', '請說明靜電引起火災爆炸的原因，以及預防與控制方法。', [
+    ['帶電機制：摩擦、剝離、流動、噴出、攪拌、感應等使電荷分離並累積', 6],
+    ['爆炸條件：靜電放電能量大於可燃物最小著火能量，且可燃物濃度在爆炸範圍內', 4],
+    ['接地與等電位連結（儲槽、管線、容器、灌裝設備）', 5],
+    ['環境與材料：提高濕度、使用導電性或抗靜電材料、裝設靜電消除器', 5],
+    ['製程與人員：限制流速、避免噴濺、靜置時間、惰性氣體置換；人員穿著防靜電鞋服、作業前人體除電', 5]
+  ], '一、原因：(1) 帶電：兩物體摩擦、剝離（薄膜捲收）、液體在管內高速流動或噴出、粉體輸送與攪拌、感應等，使正負電荷分離；(2) 累積：絕緣性物質或未接地導體使電荷無法洩放而累積；(3) 放電：電位升高後產生火花放電、刷形放電等；(4) 著火：放電能量大於周圍可燃性氣體、蒸氣或粉塵之最小著火能量，且濃度在爆炸範圍內時，即引發火災爆炸。<br>二、預防與控制：(1) 接地與等電位連結：儲槽、管線、灌裝設備、桶槽間連接並接地，使電荷洩放；(2) 增加濕度：相對濕度提高可降低表面電阻；(3) 材料：使用導電性或抗靜電材料、添加抗靜電劑；(4) 除電：裝設靜電消除器（離子產生器）；(5) 製程控制：降低流速、避免由上方噴濺灌裝（改由底部或使用浸入管）、灌裝後靜置；(6) 惰化：以氮氣置換使氧濃度低於限值；(7) 人員：穿著防靜電鞋與工作服、作業前觸摸除電棒、地面使用導電性地板。'),
+
+  // ===== 歷屆題：暴露評估、監測、控制、危害辨識、健康管理（含相關考試） =====
+  EX('p113xr1', 'oheRisk', 'con_oheRiskC', 25, '113 年高考三級職業安全衛生（相關考試）', '試比較定性暴露評估與定量暴露評估的差異，並列舉可進行定性暴露評估與定量暴露評估的方法。', [
+    ['定性暴露評估：不實際量測，以化學品危害、使用量、散布狀況、作業型態等資料判斷暴露等級', 5],
+    ['定量暴露評估：以採樣分析或模式推估得出暴露濃度數值，與容許標準比較', 5],
+    ['差異比較：精確度、成本與時間、所需專業與資料、適用時機（篩選 vs 確認）', 5],
+    ['定性方法：化學品分級管理（CCB）、專業判斷、COSHH Essentials、風險矩陣', 5],
+    ['定量方法：個人採樣與作業環境監測、直讀式儀器、生物偵測、數學模式推估（如定量暴露推估模式）', 5]
+  ], '一、定性暴露評估：不進行實際量測，依化學品健康危害分類、使用量、揮發度或粉塵度、作業時間與控制設施等資訊，以分級方式判斷暴露或風險等級。優點：快速、成本低，適合大量化學品初步篩選；缺點：結果較粗略，依賴評估者經驗。<br>二、定量暴露評估：以採樣分析或模式推估取得暴露濃度數值，與容許暴露標準比較並進行統計評估。優點：結果客觀精確，可作法規符合性判定；缺點：費時、成本高、需專業與實驗室支援。<br>三、比較：定性用於篩選與排序優先順序，定量用於確認高風險族群的實際暴露；實務上先定性、再針對中高風險者定量。<br>四、定性方法：化學品分級管理（CCB，危害群組 × 散布狀況 × 使用量）、COSHH Essentials、專業判斷、風險矩陣。<br>五、定量方法：個人採樣與作業環境監測、直讀式儀器量測、生物偵測、數學模式推估（如飽和蒸氣壓模式、暴露模式軟體）。'),
+  EX('p113mon1', 'oheMon', 'con_oheMonC', 25, '113 年高考三級職業安全衛生（相關考試）', '某鑄造廠研磨作業場所過去 10 年結晶型游離二氧化矽可呼吸性粉塵監測結果中，有 3 筆低於分析方法偵測下限（LOD = 0.1 mg/m³）而標記為 NA。請問這 3 筆資料應如何處理，才能計算該場所的暴露統計值並評估？', [
+    ['不可直接刪除或設為 0：會高估或低估平均暴露、扭曲分布', 5],
+    ['以 LOD/√2 替代（資料偏態不大，如 GSD < 3）：0.1/√2 ≈ 0.071 mg/m³', 5],
+    ['以 LOD/2 替代（資料偏態大，如 GSD ≥ 3）：0.05 mg/m³', 5],
+    ['統計方法：最大概似估計（MLE）、迴歸順序統計（ROS）等，適用未檢出比例較高時', 5],
+    ['替代後計算 GM、GSD、X95，並與容許濃度比較判定暴露等級', 5]
+  ], '一、低於偵測下限不代表濃度為 0，也不等於 LOD。若直接刪除，會高估平均暴露；若設為 0，會低估並使對數轉換無法計算；設為 LOD 則高估。<br>二、替代法（Hornung & Reed）：(1) 資料分布偏態不大（GSD 小於約 3）時，以 LOD/√2 替代，即 0.1/1.414 ≈ 0.071 mg/m³；(2) 資料高度偏態（GSD 大於等於約 3）時，以 LOD/2 替代，即 0.05 mg/m³。<br>三、統計方法：未檢出筆數比例高時（如超過 15～50%），宜採最大概似估計（MLE）、迴歸順序統計（ROS）或貝氏方法估計分布參數。<br>四、完成處理後，以對數常態分布計算幾何平均（GM）、幾何標準差（GSD）與第 95 百分位（X95 = GM × GSD^1.645），與結晶型游離二氧化矽之容許濃度比較，判定暴露等級並決定改善措施與監測頻率；報告中應註明未檢出資料的處理方式。'),
+  EX('p113ctl1', 'oheCtl', 'con_oheCtlC', 25, '113 年地方特考三等職業安全衛生（相關考試）', '某作業場所（10 m × 6 m × 5 m）使用甲溶劑（PEL-TWA 100 ppm）。整體換氣量為 200 m³/min 時，甲溶劑平衡濃度為 75 ppm。若現場條件不變，希望濃度降至行動基準（action level），需增加多少整體換氣量？', [
+    ['穩態平衡關係：C = G / Q，發生率 G 不變時 C × Q 為定值', 6],
+    ['行動基準為容許濃度之 1/2，即 50 ppm', 5],
+    ['所需換氣量 Q = 200 × 75 / 50 = 300 m³/min', 8],
+    ['需增加 300 − 200 = 100 m³/min', 4],
+    ['補充：實際需乘上混合不均之安全係數，並規劃補充空氣', 2]
+  ], '一、穩態時污染物發生率 G = 換氣量 Q × 濃度 C；現場條件不變，G 為定值，故 C₁Q₁ = C₂Q₂。<br>二、行動基準（action level）一般取容許暴露濃度的 1/2：100 × 1/2 = 50 ppm。<br>三、Q₂ = Q₁ × C₁ / C₂ = 200 × 75 / 50 = 300 m³/min。<br>四、需增加之換氣量 = 300 − 200 = 100 m³/min。<br>五、說明：本題假設室內完全混合；實務上應考量混合不均，乘以安全係數 K，並設置足夠的補充空氣（make-up air）。場所體積 300 m³ 與穩態濃度無關，只影響達到平衡所需的時間。'),
+  EX('p113haz1', 'oheHaz', 'con_oheHazC', 20, '113 年公共衛生師（相關考試）', '請說明評估混合暴露毒性效應時，常見的交互作用效應之定義；並說明這些效應如何應用於我國法規中，作業環境出現二種以上有害物時之容許暴露濃度評估。', [
+    ['相加作用：混合效應等於各物質單獨效應之和', 5],
+    ['協同（相乘）作用：混合效應大於各別效應之和', 5],
+    ['拮抗作用：一物質降低另一物質之效應（另可補充增強作用）', 5],
+    ['法規應用：作業環境有二種以上有害物且為相加效應時，Σ(Cᵢ / PELᵢ) 大於 1 即超過容許暴露', 5]
+  ], '一、相加作用（additive）：混合暴露之效應等於各物質單獨效應之總和，例如多種有機溶劑同時造成中樞神經抑制（2 + 3 = 5）。<br>二、協同作用（synergistic，相乘）：混合效應大於各別效應之和，例如石綿暴露加上吸菸，肺癌風險大幅增加（2 + 3 = 20）。<br>三、拮抗作用（antagonistic）：一物質降低另一物質之毒性效應，例如乙醇可競爭性抑制甲醇代謝（4 + 6 = 8）。<br>另有增強作用（potentiation）：本身無毒性的物質增強另一物質毒性，例如異丙醇增強四氯化碳肝毒性（0 + 2 = 10）。<br>四、法規應用：依勞工作業場所容許暴露標準，作業環境空氣中有二種以上有害物存在且其相互間效應非屬於相乘效應或獨立效應時，應視為相加效應，計算 Σ(Cᵢ / PELᵢ) = C₁/PEL₁ + C₂/PEL₂ + …，其總和大於 1 時即屬超出容許濃度。'),
+  EX('p114hlth1', 'oheHlth', 'con_oheHlthC', 20, '114 年高考三級職業安全衛生（相關考試）', '依勞工健康保護規則，雇主應使醫護人員與勞工健康服務相關人員，配合職業安全衛生、人力資源管理及相關部門人員訪視現場，辦理哪些事項？', [
+    ['辨識與評估工作場所環境、作業及組織內部影響勞工身心健康之危害因子，並提出改善措施建議', 4],
+    ['提出作業環境安全衛生設施改善規劃之建議', 4],
+    ['調查勞工健康情形與作業之關連性，並採取必要之預防及健康促進措施', 4],
+    ['提供復工勞工之職能評估、職務再設計或調整之諮詢及建議', 4],
+    ['其他經中央主管機關指定公告者；並說明訪視結果應作成紀錄、跨部門合作', 4]
+  ], '依勞工健康保護規則，雇主應使醫護人員及勞工健康服務相關人員臨場服務時，會同職業安全衛生、人力資源管理及相關部門人員訪視現場，辦理下列事項：<br>一、辨識與評估工作場所環境、作業及組織內部影響勞工身心健康之危害因子，並提出改善措施之建議。<br>二、提出作業環境安全衛生設施改善規劃之建議。<br>三、調查勞工健康情形與作業之關連性，並採取必要之預防及健康促進措施。<br>四、提供復工勞工之職能評估、職務再設計或調整之諮詢及建議。<br>五、其他經中央主管機關指定公告者。<br>（臨場服務辦理情形應作成紀錄並保存，作為改善追蹤依據。）'),
+
+  // ===== 近年可能考題 =====
+  EX('f_law1', 'law', 'con_lawA', 25, '近年可能考題', '職業安全衛生法於 114 年 12 月修正，新增職場霸凌相關規定。請說明雇主為預防勞工執行職務因他人行為遭受身體或精神不法侵害（含職場霸凌），應採取哪些措施？', [
+    ['辨識及評估危害，並依事業規模訂定預防計畫', 5],
+    ['適當配置作業場所、依工作適性適當調整人力', 5],
+    ['建構行為規範、辦理危害預防及溝通技巧訓練', 5],
+    ['建立事件之處理程序（申訴管道、調查、保密、不利處分禁止、受害者協助）', 5],
+    ['執行成效之評估及改善，執行紀錄留存 3 年；並說明修法新增職場霸凌專章、施行日期另定', 5]
+  ], '一、法源：職業安全衛生法第 6 條第 2 項第 3 款及職業安全衛生設施規則第 324 條之 3，雇主應採取暴力預防措施，作成執行紀錄並留存 3 年：(1) 辨識及評估危害；(2) 適當配置作業場所；(3) 依工作適性適當調整人力；(4) 建構行為規範；(5) 辦理危害預防及溝通技巧訓練；(6) 建立事件之處理程序；(7) 執行成效之評估及改善；(8) 其他有關安全衛生事項。<br>二、處理程序重點：明確的申訴管道（含主管為行為人時的替代管道）、公正調查、保密、禁止對申訴人不利處分、對受害者提供醫療心理協助與工作調整、懲處與預防再發。<br>三、修法趨勢：114 年 12 月 19 日修正公布之職業安全衛生法增訂職場霸凌相關專章與條文，強化雇主預防及處理義務、外部申訴機制，施行日期由行政院定之；作答時可補充說明，並以施行後之子法規定為準。'),
+  EX('f_mon1', 'oheMon', 'con_oheMonC', 25, '近年可能考題', '請說明「臨時性作業」、「作業時間短暫」、「作業期間短暫」之定義，並說明這類作業如何評估勞工暴露，以及直讀式儀器與定量暴露推估模式的運用與限制。', [
+    ['臨時性作業：正常作業以外之作業，作業期間不超過 3 個月，且 1 年內不再重覆', 3],
+    ['作業時間短暫：每日作業時間在 1 小時以內', 3],
+    ['作業期間短暫：作業期間不超過 1 個月，且確知作業終了日起 6 個月內不再實施', 3],
+    ['評估方式：若不致超出容許暴露標準，得免定期監測，但仍應實施至少 1 次監測，或以直讀式儀器、定量暴露推估等有效方法評估', 5],
+    ['直讀式儀器：即時讀值、可找出高濃度時段與洩漏點；但有干擾、選擇性與校正問題，需定期校正並確認適用性', 6],
+    ['定量暴露推估模式：依使用量、揮發性、通風條件推估濃度，快速低成本；但依賴假設與輸入參數，結果需保守判讀並以實測驗證', 5]
+  ], '一、定義：(1) 臨時性作業：正常作業以外之作業，其作業期間不超過 3 個月，且 1 年內不再重覆者；(2) 作業時間短暫：雇主使勞工每日作業時間在 1 小時以內者；(3) 作業期間短暫：作業期間不超過 1 個月，且確知自該作業終了日起 6 個月，不再實施該作業者。<br>二、評估方式：屬上述作業且勞工暴露不致超出容許暴露標準者，得不受定期監測之限制，但仍須實施作業環境監測至少 1 次，或運用直讀式儀器監測、定量暴露推估模式等有效評估勞工暴露濃度之方法。<br>三、直讀式儀器：優點為即時讀值、可找出高濃度作業時段與洩漏點、可作警報；限制為可能受其他氣體干擾、選擇性與精確度有限、需依原廠規定校正並確認量測範圍。<br>四、定量暴露推估模式：依化學品使用量、蒸氣壓、作業時間、通風量等參數推估暴露濃度，快速且成本低；限制為依賴模式假設與參數正確性，結果宜保守判讀，必要時以實測驗證。<br>（勞工作業環境監測實施辦法於 115 年修正，細節以現行條文為準。）'),
+  EX('f_hlth1', 'oheHlth', 'con_oheHlthC', 25, '近年可能考題', '請說明雇主預防輪班、夜間工作、長時間工作等異常工作負荷促發疾病的執行流程。', [
+    ['辨識及評估高風險群：健康檢查結果、心血管疾病風險評估、過負荷問卷', 5],
+    ['評估工作負荷：工作時間與加班時數、輪班夜班型態、工作壓力與環境因素', 5],
+    ['安排醫師面談及健康指導，依風險分級管理', 5],
+    ['調整或縮短工作時間、更換工作內容，並採取健康促進措施', 5],
+    ['實施成效評估及改善，執行紀錄留存 3 年', 5]
+  ], '一、法源：職業安全衛生法第 6 條第 2 項第 2 款及職業安全衛生設施規則第 324 條之 2。<br>二、流程：(1) 辨識及評估高風險群：依健康檢查結果（血壓、血脂、血糖等）以心血管疾病風險評估工具估算風險，搭配過負荷量表；(2) 工作負荷評估：統計工作時間與加班時數、輪班與夜間工作型態、出差、工作壓力及環境（高溫、噪音）；(3) 安排醫師面談及健康指導：依個人風險與工作負荷綜合分級，由醫護人員面談並提供建議；(4) 調整或縮短工作時間及更換工作內容之措施；(5) 實施健康檢查、管理及促進（運動、戒菸、減重、睡眠）；(6) 執行成效之評估及改善；(7) 其他有關安全衛生事項。<br>三、執行紀錄應留存 3 年。'),
+  EX('f_eng1', 'iseEng', 'con_iseEngC', 25, '近年可能考題', '近年工廠化學品火災造成消防人員重大傷亡。請說明有機過氧化物的危害特性，以及事業單位在儲存管理與火災應變上應採取的措施。', [
+    ['危害特性：熱不穩定，可自加速分解（SADT），分解產生大量熱與氣體，可能爆炸、劇烈燃燒，對撞擊摩擦敏感', 6],
+    ['儲存管理：溫度控制、與其他物品隔離分區、限制儲存數量、避免熱源與污染、通風', 6],
+    ['危害通識：標示與 SDS、化學品清單，並提供消防機關化學品種類、數量及位置資訊', 5],
+    ['火災應變：緊急應變計畫、救災資訊即時提供、劃定警戒區、避免救災人員貿然進入', 4],
+    ['管理：變更管理、人員教育訓練與定期演練', 4]
+  ], '一、危害特性：有機過氧化物分子含 -O-O- 結構，熱不穩定；當溫度超過自加速分解溫度（SADT）時，分解反應放熱而加速，產生大量熱與氣體，可能引起劇烈燃燒或爆炸；部分對撞擊、摩擦敏感，與還原劑、酸鹼、金屬接觸會加速分解；依 CNS 15030 分 A 至 G 型。<br>二、儲存管理：依 SDS 控制儲存溫度（必要時冷藏並設溫度警報）、獨立倉庫或分區隔離、遠離熱源與火源、限制儲存數量並依公共危險物品管理規定設置、保持通風、先進先出避免久存。<br>三、危害通識與資訊揭露：容器標示、SDS、危害性化學品清單；依消防法規向消防機關申報，並建立現場化學品種類、數量與位置圖，供救災即時取用。<br>四、火災應變：訂定緊急應變計畫，指派專人於火災時向消防指揮官說明化學品資訊；劃定警戒區並疏散；避免救災人員在不明狀況下進入高風險區。<br>五、管理：製程與儲量變更須經變更管理評估；定期教育訓練與聯合演練。'),
+  EX('f_mgt1', 'iseMgt', 'con_iseMgtC', 25, '近年可能考題', '請說明事業單位如何對承攬商進行全週期的安全衛生管理（選商、施工前、施工中、完工）。', [
+    ['選商階段：評估承攬商安全衛生績效與資格，並將安全衛生要求納入契約', 5],
+    ['施工前：事前告知危害因素與應採取措施、召開協議組織會議、施工前教育訓練與入廠管制', 5],
+    ['施工中：工作許可制度（動火、侷限空間、高處、吊掛）、巡視檢查與工作連繫調整', 5],
+    ['違規處置與事故通報：停工、罰則、再教育，事故調查與通報', 5],
+    ['完工後：驗收、承攬商績效評鑑並作為下次選商依據', 5]
+  ], '一、選商：審查承攬商的安全衛生管理制度、過去職災紀錄、人員資格與證照；招標文件與契約訂明安全衛生要求、經費與違約罰則。<br>二、施工前：依職業安全衛生法第 26 條事前告知工作環境、危害因素及應採取之措施；共同作業時依第 27 條設置協議組織並指定工作場所負責人；實施施工前安全衛生教育訓練與危害告知；人員、機具入廠檢查與管制。<br>三、施工中：危險作業採工作許可制度（動火、侷限空間、高處作業、吊掛、電氣作業）；工作之連繫與調整；工作場所巡視；相關承攬事業間安全衛生教育之指導及協助；作業前危害告知與自主檢查。<br>四、違規與事故：違規時要求立即改善或停工、依契約處罰並再教育；發生事故依法通報並調查原因、水平展開。<br>五、完工：驗收時確認現場復原；評鑑承攬商安全衛生績效，作為日後選商依據，形成持續改善循環。'),
+  EX('f_mgt2', 'iseMgt', 'con_iseMgtC', 25, '近年可能考題', '請說明安全衛生績效的領先指標與落後指標，各舉例說明，並說明建立績效指標的原則。', [
+    ['落後指標定義：衡量已發生的損失結果', 6],
+    ['落後指標舉例：失能傷害頻率 FR、嚴重率 SR、綜合傷害指數 FSI、職業病件數', 6],
+    ['領先指標定義與舉例：衡量預防作為，如虛驚通報數、稽核與巡檢完成率、訓練完成率、改善完成率、風險評估覆蓋率', 6],
+    ['比較：落後指標具客觀性但屬事後；領先指標可預警並引導改善，但需避免流於形式', 4],
+    ['建立原則：SMART（具體、可量測、可達成、相關、有時限），兩類指標搭配並定期檢討', 3]
+  ], '一、落後指標（lagging indicators）：衡量已經發生的事故與損失，反映過去績效。例如失能傷害頻率 FR（每百萬工時失能傷害次數）、失能傷害嚴重率 SR（每百萬工時損失日數）、綜合傷害指數 FSI = √(FR × SR / 1000)、職業病件數、事故損失金額。<br>二、領先指標（leading indicators）：衡量預防性作為的執行情形，可在事故發生前預警。例如虛驚事件通報數、巡檢與稽核完成率、安全觀察次數、教育訓練完成率、風險評估覆蓋率、缺失改善如期完成率、管理階層巡視次數。<br>三、比較：落後指標客觀、易比較，但事故少時統計意義低且屬事後；領先指標能引導日常管理與文化，但需定義清楚，避免只追求數量。<br>四、建立原則：符合 SMART 原則；領先與落後指標並用；與安全衛生政策及目標連結；定期於管理審查檢討並調整。'),
+  EX('f_erg1', 'iseErg', 'con_iseErgC', 25, '近年可能考題', '負荷指數（Strain Index）常用於評估上肢肌肉骨骼傷病風險。請說明其計算包含哪些乘數、計算方式，以及如何判讀結果並改善。', [
+    ['六個乘數：施力強度、施力持續時間百分比、每分鐘施力次數、手部或腕部姿勢、作業速度、每日作業時間', 12],
+    ['計算：各項依評級查得乘數後相乘得 SI', 3],
+    ['判讀：SI ≤ 3 大致安全；SI ≥ 7 屬危險作業，介於中間需注意', 5],
+    ['改善：找出乘數最大的項目優先改善，如降低施力、改善手腕姿勢、減少頻率、增加休息或輪調', 5]
+  ], '一、乘數（Moore & Garg）：(1) 施力強度（IE）；(2) 施力持續時間佔週期百分比（DE）；(3) 每分鐘施力次數（EM）；(4) 手部／腕部姿勢（HWP）；(5) 作業速度（SW）；(6) 每日作業時間（DD）。<br>二、計算：觀察作業後對每項評定等級，查表得對應乘數，SI = IE × DE × EM × HWP × SW × DD。<br>三、判讀：SI ≤ 3 屬安全作業；SI ≥ 7 屬危險作業，遠端上肢（手、腕、前臂）傷病風險高；介於 3～7 之間需注意並考慮改善。<br>四、改善：以乘數最大的項目為優先，例如使用輔具降低施力、調整工具與工作檯使手腕維持中立、自動化減少重複次數、放慢節拍、增加休息與作業輪調，改善後重新評估確認 SI 下降。')
+);
+
 if (typeof module !== 'undefined') module.exports = { G, UNITS, CERTS, ERR, makeQuestion, UNIT_TABLE, GENERIC_CARD, CONCEPTS, CGRP, POOL, ESSAYS, ESSAY_SUBJ };
 
 </script>
@@ -2298,7 +2499,7 @@ function home() {
   setNav('home');
   const wk = weakGens(), us = certUnits();
   const nGen = us.filter(([k, u]) => !u.con).reduce((s, [k, u]) => s + u.gens.length, 0), nCon = us.reduce((s, [k, u]) => s + (u.con || 0), 0);
-  let h = `<h1>今天想練哪一科？</h1>${certBar()}<p class="sub">目前：<b>${certName()}</b>　${nGen} 種計算題型（數據每次隨機）＋ 觀念題 ${nCon} 題。答錯會找出錯在哪，再出一題同考點的變形題給你驗證。</p><div class="grid">`;
+  let h = `<h1>今天想練哪一科？</h1>${certBar()}<p class="sub">目前：<b>${certName()}</b>　${nGen} 種計算題型（數據每次隨機）＋ 觀念題 ${nCon} 題。答錯會找出錯在哪，再出一題同考點的變形題給你驗證。</p><div class="cnote">📌 這裡的選擇題與計算題用來練觀念，<b>並非實際考題</b>；技師考試<b>全部是申論題</b>，練熟後請到<a onclick="essayHome()">「✍️ 申論題」</a>寫歷屆題與可能考題。</div><div class="grid">`;
   if (wk.length) h += `<button class="ucard" style="border:2px solid #7a3cd6" onclick="startDrill()"><span class="ic">🎯</span><b>錯題特訓</b><small>${wk.length} 個考點待加強 · 連續答對 2 次才算精熟</small></button>`;
   for (const [k, u] of us) {
     const p = pct(S.units[k]);
@@ -2306,7 +2507,7 @@ function home() {
   }
   h += `<button class="ucard yel" onclick="startUnit('all')"><span class="ic">🎲</span><b>綜合隨機</b><small>${curCert === 'all' ? '所有科目' : CERTS[curCert].n}所有考點混著出</small></button>
   <button class="ucard dark" onclick="startMock()"><span class="ic">📝</span><b>模擬考 10 題</b><small>${curCert === 'all' ? '各科混合' : CERTS[curCert].full} · 作答完才公布答案</small></button>
-  <button class="ucard" style="border:2px solid var(--ink)" onclick="essayHome()"><span class="ic">✍️</span><b>申論題 AI 批改</b><small>${ESSAYS.filter(essayInCert).length} 題 · 寫完由 AI 依評分要點逐點給分，再看參考答案</small></button></div>`;
+  <button class="ucard" style="border:2px solid var(--ink)" onclick="essayHome()"><span class="ic">✍️</span><b>申論題 AI 批改</b><small>${ESSAYS.filter(essayInCert).length} 題（含考選部歷屆題、近年可能考題）· AI 依評分要點逐點給分</small></button></div>`;
   const w = weakHtml(); if (w) h += `<div class="panel" style="margin-top:16px"><h2>📌 下次建議複習</h2>${w}</div>`;
   h += toolsHtml() + sponsor() + foot(); $('#app').innerHTML = h; calcRun();
   if (wk.length) { const te = topErr(); say('wave', `歡迎回來！你有 <b>${wk.length}</b> 個考點還沒練熟${te ? `，最常犯的是「${te[0]}」` : ''}。先來錯題特訓吧！`, [['🎯 開始錯題特訓', 'startDrill()']]); }
@@ -2376,7 +2577,7 @@ const ASK_TIPS = {
 function ask(q) {
   setNav(drill ? '' : 'home'); cur = q; cur.chosen = null;
   const extra = (drill ? `<span class="bd dr">${drill.label} ${drill.i + 1}/${drill.queue.length}</span>` : '') + (isVariant && !drill ? '<span class="bd var">變形題</span>' : '');
-  $('#app').innerHTML = `<div class="panel">${qHead(q, extra)}${optsHtml(q, 'answer')}${!q.isCon ? calcBox() : ''}
+  $('#app').innerHTML = `<div class="panel">${CON_NOTE}${qHead(q, extra)}${optsHtml(q, 'answer')}${!q.isCon ? calcBox() : ''}
   <div class="row"><button class="btn ghost" onclick="showHint(this)">💡 給我一點提示</button><button class="btn ghost" onclick="go('home')">${drill ? '結束特訓' : '回單元選單'}</button></div></div><div id="fb"></div>` + sponsor();
   window.scrollTo(0, 0);
   const g = S.gens[q.gen];
@@ -2412,6 +2613,7 @@ function feedback(q, i) {
   if (q.formula.expr !== '—') h += `<div class="sc"><b class="t">步驟 2｜核心公式與口訣</b><div class="formula">${q.formula.expr}</div><dl class="kv"><dt>變數</dt><dd>${q.formula.vars}</dd><dt>適用條件</dt><dd>${q.formula.cond}</dd><dt>白話</dt><dd>${q.formula.plain}</dd><dt>口訣</dt><dd><b>${q.formula.mnemonic}</b></dd></dl></div>`;
   h += `<div class="sc"><b class="t">步驟 3｜代入與單位檢核</b><ol class="steps">${q.steps.map(s => `<li>${s}</li>`).join('')}</ol><p style="margin:8px 0 0">🔎 合理性檢查：${q.check}</p></div></div>`;
   h += `<div class="stage"><h3><span>階段三</span>30 秒精華觀念卡</h3><div class="card30">${card(q, o)}</div></div></div>`;
+  if (!o.correct && !mock) h += weakAdvice([q.unit], '這題錯了，需要加強');
   return h;
 }
 function card(q, o) {
@@ -2437,7 +2639,7 @@ function startMock() {
 }
 function mockQ() {
   const q = mock.list[mock.i]; cur = q;
-  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel"><div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${!q.isCon ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>` + sponsor();
+  $('#app').innerHTML = `<div class="prog"><i style="width:${mock.i * 10}%"></i></div><div class="panel">${mock.i === 0 ? CON_NOTE : ''}<div class="badges"><span class="bd lv">第 ${mock.i + 1} / 10 題</span></div>${qHead(q)}${optsHtml(q, 'mockAns')}${!q.isCon ? calcBox() : ''}<div class="row"><button class="btn ghost" onclick="go('home')">放棄模擬考</button></div></div>` + sponsor();
   window.scrollTo(0, 0);
 }
 function mockAns(i) {
@@ -2454,6 +2656,7 @@ function mockEnd() {
   let h = `<h1>模擬考成績：${sc * 10} 分</h1><p class="sub">${sc >= 6 ? '及格！' : '還差一點，'}答錯的題目點開可以看完整解析。（範圍：${certName()}）</p>`;
   h += `<div class="stat"><div><b>${sc}/10</b><small>答對題數</small></div>${Object.entries(et).map(([k, v]) => `<div><b>${v}</b><small>${k}</small></div>`).join('')}</div>`;
   if (wrongGens.length) h += `<div class="panel" style="border:2px solid #7a3cd6"><h2>🎯 針對這次錯題特訓</h2><p style="margin-top:0">建議優先複習：${wuS.map(([u, n]) => `<b>${UNITS[u].icon} ${UNITS[u].name}</b>（錯 ${n} 題）`).join('、')}。<br>特訓會把這 ${wrongGens.length} 個考點各換數據再出 2 次，答錯的會馬上再練一次。</p><div class="row"><button class="btn pri" onclick="startDrill(${JSON.stringify(wrongGens).replace(/"/g, '&quot;')})">開始錯題特訓（${Math.max(wrongGens.length * 2, 6)} 題起）</button></div></div>`;
+  if (wuS.length) h += weakAdvice(wuS.slice(0, 4).map(x => x[0]), '這次模擬考需要加強的地方（錯最多的前 4 個單元）');
   h += `<div class="panel">`;
   l.forEach((q, n) => { const o = q.opts[q.chosen]; h += `<details class="rv"><summary>${o.correct ? '✔' : '✘'} 第 ${n + 1} 題｜${q.title}${o.correct ? '' : `<span class="bd" style="margin-left:6px;background:var(--ngbg);color:var(--ng)">${o.type}</span>`}</summary><div style="margin-top:10px">${qHead(q)}${feedback(q, q.chosen)}<button class="btn yel" onclick="startGen('${q.gen}')">▶ 練這個考點的變形題</button></div></details>`; });
   h += `</div><div class="row"><button class="btn" onclick="startMock()">再考一次</button><button class="btn ghost" onclick="go('rec')">看學習紀錄</button></div>` + sponsor() + foot();
@@ -2623,6 +2826,22 @@ const ESSAY_MAX = 3000;
 let essayCur = null, essaySubj = null;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const essayById = id => ESSAYS.find(q => q.id === id);
+let essayFilter = 'all';
+const srcKind = q => q.src === '基礎練習' ? 'base' : /可能/.test(q.src) ? 'hot' : 'past';
+const srcBadge = q => `<span class="bd src ${srcKind(q)}">${srcKind(q) === 'past' ? '📜 歷屆 ' : srcKind(q) === 'hot' ? '🔥 ' : '📘 '}${esc(q.src)}</span>`;
+const MOEX_Q = 'https://wwwq.moex.gov.tw/exam/wFrmExamQandASearch.aspx';
+// 單元 → 申論考科（lawA/lawB/lawC → law；其他去掉結尾 C/K）
+const unitSubj = u => /^law/.test(u) ? 'law' : u.replace(/[CK]$/, '');
+function essayPicks(subj, n) {
+  const sc = q => { const r = S.essay[q.id]; return (r ? r.last / q.score : -1) + (srcKind(q) === 'past' ? -0.5 : srcKind(q) === 'hot' ? -0.3 : 0); };
+  return ESSAYS.filter(q => q.subj === subj).sort((a, b) => sc(a) - sc(b)).slice(0, n);
+}
+// 需要加強的地方：依答錯的單元列出觀念特訓與申論常考題
+function weakAdvice(units, title) {
+  const us = [...new Set(units)].filter(u => UNITS[u]); if (!us.length) return '';
+  return `<div class="panel weak"><h2>📌 ${title || '需要加強的地方'}</h2><ul style="padding-left:20px;margin:0">${us.map(u => { const sj = unitSubj(u), es = ESSAY_SUBJ[sj] ? essayPicks(sj, 2) : []; return `<li><b>${UNITS[u].icon} ${UNITS[u].name}</b><br><button class="btn ghost" onclick="startUnit('${u}')">再練這單元</button>${es.map(q => `<button class="btn ghost" onclick="essayAsk('${q.id}')">✍️ 申論：${esc(q.title.slice(0, 18))}…</button>`).join('')}</li>`; }).join('')}</ul><p style="font-size:13px;color:var(--mute);margin-bottom:0">選擇題只檢查觀念；技師考試是申論題，觀念弄懂後請到申論題用自己的話寫一次。</p></div>`;
+}
+const CON_NOTE = `<div class="cnote">📌 觀念題：選擇題只用來建立觀念，並非實際考題；<b>技師考試全部是申論題</b>。<a onclick="essayHome()">去寫申論題 ›</a></div>`;
 const essayInCert = q => { const c = ESSAY_SUBJ[q.subj].cert; return curCert === 'all' || c === curCert || (c === 'law' && curCert !== 'law'); };
 function essayDraft(id, v) {
   try { const d = JSON.parse(localStorage.getItem('pe_essay_draft') || '{}'); if (v === undefined) return d[id] || ''; if (v) d[id] = v; else delete d[id]; localStorage.setItem('pe_essay_draft', JSON.stringify(d)); } catch (e) { return ''; }
@@ -2633,11 +2852,13 @@ function essayHome(subj) {
   mock = null; drill = null; essayCur = null; essaySubj = subj || null; setNav('essay');
   const subs = Object.entries(ESSAY_SUBJ).filter(([k, s]) => curCert === 'all' || s.cert === curCert || (s.cert === 'law' && curCert !== 'law'));
   const qs = ESSAYS.filter(essayInCert), done = qs.filter(q => S.essay[q.id]);
-  let h = `<h1>✍️ 申論題 AI 批改</h1>${certBar().replace(/setCert\('(\w+)'\)/g, "setCert('$1');essayHome()")}<p class="sub">目前：<b>${certName()}</b>　共 ${qs.length} 題（每題 25 分）。在作答欄寫完按「交卷批改」，AI 會依評分要點逐點給分、指出缺漏，再給你參考答案。AI 無法使用時，可改成對照評分要點自己評分。</p>`;
-  if (done.length) { const sum = done.reduce((s, q) => s + S.essay[q.id].last, 0), max = done.length * 25; h += `<div class="stat"><div><b>${done.length}</b><small>已作答題數</small></div><div><b>${Math.round(sum / max * 100)}%</b><small>最近一次平均得分率</small></div><div><b>${done.filter(q => S.essay[q.id].last / 25 < 0.6).length}</b><small>未達 60% 的題目</small></div></div>`; }
+  let h = `<h1>✍️ 申論題 AI 批改</h1>${certBar().replace(/setCert\('(\w+)'\)/g, "setCert('$1');essayHome()")}<p class="sub">目前：<b>${certName()}</b>　共 ${qs.length} 題：📜 歷屆題 ${qs.filter(q => srcKind(q) === 'past').length}、🔥 近年可能考題 ${qs.filter(q => srcKind(q) === 'hot').length}、📘 基礎練習 ${qs.filter(q => srcKind(q) === 'base').length}。歷屆題依考選部試題改寫，原題請至<a href="${MOEX_Q}" target="_blank" rel="noopener">考選部考畢試題查詢</a>。在作答欄寫完按「交卷批改」，AI 會依評分要點逐點給分、指出缺漏，再給你參考答案。AI 無法使用時，可改成對照評分要點自己評分。</p>`;
+  if (done.length) { const sum = done.reduce((s, q) => s + S.essay[q.id].last, 0), max = done.reduce((s, q) => s + q.score, 0); h += `<div class="stat"><div><b>${done.length}</b><small>已作答題數</small></div><div><b>${Math.round(sum / max * 100)}%</b><small>最近一次平均得分率</small></div><div><b>${done.filter(q => S.essay[q.id].last / q.score < 0.6).length}</b><small>未達 60% 的題目</small></div></div>`; }
+  h += `<div class="efil" role="group" aria-label="題目來源">${[['all', '全部'], ['past', '📜 歷屆題'], ['hot', '🔥 可能考題'], ['base', '📘 基礎練習'], ['todo', '尚未作答'], ['low', '未達 60%']].map(([k, n]) => `<button class="${essayFilter === k ? 'on' : ''}" onclick="essayFilter='${k}';essayHome()">${n}</button>`).join('')}</div>`;
+  const fil = q => essayFilter === 'all' || srcKind(q) === essayFilter || (essayFilter === 'todo' && !S.essay[q.id]) || (essayFilter === 'low' && S.essay[q.id] && S.essay[q.id].last / q.score < 0.6);
   for (const [k, s] of subs) {
-    const list = ESSAYS.filter(q => q.subj === k);
-    h += `<div class="panel"><h2>${s.icon} ${s.n}${curCert === 'all' ? ` <small style="font-weight:500;color:var(--mute)">${CERTS[s.cert].icon} ${CERTS[s.cert].n}</small>` : ''}</h2>${list.map(q => { const r = S.essay[q.id]; const p = r ? Math.round(r.last / q.score * 100) : null; return `<button class="eq" onclick="essayAsk('${q.id}')"><span>${esc(q.title)}</span><small>${r ? `最近 ${r.last}／${q.score}（${p}%）・最佳 ${r.best}・作答 ${r.n} 次` : essayDraft(q.id) ? '📝 有草稿' : '尚未作答'}</small>${r ? `<div class="bar"><i style="width:${p}%;background:${p >= 80 ? 'var(--ok)' : p >= 60 ? 'var(--hi)' : 'var(--ng)'}"></i></div>` : ''}</button>`; }).join('')}</div>`;
+    const list = ESSAYS.filter(q => q.subj === k && fil(q)); if (!list.length) continue;
+    h += `<div class="panel"><h2>${s.icon} ${s.n}${curCert === 'all' ? ` <small style="font-weight:500;color:var(--mute)">${CERTS[s.cert].icon} ${CERTS[s.cert].n}</small>` : ''}</h2>${list.map(q => { const r = S.essay[q.id]; const p = r ? Math.round(r.last / q.score * 100) : null; return `<button class="eq" onclick="essayAsk('${q.id}')">${srcBadge(q)} <span class="bd">${q.score} 分</span><br><span>${esc(q.title)}</span><small>${r ? `最近 ${r.last}／${q.score}（${p}%）・最佳 ${r.best}・作答 ${r.n} 次` : essayDraft(q.id) ? '📝 有草稿' : '尚未作答'}</small>${r ? `<div class="bar"><i style="width:${p}%;background:${p >= 80 ? 'var(--ok)' : p >= 60 ? 'var(--hi)' : 'var(--ng)'}"></i></div>` : ''}</button>`; }).join('')}</div>`;
   }
   h += `<details class="panel"><summary><b>⚙️ AI 批改設定</b>　<small style="color:var(--mute)">${gradeApi() ? '已設定批改服務' : '尚未設定：目前只能自己評分'}</small></summary><p style="font-size:14px">填入 AI 批改服務（Cloudflare Worker）網址，只存在這台裝置。</p><div class="row" style="margin-top:0"><input id="gapi" value="${esc(gradeApi())}" placeholder="https://xxx.workers.dev" style="flex:1;min-width:220px;font:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:10px"><button class="btn" onclick="try{localStorage.setItem('pe_grade_api',document.getElementById('gapi').value.trim())}catch(e){};essayHome()">儲存</button></div></details>`;
   h += sponsor() + foot(); $('#app').innerHTML = h; window.scrollTo(0, 0);
@@ -2647,7 +2868,7 @@ function essayHome(subj) {
 function essayAsk(id) {
   const q = essayById(id); if (!q) return essayHome(); essayCur = q; setNav('essay');
   const s = ESSAY_SUBJ[q.subj], d = essayDraft(id);
-  $('#app').innerHTML = `<div class="panel"><div class="badges"><span class="bd">${CERTS[s.cert].icon} ${CERTS[s.cert].n}・${s.n}</span><span class="bd lv">配分 ${q.score} 分</span></div><div class="stem">${esc(q.title)}</div>
+  $('#app').innerHTML = `<div class="panel"><div class="badges"><span class="bd">${CERTS[s.cert].icon} ${CERTS[s.cert].n}・${s.n}</span><span class="bd lv">配分 ${q.score} 分</span>${srcBadge(q)}</div><div class="stem">${esc(q.title)}</div>${srcKind(q) === 'past' ? `<p style="font-size:13px;color:var(--mute);margin:4px 0 0">題目依考選部歷屆試題改寫，原題請見<a href="${MOEX_Q}" target="_blank" rel="noopener">考選部考畢試題查詢</a>。</p>` : ''}
   ${ESSAY_NOTE}<textarea id="eans" class="eans" maxlength="${ESSAY_MAX}" placeholder="在這裡作答。建議分點寫：一、… 二、…，每點先寫關鍵字，再補一兩句說明。" oninput="essayInput()">${esc(d)}</textarea>
   <div class="ecount"><span id="ecnt">${d.length}</span> / ${ESSAY_MAX} 字　草稿會自動存在這台裝置</div>
   <div class="row"><button class="btn pri" id="egrade" onclick="essayGrade()">📤 交卷批改</button><button class="btn" onclick="essaySelf()">✅ 對照要點自己評分</button><button class="btn ghost" onclick="essayHome()">回題目列表</button></div></div><div id="efb"></div>` + sponsor();
@@ -2718,6 +2939,7 @@ function essayResult(q, pts, o) {
   const tips = (o.tips || []).filter(Boolean);
   if (tips.length) h += `<div class="card30"><h4>📈 怎麼寫能多拿分</h4><ul style="margin:0;padding-left:20px">${tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`;
   else if (miss.length) h += `<div class="card30"><h4>📈 下次補上這些要點</h4><ul style="margin:0;padding-left:20px">${miss.map(([p, i]) => `<li>${esc(q.pts[i][0])}（${p.max - p.got} 分）</li>`).join('')}</ul></div>`;
+  if (miss.length) { const more = essayPicks(q.subj, 3).filter(x => x.id !== q.id).slice(0, 2); h += `<div class="panel weak" style="margin-top:12px"><h2>📌 需要加強的地方</h2><p style="margin-top:0">這次缺了 <b>${miss.length}</b> 個要點，共少拿 ${Math.round(miss.reduce((s, [p]) => s + p.max - p.got, 0) * 2) / 2} 分。先看下方參考答案，把缺的要點用自己的話補進答案再交一次。</p>${G[q.link] ? `<button class="btn ghost" onclick="startDrill(['${q.link}'])">🎯 練「${UNITS[genUnit(q.link)].name}」觀念題</button>` : ''}${more.map(x => `<button class="btn ghost" onclick="essayAsk('${x.id}')">✍️ 同科再寫：${esc(x.title.slice(0, 16))}…</button>`).join('')}</div>`; }
   h += `<h3 style="margin:18px 0 6px">📖 參考答案與解析</h3><div class="eref">${q.ref}</div>
   <p style="font-size:13px;color:var(--mute)">${o.ai ? `批改引擎：${esc(o.engine || 'AI')}。` : ''}分數僅供練習參考；法規條文與數值以全國法規資料庫現行條文為準。${pc < 60 ? '得分率未達 60%，同科觀念題已加入錯題特訓。' : ''}</p>
   <div class="row"><button class="btn pri" onclick="essayRetry()">✏️ 修改答案再交一次</button>${pc < 60 && G[q.link] ? `<button class="btn yel" onclick="startDrill(['${q.link}'])">🎯 練這科觀念題</button>` : ''}<button class="btn" onclick="essayNext()">下一題</button><button class="btn ghost" onclick="essayHome()">回題目列表</button></div></div>`;
