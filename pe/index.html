@@ -41,6 +41,7 @@ nav button{white-space:nowrap}
 .etab td:last-child,.etab th:last-child{text-align:right;white-space:nowrap;font-weight:700}.etab small{color:var(--mute)}
 .eok{color:var(--ok)}.ehalf{color:#b07800}.eng{color:var(--ng)}
 .eref{background:var(--bluebg);border-radius:10px;padding:12px 14px;font-size:15px}
+.ptimer{position:sticky;top:64px;z-index:5;display:inline-block;margin-top:8px;background:var(--ink);color:#fff;border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700}.ptimer.over{background:var(--ng)}
 .cnote{background:#fff7e0;border-left:4px solid #e0a800;border-radius:8px;padding:6px 10px;font-size:13px;color:#7a5a00;margin-bottom:10px}
 .cnote a{color:var(--blue);cursor:pointer;text-decoration:underline}
 .bd.src{background:#efe7fb;color:#5b2ca0}.bd.src.past{background:#e6f0ff;color:var(--blue)}.bd.src.hot{background:#fdecea;color:var(--ng)}
@@ -2415,7 +2416,36 @@ ESSAYS.push(
   ], '一、乘數（Moore & Garg）：(1) 施力強度（IE）；(2) 施力持續時間佔週期百分比（DE）；(3) 每分鐘施力次數（EM）；(4) 手部／腕部姿勢（HWP）；(5) 作業速度（SW）；(6) 每日作業時間（DD）。<br>二、計算：觀察作業後對每項評定等級，查表得對應乘數，SI = IE × DE × EM × HWP × SW × DD。<br>三、判讀：SI ≤ 3 屬安全作業；SI ≥ 7 屬危險作業，遠端上肢（手、腕、前臂）傷病風險高；介於 3～7 之間需注意並考慮改善。<br>四、改善：以乘數最大的項目為優先，例如使用輔具降低施力、調整工具與工作檯使手腕維持中立、自動化減少重複次數、放慢節拍、增加休息與作業輪調，改善後重新評估確認 SI 下降。')
 );
 
-if (typeof module !== 'undefined') module.exports = { G, UNITS, CERTS, ERR, makeQuestion, UNIT_TABLE, GENERIC_CARD, CONCEPTS, CGRP, POOL, ESSAYS, ESSAY_SUBJ };
+// ---------- 年度考卷：補齊整份 113 年考卷所需題目 ----------
+ESSAYS.push(
+  EX('p113ih4', 'iseIH', 'con_iseIHC', 25, '113 年工業安全技師', '危害性化學品評估及分級管理辦法規定，雇主使勞工製造、處置或使用符合 CNS 15030 分類具有健康危害之化學品，應評估其危害及暴露程度，劃分風險等級，並採取對應之分級管理措施。請解釋何謂化學品暴露評估及分級管理？並說明危害性化學品如何配合法規進行分層管理、執行暴露評估及分級管理。', [
+    ['暴露評估：以定性、半定量或定量方式，評估勞工暴露於化學品之程度', 5],
+    ['分級管理：依危害與暴露程度劃分風險等級，採取對應的控制措施（工程控制、管理措施、防護具）', 5],
+    ['分層一：有容許暴露標準者，以作業環境監測或定量推估評估暴露濃度，並與容許暴露標準比較', 5],
+    ['依暴露濃度分級：小於 1/2 PEL、1/2 PEL 至 PEL、大於等於 PEL，各級評估頻率（3 年、1 年、3 個月）與改善要求', 6],
+    ['分層二：無容許暴露標準者，以化學品分級管理（危害群組、散布狀況、使用量）決定管理方法；並應定期（至少每 3 年）及變更時重新評估、紀錄保存', 4]
+  ], '一、暴露評估：以定性（分級管理工具）、半定量或定量（作業環境監測、定量暴露推估模式）方法，評估勞工經呼吸、皮膚等途徑暴露於化學品之程度。<br>二、分級管理：依化學品健康危害及暴露程度劃分風險等級，針對不同等級採取相對應的管理措施，例如整體換氣、局部排氣、密閉隔離、作業管理、個人防護具，或尋求專家協助。<br>三、分層管理與執行：<br>(1) 具容許暴露標準之化學品：應依作業環境監測或定量暴露推估等方式評估暴露濃度，並依結果分級：暴露濃度低於容許暴露標準 1/2 者，至少每 3 年評估 1 次；介於 1/2 與容許暴露標準之間者，至少每年評估 1 次；大於或等於容許暴露標準者，至少每 3 個月評估 1 次，並應立即採取有效控制措施，改善後再評估確認。<br>(2) 未訂容許暴露標準之化學品：採化學品分級管理（CCB），依健康危害分類劃分危害群組、依揮發度或粉塵度判定散布狀況、依使用量分級，決定對應之管理方法。<br>(3) 共通事項：化學品清單、標示與 SDS 之危害通識；評估結果及採取措施應作成紀錄並保存；製程、設備、化學品或作業條件變更時重新評估，並至少每 3 年檢討 1 次。<br>（適用規模與細節以現行條文為準。）'),
+  EX('p113law4', 'law', 'con_lawB', 20, '113 年職業衛生技師', '有關作業場所整體換氣的要求，請說明相關法規名稱及其主要內容（含換氣量之要求）。', [
+    ['職業安全衛生設施規則：工作場所應使空氣充分流通，必要時以機械通風換氣，並依每一勞工所佔氣積規定每分鐘新鮮空氣量', 6],
+    ['設施規則換氣標準：每人氣積未滿 5.7 m³ 需 0.6 m³/min 以上；5.7～14.2 需 0.4；14.2～28.3 需 0.3；28.3 以上需 0.14', 4],
+    ['有機溶劑中毒預防規則：整體換氣裝置換氣能力 第一種 Q = 0.3W、第二種 Q = 0.04W、第三種 Q = 0.01W（Q：m³/min，W：每小時消費量 g）', 6],
+    ['其他法規：特定化學物質危害預防標準、粉塵危害預防標準、缺氧症預防規則等之換氣規定；並說明整體換氣之適用條件與補氣', 4]
+  ], '一、職業安全衛生設施規則：雇主對於勞工工作場所應使空氣充分流通，必要時應以機械通風設備換氣，足以調節新鮮空氣、溫度及降低有害物濃度。換氣標準依每一勞工所佔立方公尺數：未滿 5.7 m³ 者，每分鐘每一勞工所需新鮮空氣 0.6 m³ 以上；5.7 以上未滿 14.2 者，0.4 m³ 以上；14.2 以上未滿 28.3 者，0.3 m³ 以上；28.3 以上者，0.14 m³ 以上。<br>二、有機溶劑中毒預防規則：設置整體換氣裝置時，其換氣能力應依有機溶劑種類計算：第一種有機溶劑 Q = 0.3W，第二種有機溶劑 Q = 0.04W，第三種有機溶劑 Q = 0.01W（Q 為每分鐘換氣量 m³/min，W 為作業時間內 1 小時之有機溶劑或其混存物之消費量 g/h）；同時使用不同種類時，合計計算。<br>三、其他：特定化學物質危害預防標準、粉塵危害預防標準對整體換氣或局部排氣之設置規定；缺氧症預防規則要求以通風換氣維持氧氣濃度在 18% 以上（不得使用純氧換氣）。<br>四、說明：整體換氣適用於毒性低、發生量少且分散的情況，排出空氣時應規劃補充空氣，並避免排氣回流。<br>（數值以現行條文為準。）'),
+  EX('p113law5', 'law', 'con_lawA', 20, '113 年職業衛生技師', '職業安全衛生法第 6 條第 3 項授權中央主管機關訂定必要安全衛生設備與措施之標準及規則。請列舉至少 5 種依此公告之附屬法規，並說明其意旨。', [
+    ['說明授權意旨：第 6 條第 1、2 項之必要安全衛生設備與措施，由中央主管機關訂定標準及規則', 4],
+    ['列舉並說明第 1、2 種：如職業安全衛生設施規則（一般工作場所設備與措施）、營造安全衛生設施標準（營造工程墜落、倒塌等）', 6],
+    ['列舉並說明第 3、4 種：如有機溶劑中毒預防規則、特定化學物質危害預防標準、鉛中毒預防規則、粉塵危害預防標準', 6],
+    ['列舉並說明第 5 種以上：如缺氧症預防規則、高壓氣體勞工安全規則、起重升降機具安全規則、異常氣壓危害預防標準等', 4]
+  ], '一、意旨：職業安全衛生法第 6 條第 1 項要求雇主對防止機械、設備、爆炸、火災、感電、墜落、有害物等危害應有符合規定之必要安全衛生設備及措施，第 2 項要求對身心健康保護事項妥為規劃；第 3 項授權中央主管機關訂定其標準及規則，作為雇主遵循與勞動檢查之具體依據。<br>二、附屬法規舉例：(1) 職業安全衛生設施規則：一般工作場所之機械、電氣、墜落、通風、照明、危害預防及身心健康保護等設施；(2) 營造安全衛生設施標準：營造工程之墜落、倒塌崩塌、施工架、開挖、模板支撐等；(3) 有機溶劑中毒預防規則：有機溶劑作業之設施、換氣、管理與防護；(4) 特定化學物質危害預防標準：特定化學物質之設施、管理、作業主管與特殊規定；(5) 鉛中毒預防規則；(6) 粉塵危害預防標準：特定粉塵作業之設施與管理；(7) 缺氧症預防規則：缺氧危險作業之測定、換氣、作業主管與救援；(8) 高壓氣體勞工安全規則；(9) 起重升降機具安全規則；(10) 異常氣壓危害預防標準等。<br>（任列 5 種並正確說明意旨即可。）')
+);
+
+// 年度考卷：整份歷屆試題（題目依考選部試題改寫）
+const PAPERS = [
+  { id: 'y113ise_ih', year: 113, cert: 'ise', name: '工業衛生概論', min: 120, qs: ['p113ih1', 'p113ih4', 'p113ih2', 'p113ih3'] },
+  { id: 'y113ohe_law', year: 113, cert: 'ohe', name: '職業安全衛生法規與職業安全概論', min: 120, qs: ['p113law4', 'p113law5', 'p113law2', 'p113eng2', 'p113law3'] }
+];
+
+if (typeof module !== 'undefined') module.exports = { G, UNITS, CERTS, ERR, makeQuestion, UNIT_TABLE, GENERIC_CARD, CONCEPTS, CGRP, POOL, ESSAYS, ESSAY_SUBJ, PAPERS };
 
 </script>
 <script>
@@ -2427,8 +2457,8 @@ let IMG = tGender === 'm' ? IMG_M : IMG_F;
 const KEY = 'pe_tutor_v1';
 const SPONSOR = 'https://portaly.cc/o4444/support';
 let S = load();
-function blank() { return { units: {}, gens: {}, errs: {}, variant: { n: 0, c: 0 }, total: { n: 0, c: 0 }, drill: { n: 0, c: 0 }, essay: {} }; }
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.units) { s.drill = s.drill || { n: 0, c: 0 }; s.essay = s.essay || {}; return s; } } catch (e) { } return blank(); }
+function blank() { return { units: {}, gens: {}, errs: {}, variant: { n: 0, c: 0 }, total: { n: 0, c: 0 }, drill: { n: 0, c: 0 }, essay: {}, papers: {} }; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.units) { s.drill = s.drill || { n: 0, c: 0 }; s.essay = s.essay || {}; s.papers = s.papers || {}; return s; } } catch (e) { } return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
 function rec(q, ok, type, flags) {
   flags = flags || {};
@@ -2854,6 +2884,7 @@ function essayHome(subj) {
   const qs = ESSAYS.filter(essayInCert), done = qs.filter(q => S.essay[q.id]);
   let h = `<h1>✍️ 申論題 AI 批改</h1>${certBar().replace(/setCert\('(\w+)'\)/g, "setCert('$1');essayHome()")}<p class="sub">目前：<b>${certName()}</b>　共 ${qs.length} 題：📜 歷屆題 ${qs.filter(q => srcKind(q) === 'past').length}、🔥 近年可能考題 ${qs.filter(q => srcKind(q) === 'hot').length}、📘 基礎練習 ${qs.filter(q => srcKind(q) === 'base').length}。歷屆題依考選部試題改寫，原題請至<a href="${MOEX_Q}" target="_blank" rel="noopener">考選部考畢試題查詢</a>。在作答欄寫完按「交卷批改」，AI 會依評分要點逐點給分、指出缺漏，再給你參考答案。AI 無法使用時，可改成對照評分要點自己評分。</p>`;
   if (done.length) { const sum = done.reduce((s, q) => s + S.essay[q.id].last, 0), max = done.reduce((s, q) => s + q.score, 0); h += `<div class="stat"><div><b>${done.length}</b><small>已作答題數</small></div><div><b>${Math.round(sum / max * 100)}%</b><small>最近一次平均得分率</small></div><div><b>${done.filter(q => S.essay[q.id].last / q.score < 0.6).length}</b><small>未達 60% 的題目</small></div></div>`; }
+  h += paperListHtml();
   h += `<div class="efil" role="group" aria-label="題目來源">${[['all', '全部'], ['past', '📜 歷屆題'], ['hot', '🔥 可能考題'], ['base', '📘 基礎練習'], ['todo', '尚未作答'], ['low', '未達 60%']].map(([k, n]) => `<button class="${essayFilter === k ? 'on' : ''}" onclick="essayFilter='${k}';essayHome()">${n}</button>`).join('')}</div>`;
   const fil = q => essayFilter === 'all' || srcKind(q) === essayFilter || (essayFilter === 'todo' && !S.essay[q.id]) || (essayFilter === 'low' && S.essay[q.id] && S.essay[q.id].last / q.score < 0.6);
   for (const [k, s] of subs) {
@@ -2956,6 +2987,102 @@ function essayNext() {
 function essayRecHtml() {
   const qs = ESSAYS.filter(q => S.essay[q.id]); if (!qs.length) return '';
   return `<div class="panel"><h2>✍️ 申論題紀錄</h2>${qs.map(q => { const r = S.essay[q.id], p = Math.round(r.last / q.score * 100); return `<div class="lrow"><span style="font-size:13px">${ESSAY_SUBJ[q.subj].icon} ${esc(q.title.slice(0, 26))}…</span><div class="bar"><i style="width:${p}%;background:${p >= 80 ? 'var(--ok)' : p >= 60 ? 'var(--hi)' : 'var(--ng)'}"></i></div><span>${r.last}/${q.score}</span></div>`; }).join('')}<div class="row"><button class="btn" onclick="essayHome()">✍️ 繼續寫申論題</button></div></div>`;
+}
+
+// ---------- 年度考卷：整份歷屆試題，算總分並對照及格標準 ----------
+const PASS = 60;
+let paperCur = null, paperTimer = null;
+const paperById = id => PAPERS.find(p => p.id === id);
+const paperInCert = p => curCert === 'all' || curCert === p.cert || curCert === 'law';
+const PASS_RULE = `技師考試以<b>六科平均總成績滿 60 分</b>為及格；任一科 0 分（含缺考）不予及格。若當年及格人數不到全程到考人數的 16%，改取排名前 16%、總成績達 50 分且無 0 分科目者及格，<b>當年及格標準就是最後一名及格者的分數</b>（會低於 60，但不低於 50）。這裡用 60 分當目標，各年實際及格標準請查考選部榜單統計。`;
+function paperListHtml() {
+  const ps = PAPERS.filter(paperInCert); if (!ps.length) return '';
+  return `<div class="panel" style="border:2px solid var(--blue)"><h2>📅 年度考卷：測自己能不能及格</h2><p style="margin-top:0;font-size:14px">一次寫完某年某科的整份考卷（共 100 分），交卷後逐題批改、算出總分，對照及格標準 ${PASS} 分。</p>${ps.map(p => { const r = (S.papers || {})[p.id]; return `<button class="eq" onclick="paperStart('${p.id}')"><span class="bd src past">📜 ${p.year} 年</span> <span class="bd">${CERTS[p.cert].icon} ${CERTS[p.cert].n}</span><br><b>${esc(p.name)}</b>（${p.qs.length} 題・${p.min} 分鐘）<small>${r ? `最近 ${r.last} 分・最佳 ${r.best} 分・${r.best >= PASS ? '✅ 達及格標準' : '尚未達 60 分'}` : '尚未作答'}</small></button>`; }).join('')}<details style="font-size:13px;color:var(--mute)"><summary>及格標準怎麼算？</summary><p>${PASS_RULE}</p></details></div>`;
+}
+function paperStart(id) {
+  const p = paperById(id); if (!p) return essayHome(); paperCur = { p, start: Date.now(), done: false }; setNav('essay');
+  const qs = p.qs.map(essayById);
+  $('#app').innerHTML = `<div class="panel"><div class="badges"><span class="bd src past">📜 ${p.year} 年 ${CERTS[p.cert].full || CERTS[p.cert].n}</span><span class="bd lv">${esc(p.name)}・100 分</span></div>
+  <p style="margin:6px 0 0;font-size:14px">考試時間 ${p.min} 分鐘（倒數僅供參考，時間到不會自動交卷）。題目依考選部 ${p.year} 年試題改寫，原題請見<a href="${MOEX_Q}" target="_blank" rel="noopener">考選部考畢試題查詢</a>。</p>
+  <div class="ptimer" id="ptimer">⏱ 剩餘 ${p.min}:00</div>${ESSAY_NOTE}</div>
+  ${qs.map((q, n) => `<div class="panel"><div class="badges"><span class="bd lv">第 ${n + 1} 題・${q.score} 分</span></div><div class="stem">${esc(q.title)}</div><textarea id="pa${n}" class="eans" maxlength="${ESSAY_MAX}" placeholder="作答區（分點寫：一、二、三…）" oninput="paperInput(${n})">${esc(essayDraft('P:' + p.id + ':' + q.id))}</textarea><div class="ecount"><span id="pc${n}">0</span> / ${ESSAY_MAX} 字</div></div>`).join('')}
+  <div class="panel"><div class="row" style="margin-top:0"><button class="btn pri" id="psubmit" onclick="paperSubmit()">📤 整份交卷批改</button><button class="btn ghost" onclick="paperQuit()">離開（草稿會保留）</button></div><div id="pprog" style="margin-top:8px;font-size:14px"></div></div><div id="pfb"></div>` + sponsor();
+  qs.forEach((q, n) => { $('#pc' + n).textContent = $('#pa' + n).value.length; });
+  clearInterval(paperTimer); paperTimer = setInterval(() => { const el = $('#ptimer'); if (!el || !paperCur) return clearInterval(paperTimer); const left = p.min * 60 - Math.floor((Date.now() - paperCur.start) / 1000); el.textContent = left > 0 ? `⏱ 剩餘 ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` : '⏱ 時間到！可以繼續寫完再交卷'; if (left <= 0) el.classList.add('over'); }, 1000);
+  window.scrollTo(0, 0);
+  say('cross', `${p.year} 年${CERTS[p.cert].n}「${p.name}」整份考卷，共 ${qs.length} 題。<br>像正式考試一樣，先把會的寫完，<b>每題都要寫</b>（任一科 0 分就不及格），寫完按最下面的「整份交卷」。`);
+}
+function paperInput(n) { const p = paperCur && paperCur.p; if (!p) return; const t = $('#pa' + n); $('#pc' + n).textContent = t.value.length; clearTimeout(paperInput['_' + n]); paperInput['_' + n] = setTimeout(() => essayDraft('P:' + p.id + ':' + p.qs[n], t.value), 400); }
+function paperQuit() { clearInterval(paperTimer); paperCur = null; essayHome(); }
+
+async function gradeOne(q, ans) {
+  const api = gradeApi(); if (!api) throw new Error('AI 批改服務尚未設定');
+  for (let tries = 0; ; tries++) {
+    const r = await fetch(api + '/grade', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout ? AbortSignal.timeout(75000) : undefined,
+      body: JSON.stringify({ q: { title: q.title, score: q.score, points: q.pts.map(p => ({ t: p[0], s: p[1] })), ref: q.ref.replace(/<br>/g, '\n') }, answer: ans })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 429 && tries < 2 && !/今天|每日|daily/i.test(j.detail || '')) { await new Promise(res => setTimeout(res, 20000)); continue; }
+    if (!r.ok || !j.points) throw new Error(r.status === 429 ? (j.detail || 'AI 批改太頻繁或額度用完') : (j.detail || j.error || 'AI 批改失敗'));
+    return { pts: q.pts.map((p, i) => { const x = j.points.find(y => y.i === i) || {}; return { got: Math.min(p[1], Math.max(0, Number(x.got) || 0)), max: p[1], note: x.note || '' }; }), comment: j.comment || '' };
+  }
+}
+
+async function paperSubmit() {
+  const c = paperCur; if (!c || c.done) return; const p = c.p, qs = p.qs.map(essayById);
+  const ans = qs.map((q, n) => ($('#pa' + n).value || '').trim());
+  const empty = ans.map((a, n) => a ? 0 : n + 1).filter(Boolean);
+  if (empty.length && !confirmInline(`第 ${empty.join('、')} 題還沒寫，空白會以 0 分計。仍要交卷嗎？`)) return;
+  ans.forEach((a, n) => essayDraft('P:' + p.id + ':' + qs[n].id, $('#pa' + n).value));
+  c.done = true; clearInterval(paperTimer); c.mins = Math.round((Date.now() - c.start) / 60000);
+  document.querySelectorAll('textarea[id^="pa"]').forEach(t => { t.readOnly = true; });
+  const btn = $('#psubmit'); btn.disabled = true;
+  c.res = []; const prog = $('#pprog');
+  say('tablet', '整份考卷批改中，一題一題來，請稍等…');
+  for (let n = 0; n < qs.length; n++) {
+    const q = qs[n];
+    if (!ans[n]) { c.res[n] = { pts: q.pts.map(x => ({ got: 0, max: x[1], note: '空白' })), ai: true, empty: true }; continue; }
+    prog.textContent = `⏳ 批改第 ${n + 1} / ${qs.length} 題…`;
+    try { const g = await gradeOne(q, ans[n]); c.res[n] = { pts: g.pts, ai: true, comment: g.comment }; }
+    catch (e) { c.res[n] = { self: true, err: String(e.message || e).slice(0, 80) }; }
+  }
+  prog.textContent = '';
+  if (c.res.some(r => r.self)) return paperSelf();
+  paperResult();
+}
+// 原生 confirm 會擋住頁面，用頁內確認列
+function confirmInline(msg) {
+  if (confirmInline.ok) { confirmInline.ok = false; return true; }
+  $('#pprog').innerHTML = `<div class="enote" style="margin:0">${msg}<div class="row" style="margin-top:6px"><button class="btn pri" onclick="confirmInline.ok=true;paperSubmit()">仍要交卷</button><button class="btn ghost" onclick="$('#pprog').innerHTML=''">回去繼續寫</button></div></div>`;
+  return false;
+}
+function paperSelf() {
+  const c = paperCur, qs = c.p.qs.map(essayById), bad = c.res.map((r, n) => r.self ? n : -1).filter(n => n >= 0);
+  $('#pfb').innerHTML = `<div class="panel"><h2>✅ 部分題目需自己評分</h2><p class="enote" style="margin-top:0">AI 批改暫時無法使用（${esc(c.res[bad[0]].err)}），以下題目請對照評分要點自己評分。</p>${bad.map(n => `<h3 style="margin:14px 0 4px">第 ${n + 1} 題（${qs[n].score} 分）</h3>${qs[n].pts.map((pt, i) => `<div class="ept"><div><b>${i + 1}.</b> ${esc(pt[0])} <small>（${pt[1]} 分）</small></div><div class="eself">${[['full', '完整'], ['half', '部分'], ['none', '沒寫']].map(([v, l]) => `<label><input type="radio" name="ps${n}_${i}" value="${v}"${v === 'none' ? ' checked' : ''}> ${l}</label>`).join('')}</div></div>`).join('')}`).join('')}<div class="row"><button class="btn pri" onclick="paperSelfDone()">計算總分</button></div></div>`;
+  $('#pfb').scrollIntoView({ behavior: 'smooth' });
+}
+function paperSelfDone() {
+  const c = paperCur, qs = c.p.qs.map(essayById);
+  c.res = c.res.map((r, n) => !r.self ? r : { pts: qs[n].pts.map((pt, i) => { const v = (document.querySelector(`input[name="ps${n}_${i}"]:checked`) || {}).value; return { got: v === 'full' ? pt[1] : v === 'half' ? pt[1] / 2 : 0, max: pt[1], note: '自評' }; }), ai: false });
+  paperResult();
+}
+function paperResult() {
+  const c = paperCur, p = c.p, qs = p.qs.map(essayById);
+  const sc = c.res.map(r => Math.round(r.pts.reduce((s, x) => s + x.got, 0) * 2) / 2), total = Math.round(sc.reduce((a, b) => a + b, 0) * 2) / 2;
+  qs.forEach((q, n) => { if (!c.res[n].empty) essayRec(q, sc[n], c.res[n].pts); });
+  S.papers = S.papers || {}; const pr = S.papers[p.id] = S.papers[p.id] || { n: 0, best: 0, last: 0 }; pr.n++; pr.last = total; pr.best = Math.max(pr.best, total); pr.at = Date.now(); save();
+  const pass = total >= PASS, zero = total === 0, gap = Math.round((PASS - total) * 2) / 2;
+  const weakQ = qs.map((q, n) => [q, n]).filter(([q, n]) => sc[n] / q.score < 0.6);
+  let h = `<div class="panel"><div class="verdict ${pass ? 'ok' : 'ng'}">${p.year} 年「${esc(p.name)}」：<b>${total}</b> / 100 分　${pass ? '✅ 達及格標準 60 分' : zero ? '✘ 0 分，此科 0 分即不及格' : `✘ 距 60 分還差 ${gap} 分`}</div>
+  <p style="font-size:14px">作答時間約 ${c.mins} 分鐘（限時 ${p.min} 分鐘）${c.mins > p.min ? '，<b>超時了</b>，正式考試要控制時間' : ''}。${c.res.some(r => !r.ai) ? '部分題目為自評分數。' : ''}</p>
+  <table class="etab"><tr><th>題目</th><th>得分</th></tr>${qs.map((q, n) => `<tr><td><b>第 ${n + 1} 題</b> ${esc(q.title.slice(0, 40))}…${c.res[n].comment ? `<br><small>${esc(c.res[n].comment)}</small>` : ''}</td><td class="${sc[n] >= q.score * 0.8 ? 'eok' : sc[n] >= q.score * 0.6 ? 'ehalf' : 'eng'}">${sc[n]}／${q.score}</td></tr>`).join('')}</table>
+  <details style="font-size:13px;color:var(--mute)"><summary>及格標準說明</summary><p>${PASS_RULE}</p></details></div>`;
+  if (weakQ.length) h += `<div class="panel weak"><h2>📌 需要加強的地方</h2><p style="margin-top:0">以下題目得分未達 6 成，點進去看逐要點批改與參考答案，修改後單題再交一次：</p>${weakQ.map(([q, n]) => `<button class="btn ghost" onclick="essayAsk('${q.id}')">第 ${n + 1} 題（${sc[n]}／${q.score}）${esc(q.title.slice(0, 16))}…</button>`).join('')}</div>`;
+  h += `<div class="panel"><h2>📖 各題評分與參考答案</h2>${qs.map((q, n) => `<details class="rv"><summary>第 ${n + 1} 題・${sc[n]}／${q.score} 分</summary><table class="etab">${c.res[n].pts.map((x, i) => `<tr><td>${esc(q.pts[i][0])}${x.note ? `<br><small>${esc(x.note)}</small>` : ''}</td><td class="${x.got >= x.max ? 'eok' : x.got > 0 ? 'ehalf' : 'eng'}">${x.got}／${x.max}</td></tr>`).join('')}</table><div class="eref">${q.ref}</div></details>`).join('')}</div>
+  <div class="row"><button class="btn" onclick="paperStart('${p.id}')">再寫一次這份考卷</button><button class="btn ghost" onclick="essayHome()">回申論題</button></div>`;
+  $('#pfb').innerHTML = h; $('#pfb').scrollIntoView({ behavior: 'smooth' });
+  say(pass ? 'clap' : 'desk', pass ? `<b>${total}</b> 分，達到 60 分及格標準！技師考試是六科平均，其他科也要穩住。` : `<b>${total}</b> 分，距 60 分還差 <b>${gap}</b> 分。先看未達 6 成的題目缺了哪些要點，補強後再考一次。`);
 }
 
 document.addEventListener('keydown', e => {
