@@ -24,6 +24,8 @@ header{background:var(--ink);color:#fff;position:sticky;top:0;z-index:5}
 .logo .tag{background:var(--hi);color:var(--ink);font-size:12px;padding:2px 8px;border-radius:4px;font-weight:900}
 nav{margin-left:auto;display:flex;gap:4px}
 nav button{background:transparent;border:0;color:#c9d1e3;font:inherit;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer}
+nav button{white-space:nowrap}
+@media(max-width:560px){nav{margin-left:0;width:100%;overflow-x:auto;gap:2px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{padding:6px 9px;font-size:15px}}
 nav button.on,nav button:hover{background:#ffffff1a;color:#fff}
 .stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--hi) 0 14px,var(--ink) 14px 28px)}
 #fb{scroll-margin-top:80px}
@@ -143,7 +145,7 @@ main{padding-bottom:250px}
 </head>
 <body>
 <header><div class="hwrap"><div class="logo" onclick="go('home')">🔬 作業環境監測陪考小家教 <span class="tag">乙級</span></div>
-<nav><button data-v="home" onclick="go('home')">練習</button><button data-v="mock" onclick="startMock()">模擬考</button><button data-v="tools" onclick="go('tools')">計算工具</button><button data-v="rec" onclick="go('rec')">學習紀錄</button></nav></div><div class="stripe"></div></header>
+<nav><button data-v="home" onclick="go('home')">練習</button><button data-v="mock" onclick="startMock()">模擬考</button><button data-v="shuke" onclick="go('shuke')">術科</button><button data-v="tools" onclick="go('tools')">計算工具</button><button data-v="rec" onclick="go('rec')">學習紀錄</button></nav></div><div class="stripe"></div></header>
 <main id="app"></main>
 <!--SERIES-START-->
 <style>
@@ -1118,7 +1120,6 @@ G.conComA = (o = {}) => conQ(CON_COM_A, 'comA', o);
 G.conComB = (o = {}) => conQ(CON_COM_B, 'comB', o);
 
 const CERTS = {
-  all: { n: '全部', icon: '🔬', full: '化學性＋物理性全部' },
   chem: { n: '化學性', icon: '🧪', full: '化學性因子作業環境監測乙級' },
   phys: { n: '物理性', icon: '🔊', full: '物理性因子作業環境監測乙級' },
   com: { n: '共同科目', icon: '📚', full: '技能檢定共同科目' }
@@ -1167,11 +1168,11 @@ const L = 'ABCD';
 let cur = null, curUnit = null, isVariant = false, mock = null, drill = null;
 
 // ---------- 證照篩選（空／水／廢／毒） ----------
-let curCert = (() => { try { const c = localStorage.getItem('wem_cert'); return CERTS[c] ? c : 'all'; } catch (e) { return 'all'; } })();
-function setCert(c) { curCert = CERTS[c] ? c : 'all'; try { localStorage.setItem('wem_cert', curCert); } catch (e) { } home(); }
-const certUnits = () => Object.entries(UNITS).filter(([k, u]) => curCert === 'all' || u.cert === curCert);
+let curCert = (() => { try { const c = localStorage.getItem('wem_cert'); return CERTS[c] && c !== 'com' ? c : 'chem'; } catch (e) { return 'chem'; } })();
+function setCert(c) { curCert = CERTS[c] && c !== 'com' ? c : 'chem'; try { localStorage.setItem('wem_cert', curCert); } catch (e) { } const nv = document.querySelector('nav button.on'); if (nv && nv.dataset.v === 'shuke') shukeView(); else home(); }
+const certUnits = () => Object.entries(UNITS).filter(([k, u]) => u.cert === curCert || u.cert === 'com');
 const certGens = () => certUnits().flatMap(([k, u]) => u.gens);
-const certName = () => curCert === 'all' ? '化學性＋物理性＋共同科目' : CERTS[curCert].full;
+const certName = () => CERTS[curCert].full + '（含共同科目）';
 
 // 每個考點會出現的錯誤類型（抽樣建立）
 const TYPEMAP = {};
@@ -1202,7 +1203,7 @@ function tutorToggle() { clearTimeout(say._t); tutorMin = !$('#tutor').classList
 setTimeout(() => { const im = $('#timg'); if (im) im.onclick = tutorToggle; }, 0);
 
 function setNav(v) { document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); }
-function go(v) { mock = null; drill = null; if (v === 'home') home(); else if (v === 'rec') records(); else if (v === 'tools') { toolsView(); return; } window.scrollTo(0, 0); }
+function go(v) { mock = null; drill = null; if (v === 'home') home(); else if (v === 'rec') records(); else if (v === 'tools') { toolsView(); return; } else if (v === 'shuke') { shukeView(); return; } window.scrollTo(0, 0); }
 function pct(o) { return o && o.n ? Math.round(o.c / o.n * 100) : null; }
 
 function weakGens() {
@@ -1212,20 +1213,21 @@ function weakGens() {
 }
 function topErr() { const es = Object.entries(S.errs).sort((a, b) => b[1] - a[1]); return es.length ? es[0] : null; }
 function sponsor() { return `<div class="spon"><p>☕ <b>覺得好用？請作者喝杯咖啡</b><br><small style="color:var(--mute)">這個陪考網頁免費使用，贊助能支持持續新增題目與功能。</small></p><a href="${SPONSOR}" target="_blank" rel="noopener noreferrer sponsored">贊助支持</a></div>`; }
-function certBar() { return `<div class="cert" role="group" aria-label="選擇證照">${Object.entries(CERTS).map(([k, c]) => `<button class="${k === curCert ? 'on' : ''}" onclick="setCert('${k}')" title="${c.full}">${c.icon} ${c.n}</button>`).join('')}</div>`; }
+function certBar() { return `<div class="cert" role="group" aria-label="選擇證照">${Object.entries(CERTS).filter(([k]) => k !== 'com').map(([k, c]) => `<button class="${k === curCert ? 'on' : ''}" onclick="setCert('${k}')" title="${c.full}">${c.icon} ${c.n}</button>`).join('')}</div>`; }
 
 function home() {
   setNav('home');
   const wk = weakGens(), us = certUnits();
   const nGen = us.filter(([k, u]) => !u.con).reduce((s, [k, u]) => s + u.gens.length, 0), nCon = us.reduce((s, [k, u]) => s + (u.con || 0), 0);
-  let h = `<h1>今天想練哪一科？</h1>${certBar()}<p class="sub">目前：<b>${certName()}</b>　${nGen} 種計算題型（數據每次隨機）＋ 觀念題 ${nCon} 題。答錯會找出錯在哪，再出一題同考點的變形題給你驗證。</p><div class="grid">`;
+  let h = `<h1>今天想練哪一科？</h1>${certBar()}<p class="sub" style="margin-top:-4px">一般只會報考其中一類，選你要考的就好；共同科目兩類都會考。</p><p class="sub">目前：<b>${certName()}</b>　${nGen} 種計算題型（數據每次隨機）＋ 觀念題 ${nCon} 題。答錯會找出錯在哪，再出一題同考點的變形題給你驗證。</p><div class="grid">`;
   if (wk.length) h += `<button class="ucard" style="border:2px solid #7a3cd6" onclick="startDrill()"><span class="ic">🎯</span><b>錯題特訓</b><small>${wk.length} 個考點待加強 · 連續答對 2 次才算精熟</small></button>`;
   for (const [k, u] of us) {
     const p = pct(S.units[k]);
-    h += `<button class="ucard" onclick="startUnit('${k}')"><span class="ic">${u.icon}</span><b>${u.name}</b><small>${curCert === 'all' ? CERTS[u.cert].icon + ' ' : ''}${u.con ? u.con + ' 題' : u.gens.length + ' 種題型'}${p !== null ? ` · 正確率 ${p}%（${S.units[k].n} 題）` : ' · 尚未練習'}</small><div class="bar"><i style="width:${p || 0}%"></i></div></button>`;
+    h += `<button class="ucard" onclick="startUnit('${k}')"><span class="ic">${u.icon}</span><b>${u.name}</b><small>${u.cert === 'com' ? '📚 ' : ''}${u.con ? u.con + ' 題' : u.gens.length + ' 種題型'}${p !== null ? ` · 正確率 ${p}%（${S.units[k].n} 題）` : ' · 尚未練習'}</small><div class="bar"><i style="width:${p || 0}%"></i></div></button>`;
   }
-  h += `<button class="ucard yel" onclick="startUnit('all')"><span class="ic">🎲</span><b>綜合隨機</b><small>${curCert === 'all' ? '所有科目' : CERTS[curCert].n}所有考點混著出</small></button>
-  <button class="ucard dark" onclick="startMock()"><span class="ic">📝</span><b>模擬考 10 題</b><small>${curCert === 'all' ? '各科混合' : CERTS[curCert].full} · 作答完才公布答案</small></button></div>`;
+  h += `<button class="ucard yel" onclick="startUnit('all')"><span class="ic">🎲</span><b>綜合隨機</b><small>${CERTS[curCert].n}＋共同科目所有考點混著出</small></button>
+  <button class="ucard" style="border:2px solid #0b6e4f" onclick="shukeView()"><span class="ic">🧰</span><b>術科實戰要訣</b><small>${curCert === 'chem' ? '三站：校準採樣＋採樣規劃計算' : '三站：熱環境、穩定性噪音、劑量計'} · 考場重點與扣分地雷</small></button>
+  <button class="ucard dark" onclick="startMock()"><span class="ic">📝</span><b>模擬考 10 題</b><small>${CERTS[curCert].full} · 作答完才公布答案</small></button></div>`;
   const w = weakHtml(); if (w) h += `<div class="panel" style="margin-top:16px"><h2>📌 下次建議複習</h2>${w}</div>`;
   h += toolsHtml() + sponsor() + foot(); $('#app').innerHTML = h; calcRun();
   if (wk.length) { const te = topErr(); say('wave', `歡迎回來！你有 <b>${wk.length}</b> 個考點還沒練熟${te ? `，最常犯的是「${te[0]}」` : ''}。先來錯題特訓吧！`, [['🎯 開始錯題特訓', 'startDrill()']]); }
@@ -1495,6 +1497,68 @@ function toolsHtml() {
   <h2 style="margin-top:20px">📎 官方資料</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">${LINKS.map(l => `<a href="${l[1]}" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:var(--ink);background:#fafbfd;border:1px solid var(--line);border-radius:10px;padding:10px 12px"><b>${l[0]}</b><br><small style="color:var(--mute)">${l[2]}</small></a>`).join('')}</div></div>`;
 }
 function calcRun() { const o = document.getElementById('calcOut'); if (!o) return; try { o.innerHTML = TOOLS[curTool].run(); } catch (e) { o.innerHTML = '請確認輸入的數字。'; } }
+// ---------- 術科實戰要訣（依官方術科測試參考資料與考生經驗整理） ----------
+const SHUKE = {
+  chem: {
+    title: '化學性因子作業環境監測乙級・術科',
+    sum: '術科是實作＋計算：先抽「高流量（H）或低流量（L）」採樣屬性，再依屬性完成校準、採樣，最後做採樣規劃與濃度計算。',
+    stations: [
+      ['第一、二站：採樣設備校準與採樣', '90 分鐘・55 分', '流率校準並填校準紀錄表 → 依 H／L 屬性組裝採樣介質並採樣，填採樣紀錄表。'],
+      ['第三站：採樣規劃與濃度計算', '90 分鐘・45 分', '依抽到的試題規劃採樣、計算暴露濃度，判定是否符合容許濃度標準。']
+    ],
+    pass: ['三站總分 60 分以上', '第一、二站合計要拿到 55 分的一半以上', '第三站要拿到 45 分的一半以上（任一段太低就不及格，不能只靠計算撐）'],
+    tips: [
+      ['開場 10 分鐘先清點器材', '幫浦、校準器、採樣介質逐一核對，短缺或不堪用要當場提出；過了時間才發現只能自己承擔。'],
+      ['幫浦先開機暖機', '校準前先讓幫浦運轉 2～3 分鐘穩定，順便確認電力足夠。'],
+      ['皂泡計先潤濕管壁', '先抽幾個皂泡讓管壁濕潤，正式計時時泡泡才不會半路破掉；每次讀值都要記，至少量 3 次取平均。'],
+      ['校準組合＝採樣組合', '校準時就要接上與正式採樣完全相同的採樣介質（吸附管或濾紙匣），否則阻力不同、流率就不準。'],
+      ['低流量（吸附管）', '兩端都要折斷、箭頭（後段）朝幫浦；接管不可折到、漏氣。記得做現場空白。'],
+      ['高流量（濾紙匣／旋風分離器）', '濾紙方向與匣子組裝要正確，旋風分離器要保持直立；流率依方法設定（例如 10 mm 尼龍旋風 1.7 L/min）。'],
+      ['紀錄表一格都不能空', '樣本編號、起訖時間、校準前後流率、平均流率、採樣體積都要填，數字一定要加單位。'],
+      ['第三站寫法：公式 → 代入 → 答案 → 單位 → 判定', '最後一定要寫結論，例如「Σ(C/PEL) = 1.12 > 1，不符合容許濃度標準」。只寫數字沒有判定會被扣分。'],
+      ['計算機用考選部核定機型', '考前熟悉自己那台的 log、次方、記憶鍵；中間值多留幾位，最後再依題目四捨五入。']
+    ],
+    calc: ['相當 8 小時時量平均', '混合物相加效應 Σ(C/PEL)', '短時間時量平均（變量係數）', '活性碳管濃度（前後段、空白、脫附效率）', '破出判定', '第一種粉塵容許濃度', '粉塵重量法', '溫度壓力校正', '採樣前後流率與採樣體積', 'ppm ↔ mg/m³'],
+    unit: 'chemK'
+  },
+  phys: {
+    title: '物理性因子作業環境監測乙級・術科',
+    sum: '術科分三站、每站 50 分鐘，每站從題組抽一組：熱環境、穩定性噪音（噪音計）、不規則變動性噪音（噪音劑量計）。每一站都是「操作＋計算」。',
+    stations: [
+      ['第一站：熱環境監測', '50 分鐘・33 分', '架設 WBGT 儀器、讀三種溫度、算 WBGT 與時量平均 WBGT，判定高溫作業並分配作息，填監測紀錄表。'],
+      ['第二站：穩定性噪音監測', '50 分鐘・34 分', '校準噪音計、設定權衡與回應、讀音壓級，計算劑量與日時量平均音壓級（要寫計算過程）。'],
+      ['第三站：不規則變動性噪音監測', '50 分鐘・33 分', '校準並佩戴噪音劑量計、讀取劑量，計算工作日劑量與日時量平均音壓級。']
+    ],
+    pass: ['三站總分 60 分以上', '任一站低於該站總分 50%，或計算誤差超過 5%，該站就算不及格', '儀器掉到地上扣 10 分、損毀扣 15 分'],
+    tips: [
+      ['開場 10 分鐘先檢查儀器', '電池、溫度計、校準器都要確認，短缺或壞掉的要在 10 分鐘內提出更換。'],
+      ['【第一站】三支溫度計球部同高', '高度依作業姿勢決定，三支球部同一高度、相對位置合理。球部不同高或位置不合理是「全站不給分」項目。'],
+      ['【第一站】乾球要遮蔽、黑球不能擋熱源', '乾球要遮蔽輻射熱；黑球要能「看到」熱源，不可被其他溫度計或物品擋住。'],
+      ['【第一站】自然濕球包紮', '紗布包住球部、用蒸餾水保持濕潤，不強制通風；讀數誤差要在 ±0.5°C 內，等讀數穩定再讀。'],
+      ['【第一站】公式先判斷有沒有日曬', '室內或無日曬 0.7 濕球 + 0.3 黑球；戶外有日曬 0.7 濕球 + 0.2 黑球 + 0.1 乾球。公式錯或誤差 > 5% 整站零分。'],
+      ['【第二站】校準要確實', '先確認校準器電力與頻率，噪音計麥克風與校準器要密合；校準動作每錯一項就扣分，校準無效整站不給分。'],
+      ['【第二站】A 權衡、慢速、範圍選對', '權衡電網或範圍選錯整站零分。量測時麥克風朝音源，手臂伸直讓身體離開麥克風。'],
+      ['【第三站】劑量計微音器別被擋住', '佩戴在肩上靠近耳朵處，衣領、頭髮、背帶都不能遮住微音器。'],
+      ['【第三站】劑量計算三步驟', '80 dBA 以下不計 → D = Σ(t/T)，T = 8 ÷ 2^((L − 90)/5) → TWA = 16.61 log D + 90（D 用小數代入）。'],
+      ['每站都要寫計算過程', '只寫答案拿不到過程分；中間值多留位數，避免累積誤差超過 5%。計算機要用考選部核定機型。']
+    ],
+    calc: ['綜合溫度熱指數（有／無日曬）', '時量平均 WBGT 與作息判定', '噪音容許暴露時間', '噪音暴露劑量', '劑量 ↔ 日時量平均音壓級', '分貝合成與扣除背景', '均能音量 Leq'],
+    unit: 'physK'
+  }
+};
+function shukeView() {
+  mock = null; drill = null; setNav('shuke');
+  const d = SHUKE[curCert] || SHUKE.chem;
+  let h = `<h1>🧰 術科實戰要訣</h1>${certBar()}<p class="sub"><b>${d.title}</b><br>${d.sum}</p>`;
+  h += `<div class="panel"><h2>📋 考試架構</h2>${d.stations.map(s => `<p style="margin:8px 0"><b>${s[0]}</b>　<span class="bd">${s[1]}</span><br><small style="color:var(--mute)">${s[2]}</small></p>`).join('')}</div>`;
+  h += `<div class="panel" style="margin-top:12px"><h2>✅ 及格門檻</h2><ul style="margin:6px 0 0;padding-left:20px">${d.pass.map(x => `<li style="margin:4px 0">${x}</li>`).join('')}</ul></div>`;
+  h += `<div class="panel" style="margin-top:12px"><h2>💡 考場要訣與扣分地雷</h2><ol style="margin:6px 0 0;padding-left:22px">${d.tips.map(t => `<li style="margin:10px 0"><b>${t[0]}</b><br><small style="color:var(--mute);font-size:14px">${t[1]}</small></li>`).join('')}</ol></div>`;
+  h += `<div class="panel" style="margin-top:12px"><h2>🧮 術科一定要會的計算</h2><p style="margin:4px 0 10px">${d.calc.map(c => `<span class="bd" style="display:inline-block;margin:3px 4px 3px 0">${c}</span>`).join('')}</p><button class="ucard dark" style="width:100%" onclick="startUnit('${d.unit}')"><span class="ic">✍️</span><b>開始術科計算特訓</b><small>數字每次隨機，答錯會告訴你錯在哪一步</small></button></div>`;
+  h += `<p class="sub" style="margin-top:12px;font-size:13px">整理自技能檢定中心術科測試參考資料與考生經驗分享；站別、時間與配分每年可能修訂，報名後請以辦理單位寄發的術科參考資料為準（<a href="https://techbank.wdasec.gov.tw/owInform/TestReferData.aspx" target="_blank" rel="noopener">技能檢定中心測試參考資料</a>）。實作技巧仍建議到訓練單位實際操作練習。</p>`;
+  h += sponsor() + foot();
+  $('#app').innerHTML = h; window.scrollTo(0, 0);
+  say('present', curCert === 'chem' ? '化學性術科最容易失分的是<b>校準</b>和<b>紀錄表漏填</b>。計算站記得最後一定要寫「符合／不符合」！' : '物理性術科有很多「整站零分」地雷：<b>溫度計不同高、權衡選錯、校準無效、誤差超過 5%</b>。先把這幾個記熟！', [['✍️ 術科計算特訓', `startUnit('${d.unit}')`]]);
+}
 function toolsView() { mock = null; drill = null; setNav('tools'); $('#app').innerHTML = `<h1>計算工具</h1><p class="sub">練習題算完想驗證，或現場想快速估算時量平均、活性碳管濃度、噪音劑量、WBGT，都可以用這裡。</p>` + toolsHtml() + sponsor() + foot(); calcRun(); window.scrollTo(0, 0); say('present', '選一個工具、輸入數字就會即時算出來。下面有技能檢定中心、職安署和全國法規資料庫的連結，法規數值以現行條文為準。'); }
 
 // ---------- 學習紀錄 ----------
