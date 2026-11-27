@@ -933,4 +933,22 @@ function drSync(p){if(CURI==null||!DR||!DR.items[CURI]||!p)return;const it=DR.it
 function drLang(){if(DR)drRender();if(CURI!=null)$("#drBack").textContent=t("drBack",CURI+1)}
 $("#drBack").onclick=()=>{try{$("#dr").scrollIntoView({behavior:"smooth",block:"start"})}catch(e){}};
 </script>
+<!-- pingan-fb-card start -->
+<style>
+#pinganFbCard{box-sizing:border-box;max-width:560px;margin:28px auto 24px;padding:16px 18px;border-radius:14px;background:#fff;border:1px solid #d8dee6;box-shadow:0 2px 10px rgba(0,0,0,.08);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1f2933;text-align:center;line-height:1.6;position:relative;z-index:1;clear:both}
+#pinganFbCard .pfb-t{font-size:17px;font-weight:800;margin:0 0 4px}
+#pinganFbCard .pfb-d{font-size:14px;color:#52606d;margin:0 0 12px}
+#pinganFbCard a{display:inline-block;min-height:44px;line-height:44px;padding:0 22px;border-radius:999px;background:#1877f2;color:#fff!important;font-weight:700;font-size:15px;text-decoration:none}
+#pinganFbCard a:hover{background:#166fe5}
+#pinganFbCard .pfb-row{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+#pinganFbCard .pfb-qr{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#52606d}
+#pinganFbCard .pfb-qr svg{width:132px;height:132px;display:block}
+@media (max-width:600px){#pinganFbCard{margin:20px 12px 170px}}
+</style>
+<div id="pinganFbCard" role="complementary" aria-label="追蹤職安衛粉專">
+<p class="pfb-t">👍 按讚追蹤「職安衛」粉專，才能搶先看</p>
+<p class="pfb-d">不定期推出新的免費工安工具，第一時間通知你。</p>
+<div class="pfb-row"><a href="https://www.facebook.com/share/1C5UNcLiEi/" target="_blank" rel="noopener">前往粉專按讚追蹤</a><div class="pfb-qr"><svg role="img" aria-label="職安衛粉專 QR Code" xmlns="http://www.w3.org/2000/svg" width="132" height="132" class="segno"><g transform="scale(4)"><path fill="#fff" d="M0 0h33v33h-33z"/><path class="qrline" stroke="#111" d="M2 2.5h7m1 0h2m1 0h2m3 0h5m1 0h7m-29 1h1m5 0h1m1 0h1m3 0h3m3 0h1m3 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m2 0h3m2 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h5m1 0h1m2 0h1m4 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m2 0h3m1 0h1m2 0h1m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m3 0h2m1 0h2m3 0h2m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h3m3 0h1m1 0h4m-20 1h1m1 0h2m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m4 0h1m2 0h1m1 0h2m-24 1h1m1 0h4m2 0h1m1 0h5m1 0h4m3 0h1m-29 1h1m2 0h1m1 0h2m2 0h2m3 0h1m1 0h1m1 0h1m2 0h1m1 0h2m1 0h2m-28 1h4m4 0h1m4 0h2m3 0h1m4 0h2m3 0h1m-28 1h1m1 0h1m2 0h3m3 0h1m1 0h4m1 0h1m5 0h2m-27 1h1m1 0h1m2 0h1m1 0h1m2 0h3m1 0h2m1 0h3m2 0h2m2 0h3m-29 1h1m5 0h2m1 0h3m1 0h2m2 0h1m1 0h2m1 0h3m1 0h3m-28 1h1m3 0h1m4 0h1m1 0h1m1 0h1m4 0h2m2 0h2m2 0h1m-23 1h2m1 0h3m1 0h2m4 0h4m2 0h2m1 0h1m-27 1h1m2 0h1m6 0h2m4 0h1m2 0h1m2 0h1m1 0h3m-28 1h1m5 0h2m1 0h3m3 0h2m1 0h1m1 0h2m1 0h1m2 0h1m-24 1h1m1 0h1m2 0h2m7 0h1m1 0h1m1 0h2m3 0h1m-26 1h1m3 0h8m4 0h2m1 0h7m-19 1h6m4 0h1m1 0h1m3 0h5m-29 1h7m1 0h1m1 0h2m1 0h1m2 0h2m1 0h2m1 0h1m1 0h2m1 0h1m-28 1h1m5 0h1m1 0h8m2 0h1m1 0h1m3 0h2m-26 1h1m1 0h3m1 0h1m4 0h2m4 0h1m2 0h5m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h4m2 0h2m1 0h2m2 0h1m2 0h2m2 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m2 0h3m2 0h1m1 0h1m3 0h1m2 0h1m1 0h1m-29 1h1m5 0h1m5 0h1m2 0h2m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m-28 1h7m1 0h1m1 0h2m6 0h4m3 0h1m1 0h1"/></g></svg><span>手機掃碼追蹤</span></div></div>
+</div>
+<!-- pingan-fb-card end -->
 </body></html>
